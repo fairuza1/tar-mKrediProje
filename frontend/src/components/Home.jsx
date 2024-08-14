@@ -14,13 +14,13 @@ import card1 from '../assets/card1.jpg';
 import card2 from '../assets/card2.jpg';
 import card3 from '../assets/card3.jpg';
 import card4 from '../assets/card4.jpg';
-
+import card5 from '../assets/card5.jpg';
 const cards = [
     { title: 'Arazi Ekle', description: '', link: '/add-land', button: 'Arazi Ekle', image: card1 },
     { title: 'Arazilerim', description: '', button: 'Arazilerimi Görüntüle', link: '/land-list', image: card2 },
     { title: 'Veriminizi Degerlendiriniz', button: 'Verim Degerlendir', link: '/degerlendirme', image: card3 },
     { title: 'Ekim Yap', description: '', button: 'Ekim Yap', link: '/sowings', image: card4 },
-    { title: 'Card 5', description: 'Description 5', link: '/link5', image: '' },
+    { title: 'Ekilen arazilerim', description:'', button: 'Ekilen Arazileri görüntüle',  link: '/sowing-list', image: card5 },
     { title: 'Card 6', description: 'Description 6', link: '/link6', image: '' },
 ];
 

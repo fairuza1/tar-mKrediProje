@@ -15,12 +15,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios'; // axios'u import edin
 import Logo from '../assets/logo.png'; // Logo dosyasının yolu
 
-const pages = ['Add Land', 'View Lands', 'Contact', 'Signup', 'Login', 'Land List'];
+const pages = ['Add Land', 'Signup', 'Login', 'Land List', 'Sowing List'];
 
-const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada alıyoruz
+const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
-    const navigate = useNavigate(); // useNavigate hook'u ile yönlendirme
+    const navigate = useNavigate();
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -44,10 +44,9 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada al
             setIsLoggedIn(false); // Kullanıcı çıkış yaptıktan sonra isLoggedIn durumunu false olarak ayarlayın
             navigate('/login'); // Kullanıcıyı login sayfasına yönlendirin
         } catch (error) {
-            console.error('Logout failed:', error);
+            console.error('Çıkış yapma hatası:', error);
         }
     };
-
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'green' }}>
@@ -71,7 +70,6 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada al
                             textDecoration: 'none',
                             color: 'white',
                             fontFamily: 'Poppins, sans-serif',
-
                         }}
                     >
                         Ekim Rehberi
@@ -80,7 +78,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada al
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                         <IconButton
                             size="large"
-                            aria-label="account of current user"
+                            aria-label="menu"
                             aria-controls="menu-appbar"
                             aria-haspopup="true"
                             onClick={handleOpenNavMenu}
@@ -104,12 +102,11 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada al
                             onClose={handleCloseNavMenu}
                             sx={{
                                 display: { xs: 'block', md: 'none' },
-                                fontSize:'100px'
                             }}
                         >
                             {pages.map((page) => (
                                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                    <Typography textAlign="center" sx={{ fontFamily: 'Poppins, sans-serif'}}>
+                                    <Typography textAlign="center" sx={{ fontFamily: 'Poppins, sans-serif' }}>
                                         <Link to={`/${page.toLowerCase().replace(/ /g, '-')}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             {page}
                                         </Link>
@@ -118,6 +115,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada al
                             ))}
                         </Menu>
                     </Box>
+
                     <Typography
                         variant="h6"
                         noWrap
@@ -126,13 +124,15 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada al
                     >
                         Ekim Rehberi
                     </Typography>
+
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         {pages.map((page) => (
                             <Button
                                 key={page}
                                 onClick={handleCloseNavMenu}
                                 sx={{ my: 2, color: 'white', display: 'block', fontFamily: 'Poppins, sans-serif' }}
-                                component={Link} to={`/${page.toLowerCase().replace(/ /g, '-')}`}
+                                component={Link}
+                                to={`/${page.toLowerCase().replace(/ /g, '-')}`}
                             >
                                 {page}
                             </Button>
@@ -140,15 +140,13 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada al
                     </Box>
 
                     <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title="Open settings">
+                        <Tooltip title="Ayarlar">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
+                                <Avatar alt="Kullanıcı Avatarı" src="/static/images/avatar/2.jpg" />
                             </IconButton>
                         </Tooltip>
                         <Menu
-                            sx={{ mt: '45px' ,
-
-                            }}
+                            sx={{ mt: '45px' }}
                             id="menu-appbar"
                             anchorEl={anchorElUser}
                             anchorOrigin={{
@@ -166,20 +164,20 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada al
                             <MenuItem onClick={handleCloseUserMenu}>
                                 <Typography textAlign="center" sx={{ fontFamily: 'Poppins, sans-serif' }}>
                                     <Link to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                        Profile
+                                        Profil
                                     </Link>
                                 </Typography>
                             </MenuItem>
                             <MenuItem onClick={handleCloseUserMenu}>
                                 <Typography textAlign="center" sx={{ fontFamily: 'Poppins, sans-serif' }}>
                                     <Link to="/settings" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                        Settings
+                                        Ayarlar
                                     </Link>
                                 </Typography>
                             </MenuItem>
                             <MenuItem onClick={handleLogout}>
                                 <Typography textAlign="center" sx={{ fontFamily: 'Poppins, sans-serif' }}>
-                                    Logout
+                                    Çıkış Yap
                                 </Typography>
                             </MenuItem>
                         </Menu>
@@ -189,4 +187,5 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => { // setIsLoggedIn'i burada al
         </AppBar>
     );
 };
+
 export default Navbar;

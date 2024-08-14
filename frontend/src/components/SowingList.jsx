@@ -2,20 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import BreadcrumbComponent from "./BreadCrumb.jsx";
 
-const LandList = () => {
-    const [lands, setLands] = useState([]);
+const SowingList = () => {
+    const [sowings, setSowings] = useState([]);
     const [isAuthenticated, setIsAuthenticated] = useState(true); // Başlangıçta true kabul edelim
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/lands', { withCredentials: true })
+        axios.get('http://localhost:8080/sowings', { withCredentials: true })
             .then(response => {
                 console.log('Response:', response);
-                setLands(response.data);
+                setSowings(response.data);
             })
             .catch(error => {
-                console.error('Error fetching lands:', error);
+                console.error('Error fetching sowings:', error);
                 if (error.response && error.response.status === 401) {
                     setIsAuthenticated(false); // Eğer 401 Unauthorized hatası alırsanız, kullanıcı giriş yapmamış demektir
                 }
@@ -33,42 +34,40 @@ const LandList = () => {
             </Container>
         );
     }
-const  handleDetail=(id)=>{
-        navigate(`/lands/detail/${id}`);
-}
+
+    const handleDetail = (id) => {
+        navigate(`/sowings/detail/${id}`);
+    };
+
     return (
         <Container maxWidth="md">
+            <Box>
+                <BreadcrumbComponent pageName="Ekimlerim" />
+            </Box>
             <Box sx={{ mt: 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
-                    Lands List
+                    Sowings List
                 </Typography>
                 <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} aria-label="lands table">
+                    <Table sx={{ minWidth: 650 }} aria-label="sowings table">
                         <TableHead>
                             <TableRow>
                                 <TableCell>Name</TableCell>
-                                <TableCell align="right">Size (hectares)</TableCell>
-                                <TableCell align="right">City</TableCell>
-                                <TableCell align="right">District</TableCell>
-                                <TableCell align="right">Village</TableCell>
+                                <TableCell align="right">Plant</TableCell>
+                                <TableCell align="right">Date</TableCell>
                                 <TableCell align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {lands.map((land) => (
-                                <TableRow key={land.id}>
+                            {sowings.map((sowing) => (
+                                <TableRow key={sowing.id}>
                                     <TableCell component="th" scope="row">
-                                        {land.name}
+                                        {sowing.landName}
                                     </TableCell>
-                                    <TableCell align="right">{land.landSize}</TableCell>
-                                    <TableCell align="right">{land.city}</TableCell>
-                                    <TableCell align="right">{land.district}</TableCell>
-                                    <TableCell align="right">{land.village || 'N/A'}</TableCell>
+                                    <TableCell align="right">{sowing.plantName}</TableCell>
+                                    <TableCell align="right">{sowing.sowingDate}</TableCell>
                                     <TableCell align="right">
-                                        <Button variant="contained" color="primary" onClick={() => handleEdit(land.id)}>
-                                            Düzenle
-                                        </Button>
-                                        <Button variant="outlined" color="secondary" onClick={() => handleDetail(land.id)} sx={{ ml: 2 }}>
+                                        <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} sx={{ ml: 2 }}>
                                             Detay
                                         </Button>
                                     </TableCell>
@@ -82,5 +81,4 @@ const  handleDetail=(id)=>{
     );
 };
 
-export default LandList;
-
+export default SowingList;
