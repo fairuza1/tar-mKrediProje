@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import AddLand from './components/AddLand';
@@ -18,19 +17,39 @@ import './App.css';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loading, setLoading] = useState(true); // Yüklenme durumu
 
     useEffect(() => {
-        const token = Cookies.get('jwtToken');
-        if (token) {
-            setIsLoggedIn(true);
-        } else {
-            setIsLoggedIn(false);
-        }
+        const checkAuth = async () => {
+            try {
+                const response = await fetch('/auth/validate-token', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    setIsLoggedIn(true);
+                } else {
+                    setIsLoggedIn(false);
+                }
+            } catch (error) {
+                console.error('Error checking authentication:', error);
+                setIsLoggedIn(false);
+            } finally {
+                setLoading(false); // Yüklenme durumunu güncelle
+            }
+        };
+
+        checkAuth();
     }, []);
+
+    if (loading) {
+        return <div>Loading...</div>; // Yüklenme sırasında bir mesaj veya spinner gösterebilirsiniz
+    }
 
     return (
         <Router>
-            <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /> {/* setIsLoggedIn'i prop olarak geçiyoruz */}
+            <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
             <Routes>
                 <Route path="/" element={<Navigate to={isLoggedIn ? "/home" : "/login"} />} />
                 <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />

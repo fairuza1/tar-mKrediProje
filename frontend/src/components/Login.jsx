@@ -7,7 +7,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme();
 
-function Login({ setIsLoggedIn }) { // setIsLoggedIn prop olarak alınıyor
+function Login({ setIsLoggedIn }) {
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -19,16 +19,14 @@ function Login({ setIsLoggedIn }) { // setIsLoggedIn prop olarak alınıyor
             const response = await axios.post('http://localhost:8080/auth/login', { user, password }, { withCredentials: true });
             if (response.status === 200) {
                 const data = response.data;
-                // Cookie otomatik olarak gönderildiği için sadece gerekli verileri saklıyoruz
-                localStorage.setItem('userId', data.userId);
-                setError('');
-                setIsLoggedIn(true); // Oturum açma başarılı, isLoggedIn true yapılıyor
-                navigate('/home'); // Ana sayfaya yönlendiriliyor
+                localStorage.setItem('userId', data.userId); // Kullanıcı ID'sini saklıyor
+                setIsLoggedIn(true); // Kullanıcıyı giriş yapmış olarak ayarlıyor
+                navigate('/home'); // Ana sayfaya yönlendiriyor
             } else {
-                setError('Invalid credentials');
+                setError('Invalid credentials'); // Hatalı giriş bilgisi
             }
         } catch (error) {
-            setError('An error occurred');
+            setError('An error occurred'); // Hata oluştu
             console.error('Error:', error);
         }
     };
@@ -103,7 +101,7 @@ function Login({ setIsLoggedIn }) { // setIsLoggedIn prop olarak alınıyor
                                 </Link>
                             </Grid>
                             <Grid item>
-                                <Link href="#" variant="body2">
+                                <Link href="/signup" variant="body2">
                                     {"Don't have an account? Sign Up"}
                                 </Link>
                             </Grid>

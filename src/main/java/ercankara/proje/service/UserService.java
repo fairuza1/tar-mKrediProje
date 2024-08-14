@@ -3,12 +3,11 @@ package ercankara.proje.service;
 import ercankara.proje.dto.LoginRequest;
 import ercankara.proje.dto.LoginResponse;
 import ercankara.proje.entity.User;
+import ercankara.proje.repository.UserRepository;
+import ercankara.proje.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import ercankara.proje.repository.UserRepository;
-import ercankara.proje.util.JwtUtil;
-
 
 @Service
 public class UserService {
@@ -46,6 +45,18 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public String generateRefreshToken(String username) {
+        return jwtUtil.generateRefreshToken(username);
+    }
+
+    public String refreshAccessToken(String refreshToken) {
+        if (jwtUtil.isTokenExpired(refreshToken)) {
+            throw new RuntimeException("Refresh token expired");
+        }
+        String username = jwtUtil.extractUsername(refreshToken);
+        return jwtUtil.generateToken(username);
     }
 
 }
