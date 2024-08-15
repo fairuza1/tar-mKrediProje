@@ -34,7 +34,6 @@ const SowingList = () => {
             </Container>
         );
     }
-
     const handleDetail = (id) => {
         navigate(`/sowings/detail/${id}`);
     };
@@ -67,7 +66,8 @@ const SowingList = () => {
                                     <TableCell align="right">{sowing.plantName}</TableCell>
                                     <TableCell align="right">{sowing.sowingDate}</TableCell>
                                     <TableCell align="right">
-                                        <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} sx={{ ml: 2 }}>
+
+                                        <Button variant="contained" color="primary" onClick={() => handleDetail(land.id)} sx={{ ml: 2 }}>
                                             Detay
                                         </Button>
                                     </TableCell>

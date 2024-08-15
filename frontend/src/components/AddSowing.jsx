@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, Container, Typography, Box, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import BreadcrumbComponent from "./BreadCrumb";
+
 
 function AddSowing() {
     const [plantId, setPlantId] = useState('');
@@ -13,6 +15,37 @@ function AddSowing() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const navigate = useNavigate();
+    //-----------------------------------------------------------------------------------
+    const [categories ,setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
+
+    useEffect(()=>{
+        const fetchCategories = async ()=>{
+            try{
+                const response = await axios.get('http://localhost:8080/categories',{withCredentials:true});
+                setCategories(response.data);
+            }catch(error){
+                console.log("Error Fetching Categories",error);
+            }
+        };
+        fetchCategories();
+    },[]);
+
+    useEffect(() => {
+        if(selectedCategory){
+            const fetchPlantsByCategory = async ()=>{
+                try {
+                    const response = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${selectedCategory}`, { withCredentials: true });
+                    setPlants(response.data);
+                }catch (error){
+                    console.log("Error Fetching Plants",error);
+                }
+            };
+//s
+            fetchPlantsByCategory();
+        }
+    }, [selectedCategory]);
+
 
     useEffect(() => {
         // Bitkileri ve arazileri API'den çekmek için istekler
@@ -78,21 +111,39 @@ function AddSowing() {
 
     return (
         <Container maxWidth="sm">
+            <Box>
+                <BreadcrumbComponent pageName="Ekim Yap" />
+            </Box>
             <Box component="form" onSubmit={handleAddSowing} sx={{ mt: 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
                     Add Sowing
                 </Typography>
+
                 <FormControl fullWidth margin="normal">
-                    <InputLabel>Plant</InputLabel>
+                    <InputLabel>Kategori</InputLabel>
+                    <Select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                        {categories.map((category) => (
+                            <MenuItem key={category.id} value={category.id}>{category.categoryName}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Bitki</InputLabel>
                     <Select
                         value={plantId}
                         onChange={(e) => setPlantId(e.target.value)}
+                        disabled={!selectedCategory} // Kategori seçilmeden bitki seçimi yapılamaz
                     >
                         {plants.map((plant) => (
                             <MenuItem key={plant.id} value={plant.id}>{plant.name}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
+
                 <TextField
                     fullWidth
                     label="Sowing Date"

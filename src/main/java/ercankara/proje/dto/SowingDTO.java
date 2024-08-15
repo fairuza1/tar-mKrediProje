@@ -2,13 +2,11 @@ package ercankara.proje.dto;
 
 import lombok.Data;
 
-
-
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data
-public class SowingDTO {
+public class    SowingDTO {
     private Long id;
 
     @NotNull(message = "Plant ID cannot be null")

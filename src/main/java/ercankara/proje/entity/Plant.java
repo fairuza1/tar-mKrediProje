@@ -16,9 +16,11 @@ public class Plant {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, length = 50)
-    private String categoryName;
 
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Sowing> sowings;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category; //mappedBy'da kullanılan kısımdır.("plantCategory")
 }

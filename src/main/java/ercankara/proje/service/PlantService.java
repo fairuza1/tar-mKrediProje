@@ -2,10 +2,9 @@ package ercankara.proje.service;
 
 import ercankara.proje.dto.PlantDTO;
 import ercankara.proje.entity.Plant;
+import ercankara.proje.repository.PlantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ercankara.proje.repository.PlantRepository;
-
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +23,13 @@ public class PlantService {
         return plantRepository.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
+    public List<PlantDTO> getPlantsByCategory(Long categoryId) {
+        return plantRepository.findByCategoryId(categoryId)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     public PlantDTO getPlantById(Long id) {
         Plant plant = plantRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Plant not found"));
@@ -34,7 +40,6 @@ public class PlantService {
         PlantDTO plantDto = new PlantDTO();
         plantDto.setId(plant.getId());
         plantDto.setName(plant.getName());
-        plantDto.setCategoryName(plant.getCategoryName());
         return plantDto;
     }
 }

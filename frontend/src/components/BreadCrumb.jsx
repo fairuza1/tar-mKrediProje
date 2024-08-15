@@ -23,6 +23,7 @@ const BreadcrumbComponent = ({ pageName }) => {
                 alignItems: 'center',
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                 fontFamily: 'Poppins, sans-serif',
+
             }}
         >
             <Breadcrumbs aria-label="breadcrumb">
@@ -31,7 +32,7 @@ const BreadcrumbComponent = ({ pageName }) => {
                     color="inherit"
                     to="/" // href yerine to kullanıyoruz çünkü React Router kullanıyoruz
                     onClick={(event) => handleClick(event, '/')}
-                    style={{ fontSize: '1rem', color: 'green', fontFamily: 'Poppins, sans-serif' }}
+                    style={{ fontSize: '1rem', color: 'green', fontFamily: 'Poppins, sans-serif',textDecoration:'none'}}
                 >
                     Anasayfa
                 </Link>

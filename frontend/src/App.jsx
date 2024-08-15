@@ -27,7 +27,7 @@ function App() {
                     method: 'GET',
                     credentials: 'include',
                 });
-
+                console.log(response);
                 if (response.ok) {
                     setIsLoggedIn(true);
                 } else {
@@ -44,26 +44,27 @@ function App() {
         checkAuth();
     }, []);
 
+
+
     if (loading) {
         return <div>Loading...</div>; // Yüklenme sırasında bir mesaj veya spinner gösterebilirsiniz
     }
 
     return (
         <Router>
-            <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
+            <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
             <Routes>
-                <Route path="/" element={<Navigate to={isLoggedIn ? "/home" : "/login"}/>}/>
-                <Route path="/home" element={isLoggedIn ? <Home/> : <Navigate to="/login"/>}/>
-                <Route path="/add-land" element={isLoggedIn ? <AddLand/> : <Navigate to="/login"/>}/>
-                <Route path="/profile" element={isLoggedIn ? <Profile/> : <Navigate to="/login"/>}/>
-                <Route path="/settings" element={isLoggedIn ? <Settings/> : <Navigate to="/login"/>}/>
-                <Route path="/signup" element={<Signup/>}/>
-                <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn}/>}/>
-                <Route path="/land-list" element={isLoggedIn ? <LandList/> : <Navigate to="/login"/>}/>
-                <Route path="/lands/detail/:id" element={isLoggedIn ? <LandDetails/> : <Navigate to="/login"/>}/>
-                <Route path="/sowings" element={isLoggedIn ? <AddSowing/> : <Navigate to="/login"/>}/>
-                <Route path="/sowing-list" element={isLoggedIn ? <SowingList/> :
-                    <Navigate to="/login"/>}/> {/* SowingList route'u burada tanımlanıyor */}
+                <Route path="/" element={<Navigate to={isLoggedIn ? "/home" : "/login"} />} />
+                <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
+                <Route path="/add-land" element={isLoggedIn ? <AddLand /> : <Navigate to="/login" />} />
+                <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
+                <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+                <Route path="/land-list" element={isLoggedIn ? <LandList /> : <Navigate to="/login" />} />
+                <Route path="/lands/detail/:id" element={isLoggedIn ? <LandDetails /> : <Navigate to="/login" />} />
+                <Route path="/sowings" element={isLoggedIn ? <AddSowing /> : <Navigate to="/login" />} />
+                <Route path="/sowing-list" element={isLoggedIn ? <SowingList /> : <Navigate to="/login" />} />
             </Routes>
         </Router>
     );

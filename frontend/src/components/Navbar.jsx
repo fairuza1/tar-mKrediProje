@@ -11,13 +11,13 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link, useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import axios from 'axios'; // axios'u import edin
 import Logo from '../assets/logo.png'; // Logo dosyasının yolu
 
-const pages = ['Add Land', 'Signup', 'Login', 'Land List', 'Sowing List'];
+const pages = ['Add Land','Land List','Sowings','Sowing List','Signup','Login',];
 
-const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
+const Navbar = ({isLoggedIn, setIsLoggedIn}) => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const navigate = useNavigate();
@@ -39,7 +39,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
 
     const handleLogout = async () => {
         try {
-            await axios.post('http://localhost:8080/auth/logout', {}, { withCredentials: true });
+            await axios.post('http://localhost:8080/auth/logout', {}, {withCredentials: true});
             localStorage.removeItem('userId'); // localStorage'dan kullanıcı bilgilerini temizleyin
             setIsLoggedIn(false); // Kullanıcı çıkış yaptıktan sonra isLoggedIn durumunu false olarak ayarlayın
             navigate('/login'); // Kullanıcıyı login sayfasına yönlendirin
@@ -49,14 +49,14 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
     };
 
     return (
-        <AppBar position="static" sx={{ backgroundColor: 'green' }}>
+        <AppBar position="static" sx={{backgroundColor: 'green'}}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <Box
                         component="img"
                         src={Logo}
                         alt="Ekim Rehberi Logo"
-                        sx={{ height: 40, marginRight: 2 }}
+                        sx={{height: 40, marginRight: 2}}
                     />
 
                     <Typography
@@ -66,7 +66,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                         to="/home"
                         sx={{
                             mr: 2,
-                            display: { xs: 'none', md: 'flex' },
+                            display: {xs: 'none', md: 'flex'},
                             textDecoration: 'none',
                             color: 'white',
                             fontFamily: 'Poppins, sans-serif',
@@ -75,7 +75,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                         Ekim Rehberi
                     </Typography>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
                         <IconButton
                             size="large"
                             aria-label="menu"
@@ -84,7 +84,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                             onClick={handleOpenNavMenu}
                             color="inherit"
                         >
-                            <MenuIcon />
+                            <MenuIcon/>
                         </IconButton>
                         <Menu
                             id="menu-appbar"
@@ -101,13 +101,14 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                             open={Boolean(anchorElNav)}
                             onClose={handleCloseNavMenu}
                             sx={{
-                                display: { xs: 'block', md: 'none' },
+                                display: {xs: 'block', md: 'none'},
                             }}
                         >
                             {pages.map((page) => (
                                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                    <Typography textAlign="center" sx={{ fontFamily: 'Poppins, sans-serif' }}>
-                                        <Link to={`/${page.toLowerCase().replace(/ /g, '-')}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <Typography textAlign="center" sx={{fontFamily: 'Poppins, sans-serif'}}>
+                                        <Link to={`/${page.toLowerCase().replace(/ /g, '-')}`}
+                                              style={{textDecoration: 'none', color: 'inherit'}}>
                                             {page}
                                         </Link>
                                     </Typography>
@@ -120,17 +121,22 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                         variant="h6"
                         noWrap
                         component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, color: 'white', fontFamily: 'Poppins, sans-serif' }}
+                        sx={{
+                            flexGrow: 1,
+                            display: {xs: 'flex', md: 'none'},
+                            color: 'white',
+                            fontFamily: 'Poppins, sans-serif'
+                        }}
                     >
                         Ekim Rehberi
                     </Typography>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                    <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
                         {pages.map((page) => (
                             <Button
                                 key={page}
                                 onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: 'white', display: 'block', fontFamily: 'Poppins, sans-serif' }}
+                                sx={{my: 2, color: 'white', display: 'block', fontFamily: 'Poppins, sans-serif'}}
                                 component={Link}
                                 to={`/${page.toLowerCase().replace(/ /g, '-')}`}
                             >
@@ -139,14 +145,14 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                         ))}
                     </Box>
 
-                    <Box sx={{ flexGrow: 0 }}>
+                    <Box sx={{flexGrow: 0}}>
                         <Tooltip title="Ayarlar">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="Kullanıcı Avatarı" src="/static/images/avatar/2.jpg" />
+                            <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                <Avatar alt="Kullanıcı Avatarı" src="/static/images/avatar/2.jpg"/>
                             </IconButton>
                         </Tooltip>
                         <Menu
-                            sx={{ mt: '45px' }}
+                            sx={{mt: '45px'}}
                             id="menu-appbar"
                             anchorEl={anchorElUser}
                             anchorOrigin={{
@@ -162,21 +168,21 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                             onClose={handleCloseUserMenu}
                         >
                             <MenuItem onClick={handleCloseUserMenu}>
-                                <Typography textAlign="center" sx={{ fontFamily: 'Poppins, sans-serif' }}>
-                                    <Link to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <Typography textAlign="center" sx={{fontFamily: 'Poppins, sans-serif'}}>
+                                    <Link to="/profile" style={{textDecoration: 'none', color: 'inherit'}}>
                                         Profil
                                     </Link>
                                 </Typography>
                             </MenuItem>
                             <MenuItem onClick={handleCloseUserMenu}>
-                                <Typography textAlign="center" sx={{ fontFamily: 'Poppins, sans-serif' }}>
-                                    <Link to="/settings" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <Typography textAlign="center" sx={{fontFamily: 'Poppins, sans-serif'}}>
+                                    <Link to="/settings" style={{textDecoration: 'none', color: 'inherit'}}>
                                         Ayarlar
                                     </Link>
                                 </Typography>
                             </MenuItem>
                             <MenuItem onClick={handleLogout}>
-                                <Typography textAlign="center" sx={{ fontFamily: 'Poppins, sans-serif' }}>
+                                <Typography textAlign="center" sx={{fontFamily: 'Poppins, sans-serif'}}>
                                     Çıkış Yap
                                 </Typography>
                             </MenuItem>

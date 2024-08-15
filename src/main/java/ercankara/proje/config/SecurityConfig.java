@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/lands/**").permitAll()
                         .requestMatchers("/sowings/**").permitAll()
                         .requestMatchers("/plants/**").permitAll()
+                        .requestMatchers("/api/categories").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

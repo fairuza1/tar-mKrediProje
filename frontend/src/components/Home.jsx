@@ -6,7 +6,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
+import BreadcrumbComponent from "./BreadCrumb";
 import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 
@@ -15,51 +15,27 @@ import card2 from '../assets/card2.jpg';
 import card3 from '../assets/card3.jpg';
 import card4 from '../assets/card4.jpg';
 import card5 from '../assets/card5.jpg';
+
+
+const pageName = "Ekim Yap"
+
 const cards = [
     { title: 'Arazi Ekle', description: '', link: '/add-land', button: 'Arazi Ekle', image: card1 },
     { title: 'Arazilerim', description: '', button: 'Arazilerimi Görüntüle', link: '/land-list', image: card2 },
     { title: 'Veriminizi Degerlendiriniz', button: 'Verim Degerlendir', link: '/degerlendirme', image: card3 },
     { title: 'Ekim Yap', description: '', button: 'Ekim Yap', link: '/sowings', image: card4 },
-    { title: 'Ekilen arazilerim', description:'', button: 'Ekilen Arazileri görüntüle',  link: '/sowing-list', image: card5 },
+    { title: 'Ekimlerim', description: '', button: 'Ekimlerim', link: '/sowing-list', image:card5 },
     { title: 'Card 6', description: 'Description 6', link: '/link6', image: '' },
 ];
-
-function handleClick(event) {
-    event.preventDefault();
-    console.info('You clicked a breadcrumb.');
-}
 
 function Home() {
     return (
         <Container>
-            <Box
-                sx={{
-                    marginTop:'10px',
-                    backgroundColor: 'rgba(0, 128, 0, 0.1)',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    marginBottom: 4,
-                    display: 'flex',
-                    justifyContent: 'start',
-                    alignItems: 'center',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                    fontFamily: 'Poppins, sans-serif',
-                }}
-            >
-                <Breadcrumbs aria-label="breadcrumb">
-                    <Link
-                        underline="hover"
-                        color="inherit"
-                        href="/"
-                        onClick={handleClick}
-                        style={{ fontSize: '1rem', color: 'green', fontFamily: 'Poppins, sans-serif' }}
-                    >
-                        Anasayfa
-                    </Link>
-
-                    <Typography color="text.primary" sx={{ fontSize: '1rem', color: 'green', fontFamily: 'Poppins, sans-serif' }}>Menü</Typography>
-                </Breadcrumbs>
+            <Box>
+                <BreadcrumbComponent pageName="Menu" />
             </Box>
+
+            {/* Diğer içerikler */}
             <Grid container spacing={4}>
                 {cards.map((card, index) => (
                     <Grid item key={index} xs={12} sm={6} md={4}>

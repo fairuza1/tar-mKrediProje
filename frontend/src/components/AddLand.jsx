@@ -4,6 +4,7 @@ import ilIlceData from '../Data/il-ilce.json';
 import koylerData from '../Data/koyler.json';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import BreadcrumbComponent from "./BreadCrumb.jsx";
 
 function AddLand() {
     const [landName, setLandName] = useState('');
@@ -96,6 +97,9 @@ function AddLand() {
 
     return (
         <Container maxWidth="sm">
+            <Box>
+                <BreadcrumbComponent pageName="Arazi Ekle" />
+            </Box>
             <Box component="form" onSubmit={handleAddLand} sx={{ mt: 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
                     Add Land
