@@ -3,17 +3,14 @@ import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import AddLand from './components/AddLand';
-
 import Profile from './components/Profile';
 import Settings from './components/Settings';
-
 import Signup from './components/Signup';
-import Login from './components/Login';
+import Login from './components/Login.jsx';
 import LandList from './components/LandList';
 import LandDetails from './components/LandDetails';
 import AddSowing from './components/AddSowing';
 import SowingList from './components/SowingList'; // Burada SowingList import ediliyor
-
 import './App.css';
 
 function App() {
@@ -40,11 +37,8 @@ function App() {
                 setLoading(false); // Yüklenme durumunu güncelle
             }
         };
-
         checkAuth();
     }, []);
-
-
 
     if (loading) {
         return <div>Loading...</div>; // Yüklenme sırasında bir mesaj veya spinner gösterebilirsiniz

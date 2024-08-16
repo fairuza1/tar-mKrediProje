@@ -34,8 +34,13 @@ const LandList = () => {
             </Container>
         );
     }
+
     const handleDetail = (id) => {
         navigate(`/lands/detail/${id}`);
+    };
+
+    const handleEdit = (id) => {
+        navigate(`/lands/edit/${id}`);
     };
 
     return (
@@ -56,7 +61,7 @@ const LandList = () => {
                                 <TableCell align="right">City</TableCell>
                                 <TableCell align="right">District</TableCell>
                                 <TableCell align="right">Village</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell align="center" colSpan={3}>Actions</TableCell> {/* Sütunları birleştirip Actions başlığını ortalıyoruz */}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -73,7 +78,9 @@ const LandList = () => {
                                         <Button variant="contained" color="primary" onClick={() => handleEdit(land.id)}>
                                             Düzenle
                                         </Button>
-                                        <Button variant="outlined" color="secondary" onClick={() => handleDetail(land.id)} sx={{ ml: 2 }}>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Button variant="outlined" color="secondary" onClick={() => handleDetail(land.id)}>
                                             Detay
                                         </Button>
                                     </TableCell>
