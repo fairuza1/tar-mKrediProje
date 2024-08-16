@@ -20,6 +20,6 @@ public class LandDTO {
 
     private String district;
     private String village;
-
+    private String landType; // Land Type Değeri
     private Long userId; // User ID Değeri
 }

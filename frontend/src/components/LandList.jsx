@@ -61,7 +61,8 @@ const LandList = () => {
                                 <TableCell align="right">City</TableCell>
                                 <TableCell align="right">District</TableCell>
                                 <TableCell align="right">Village</TableCell>
-                                <TableCell align="center" colSpan={3}>Actions</TableCell> {/* Sütunları birleştirip Actions başlığını ortalıyoruz */}
+                                <TableCell align="right">Land Type</TableCell> {/* Arazi Tipi için yeni sütun */}
+                                <TableCell align="center" colSpan={2}>Actions</TableCell> {/* Sütunları birleştirip Actions başlığını ortalıyoruz */}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -74,6 +75,7 @@ const LandList = () => {
                                     <TableCell align="right">{land.city}</TableCell>
                                     <TableCell align="right">{land.district}</TableCell>
                                     <TableCell align="right">{land.village || 'N/A'}</TableCell>
+                                    <TableCell align="right">{land.landType || 'N/A'}</TableCell> {/* Arazi Tipi */}
                                     <TableCell align="right">
                                         <Button variant="contained" color="primary" onClick={() => handleEdit(land.id)}>
                                             Düzenle

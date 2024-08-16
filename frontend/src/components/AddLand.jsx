@@ -9,6 +9,7 @@ import BreadcrumbComponent from "./BreadCrumb.jsx";
 function AddLand() {
     const [landName, setLandName] = useState('');
     const [landSize, setLandSize] = useState('');
+    const [landType, setLandType] = useState(''); // Yeni state
     const [selectedIl, setSelectedIl] = useState('');
     const [selectedIlce, setSelectedIlce] = useState('');
     const [selectedKoy, setSelectedKoy] = useState('');
@@ -47,7 +48,7 @@ function AddLand() {
         e.preventDefault();
 
         // Boş alan kontrolü
-        if (!landName || !landSize || !selectedIl || !selectedIlce) {
+        if (!landName || !landSize || !selectedIl || !selectedIlce || !landType) { // landType kontrolü eklendi
             setSnackbarMessage('Please fill in all the fields.');
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
@@ -59,6 +60,7 @@ function AddLand() {
         const newLand = {
             name: landName,
             landSize: parseInt(landSize),
+            landType: landType, // Yeni ekleme
             city: selectedIl,
             district: selectedIlce,
             village: selectedKoy,
@@ -74,6 +76,7 @@ function AddLand() {
                 setTimeout(() => navigate('/land-list'), 3000);
                 setLandName('');
                 setLandSize('');
+                setLandType(''); // Yeni ekleme
                 setSelectedIl('');
                 setSelectedIlce('');
                 setSelectedKoy('');
@@ -88,8 +91,6 @@ function AddLand() {
             setOpenSnackbar(true);
         }
     };
-
-
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
@@ -120,6 +121,22 @@ function AddLand() {
                     value={landSize}
                     onChange={(e) => setLandSize(e.target.value)}
                 />
+
+                {/* Arazi Tipi için ComboBox */}
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Arazi Tipi</InputLabel>
+                    <Select
+                        value={landType}
+                        onChange={(e) => setLandType(e.target.value)}
+                    >
+                        <MenuItem value="Tarla">Tarla</MenuItem>
+                        <MenuItem value="Bahçe">Bahçe</MenuItem>
+                        <MenuItem value="Bağ">Bağ</MenuItem>
+                        <MenuItem value="Zeytinlik">Zeytinlik</MenuItem>
+                        <MenuItem value="Çayır">Çayır</MenuItem>
+                        <MenuItem value="Mera">Mera</MenuItem>
+                    </Select>
+                </FormControl>
 
                 <FormControl fullWidth margin="normal">
                     <InputLabel>İl</InputLabel>

@@ -28,6 +28,8 @@ public class Land {
     @Column(nullable = false)
     String district;
 
+    private String landType;
+
     String village;
 
     @ManyToOne(fetch = FetchType.LAZY)

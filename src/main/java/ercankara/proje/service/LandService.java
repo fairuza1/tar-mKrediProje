@@ -57,6 +57,8 @@ public class LandService {
         existingLand.setCity(landDto.getCity());
         existingLand.setDistrict(landDto.getDistrict());
         existingLand.setVillage(landDto.getVillage());
+        existingLand.setLandType(landDto.getLandType()); // landType güncellemesi
+
 
         // Güncellenen kullanıcı bilgisi varsa, kullanıcıyı bulur ve set eder
         if (landDto.getUserId() != null) {
@@ -83,6 +85,8 @@ public class LandService {
         landDto.setDistrict(land.getDistrict());
         landDto.setVillage(land.getVillage());
         landDto.setUserId(land.getUser().getId());
+        landDto.setLandType(land.getLandType()); // landType dönüştürülüyor
+
         return landDto;
     }
 }
