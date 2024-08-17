@@ -14,6 +14,8 @@ public class    SowingDTO {
 
     private String plantName;
 
+    private int amount;
+
     @NotNull(message = "Land ID cannot be null")
     private Long landId;
 

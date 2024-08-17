@@ -12,6 +12,9 @@ public class Sowing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+//    @Column(nullable = false) // Ekim miktarı zorunlu bir alan olabilir
+    private int amount; // Ekim miktarını ekleyin
+
     @ManyToOne
     @JoinColumn(name = "plant_id", nullable = false)
     private Plant plant;
