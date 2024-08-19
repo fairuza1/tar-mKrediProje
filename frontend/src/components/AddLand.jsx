@@ -107,7 +107,7 @@ function AddLand() {
                 </Typography>
                 <TextField
                     fullWidth
-                    label="Land Name"
+                    label="Arazi ismi giriniz"
                     variant="outlined"
                     margin="normal"
                     value={landName}
@@ -115,7 +115,7 @@ function AddLand() {
                 />
                 <TextField
                     fullWidth
-                    label="Land Size (hectares)"
+                    label="Arazi boyutu giriniz (m²)"
                     variant="outlined"
                     margin="normal"
                     value={landSize}

@@ -6,15 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data
-public class    SowingDTO {
+public class SowingDTO {
     private Long id;
 
     @NotNull(message = "Plant ID cannot be null")
     private Long plantId;
 
     private String plantName;
-
-    private int amount;
 
     @NotNull(message = "Land ID cannot be null")
     private Long landId;
@@ -23,4 +21,7 @@ public class    SowingDTO {
 
     @NotNull(message = "Sowing date cannot be null")
     private LocalDate sowingDate;
+
+    @NotNull(message = "Amount cannot be null")  // Add this line
+    private Integer amount; // amount alanını ekleyin
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {Container, Typography, Box, Paper, Button, TextField, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
-import {useNavigate, useParams} from 'react-router-dom';
+import { Container, Typography, Box, Paper, Button, TextField, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
 import ilIlceData from '../Data/il-ilce.json';
 import koylerData from '../Data/koyler.json';
 
@@ -15,6 +15,34 @@ const LandDetails = () => {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        fetchLandDetails();
+    }, [id]);
+
+    const fetchLandDetails = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/lands/detail/${id}`);
+            const data = await response.json();
+            // Hesaplama işlemi
+            const remainingArea = data.landSize - data.sowedArea;
+            setLand({ ...data, remainingArea });
+            if (data.city) {
+                const ilceList = ilIlceData
+                    .filter(item => item.il.localeCompare(data.city, undefined, { sensitivity: 'base' }) === 0)
+                    .map(item => item.ilce);
+                setIlceler(ilceList);
+            }
+            if (data.city && data.district) {
+                const koyList = koylerData
+                    .filter(item => item.il.localeCompare(data.city, undefined, { sensitivity: 'base' }) === 0 && item.ilce.localeCompare(data.district, undefined, { sensitivity: 'base' }) === 0)
+                    .map(item => item.mahalle_koy);
+                setKoyler(koyList);
+            }
+        } catch (error) {
+            console.error('Error fetching land details:', error);
+        }
+    };
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
@@ -81,59 +109,6 @@ const LandDetails = () => {
         setOpenDeleteDialog(false);
     };
 
-    useEffect(() => {
-        fetch(`http://localhost:8080/lands/detail/${id}`)
-            .then(response => response.json())
-            .then(data => {
-                setLand(data);
-                if (data.city) {
-                    const ilceList = ilIlceData
-                        .filter(item => item.il.localeCompare(data.city, undefined, { sensitivity: 'base' }) === 0)
-                        .map(item => item.ilce);
-                    setIlceler(ilceList);
-                }
-                if (data.city && data.district) {
-                    const koyList = koylerData
-                        .filter(item => item.il.localeCompare(data.city, undefined, { sensitivity: 'base' }) === 0 && item.ilce.localeCompare(data.district, undefined, { sensitivity: 'base' }) === 0)
-                        .map(item => item.mahalle_koy);
-                    setKoyler(koyList);
-                }
-            })
-            .catch(error => console.error('Error fetching land details:', error));
-    }, [id]);
-
-    useEffect(() => {
-        if (land?.city) {
-            const ilceList = ilIlceData
-                .filter(item => item.il.localeCompare(land.city, undefined, { sensitivity: 'base' }) === 0)
-                .map(item => item.ilce);
-            setIlceler(ilceList);
-
-            if (!ilceList.includes(land.district)) {
-                setLand(prevState => ({ ...prevState, district: '', village: '' }));
-            }
-        }
-    }, [land?.city]);
-
-    useEffect(() => {
-        if (land?.district) {
-            const koyList = koylerData
-                .filter(item => item.il.localeCompare(land.city, undefined, { sensitivity: 'base' }) === 0 && item.ilce.localeCompare(land.district, undefined, { sensitivity: 'base' }) === 0)
-                .map(item => item.mahalle_koy);
-            setKoyler(koyList);
-
-            if (!koyList.includes(land.village)) {
-                setLand(prevState => ({ ...prevState, village: '' }));
-            }
-        } else {
-            setKoyler([]);
-        }
-    }, [land?.district]);
-
-    if (!land) {
-        return <Typography>Loading...</Typography>;
-    }
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLand(prevState => ({
@@ -144,6 +119,10 @@ const LandDetails = () => {
 
     // Benzersiz şehir isimlerini elde etme
     const uniqueCities = Array.from(new Set(ilIlceData.map(item => item.il)));
+
+    if (!land) {
+        return <Typography>Loading...</Typography>;
+    }
 
     return (
         <Container maxWidth="md">
@@ -164,9 +143,17 @@ const LandDetails = () => {
                             />
                             <TextField
                                 fullWidth
-                                label="Boyut (Hektar)"
+                                label="Boyut (m²)"
                                 name="landSize"
                                 value={land.landSize}
+                                onChange={handleChange}
+                                margin="normal"
+                            />
+                            <TextField
+                                fullWidth
+                                label="Ekili Alan (m²)"
+                                name="sowedArea"
+                                value={land.sowedArea}
                                 onChange={handleChange}
                                 margin="normal"
                             />
@@ -209,7 +196,9 @@ const LandDetails = () => {
                         </>
                     ) : (
                         <>
-                            <Typography variant="h6">Boyut: {land.landSize} hektar</Typography>
+                            <Typography variant="h6">Boyut: {land.landSize} m²</Typography>
+                            <Typography variant="h6">Ekili Alan: {land.sowedArea} m²</Typography>
+                            <Typography variant="h6">Boş Alan: {land.remainingArea} m²</Typography>
                             <Typography variant="h6">Şehir: {land.city}</Typography>
                             <Typography variant="h6">İlçe: {land.district}</Typography>
                             <Typography variant="h6">Köy: {land.village || 'N/A'}</Typography>

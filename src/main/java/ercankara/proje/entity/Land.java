@@ -27,8 +27,9 @@ public class Land {
 
     @Column(nullable = false)
     String district;
+
     private String landType;
-    private int remainingSize; // Yeni eklenen alan
+
     String village;
 
     @ManyToOne(fetch = FetchType.LAZY)

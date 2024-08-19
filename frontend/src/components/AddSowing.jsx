@@ -4,51 +4,49 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbComponent from "./BreadCrumb";
 
-
 function AddSowing() {
     const [plantId, setPlantId] = useState('');
     const [sowingDate, setSowingDate] = useState('');
     const [landId, setLandId] = useState('');
+    const [amount, setAmount] = useState(''); // Ekilen miktar için state
     const [plants, setPlants] = useState([]);
     const [lands, setLands] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const navigate = useNavigate();
-    //-----------------------------------------------------------------------------------
-    const [categories ,setCategories] = useState([]);
+
+    const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
 
-    useEffect(()=>{
-        const fetchCategories = async ()=>{
-            try{
-                const response = await axios.get('http://localhost:8080/categories',{withCredentials:true});
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/categories', { withCredentials: true });
                 setCategories(response.data);
-            }catch(error){
-                console.log("Error Fetching Categories",error);
+            } catch (error) {
+                console.log("Error Fetching Categories", error);
             }
         };
         fetchCategories();
-    },[]);
+    }, []);
 
     useEffect(() => {
-        if(selectedCategory){
-            const fetchPlantsByCategory = async ()=>{
+        if (selectedCategory) {
+            const fetchPlantsByCategory = async () => {
                 try {
                     const response = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${selectedCategory}`, { withCredentials: true });
                     setPlants(response.data);
-                }catch (error){
-                    console.log("Error Fetching Plants",error);
+                } catch (error) {
+                    console.log("Error Fetching Plants", error);
                 }
             };
-//s
+
             fetchPlantsByCategory();
         }
     }, [selectedCategory]);
 
-
     useEffect(() => {
-        // Bitkileri ve arazileri API'den çekmek için istekler
         const fetchPlantsAndLands = async () => {
             try {
                 const [plantsResponse, landsResponse] = await Promise.all([
@@ -68,8 +66,7 @@ function AddSowing() {
     const handleAddSowing = async (e) => {
         e.preventDefault();
 
-        // Boş alan kontrolü
-        if (!plantId || !sowingDate || !landId) {
+        if (!plantId, !landId, !amount, !sowingDate) { // Ekilen miktar için de kontrol
             setSnackbarMessage('Please fill in all the fields.');
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
@@ -79,7 +76,8 @@ function AddSowing() {
         const newSowing = {
             plantId: parseInt(plantId),
             sowingDate: sowingDate,
-            landId: parseInt(landId)
+            landId: parseInt(landId),
+            amount: parseFloat(amount) // Miktarı ekledim
         };
 
         try {
@@ -92,6 +90,7 @@ function AddSowing() {
                 setPlantId('');
                 setSowingDate('');
                 setLandId('');
+                setAmount(''); // Miktar alanını sıfırlama
             } else {
                 setSnackbarMessage('Failed to save the Sowing.');
                 setSnackbarSeverity('error');
@@ -104,7 +103,6 @@ function AddSowing() {
         }
     };
 
-
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
     };
@@ -116,8 +114,20 @@ function AddSowing() {
             </Box>
             <Box component="form" onSubmit={handleAddSowing} sx={{ mt: 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
-                    Add Sowing
+                   Ekim Yap
                 </Typography>
+
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Arazilerim</InputLabel>
+                    <Select
+                        value={landId}
+                        onChange={(e) => setLandId(e.target.value)}
+                    >
+                        {lands.map((land) => (
+                            <MenuItem key={land.id} value={land.id}>{land.name}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
 
                 <FormControl fullWidth margin="normal">
                     <InputLabel>Kategori</InputLabel>
@@ -136,7 +146,7 @@ function AddSowing() {
                     <Select
                         value={plantId}
                         onChange={(e) => setPlantId(e.target.value)}
-                        disabled={!selectedCategory} // Kategori seçilmeden bitki seçimi yapılamaz
+                        disabled={!selectedCategory}
                     >
                         {plants.map((plant) => (
                             <MenuItem key={plant.id} value={plant.id}>{plant.name}</MenuItem>
@@ -146,7 +156,17 @@ function AddSowing() {
 
                 <TextField
                     fullWidth
-                    label="Sowing Date"
+                    label="Ekilen Alan"
+                    type="number"
+                    variant="outlined"
+                    margin="normal"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                />
+
+                <TextField
+                    fullWidth
+                    label="Ekim Tarihi"
                     type="date"
                     variant="outlined"
                     margin="normal"
@@ -156,17 +176,7 @@ function AddSowing() {
                         shrink: true,
                     }}
                 />
-                <FormControl fullWidth margin="normal">
-                    <InputLabel>Land</InputLabel>
-                    <Select
-                        value={landId}
-                        onChange={(e) => setLandId(e.target.value)}
-                    >
-                        {lands.map((land) => (
-                            <MenuItem key={land.id} value={land.id}>{land.name}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+
                 <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
                     Add Sowing
                 </Button>

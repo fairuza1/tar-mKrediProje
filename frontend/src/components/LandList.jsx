@@ -56,12 +56,12 @@ const LandList = () => {
                     <Table sx={{ minWidth: 650 }} aria-label="lands table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell align="right">Size (hectares)</TableCell>
-                                <TableCell align="right">City</TableCell>
-                                <TableCell align="right">District</TableCell>
-                                <TableCell align="right">Village</TableCell>
-                                <TableCell align="right">Land Type</TableCell> {/* Arazi Tipi için yeni sütun */}
+                                <TableCell>Arazi İsmi</TableCell>
+                                <TableCell align="right">Arazi Alanı (m²)</TableCell>
+                                <TableCell align="right">Şehir</TableCell>
+                                <TableCell align="right">İlçe</TableCell>
+                                <TableCell align="right">Köy</TableCell>
+                                <TableCell align="right">Arazi tipi</TableCell> {/* Arazi Tipi için yeni sütun */}
                                 <TableCell align="center" colSpan={2}>Actions</TableCell> {/* Sütunları birleştirip Actions başlığını ortalıyoruz */}
                             </TableRow>
                         </TableHead>
