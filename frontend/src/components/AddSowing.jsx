@@ -32,21 +32,6 @@ function AddSowing() {
     }, []);
 
     useEffect(() => {
-        if (selectedCategory) {
-            const fetchPlantsByCategory = async () => {
-                try {
-                    const response = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${selectedCategory}`, { withCredentials: true });
-                    setPlants(response.data);
-                } catch (error) {
-                    console.log("Error Fetching Plants", error);
-                }
-            };
-
-            fetchPlantsByCategory();
-        }
-    }, [selectedCategory]);
-
-    useEffect(() => {
         const fetchPlantsAndLands = async () => {
             try {
                 const [plantsResponse, landsResponse] = await Promise.all([
@@ -62,6 +47,21 @@ function AddSowing() {
 
         fetchPlantsAndLands();
     }, []);
+
+    useEffect(() => {
+        if (selectedCategory) {
+            const fetchPlantsByCategory = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${selectedCategory}`, { withCredentials: true });
+                    setPlants(response.data);
+                } catch (error) {
+                    console.log("Error Fetching Plants", error);
+                }
+            };
+
+            fetchPlantsByCategory();
+        }
+    }, [selectedCategory]);
 
     const getLandSize = (landId) => {
         const land = lands.find(land => land.id === landId);
@@ -93,7 +93,7 @@ function AddSowing() {
         const remainingSize = landSize - sownAmount;
 
         if (parseFloat(amount) > remainingSize) {
-            setSnackbarMessage('Eklenen alan, arazi alanından fazla.');
+            setSnackbarMessage(`Eklenen alan, arazi alanından fazla. Kalan alan: ${remainingSize}`);
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
             return;
@@ -124,7 +124,11 @@ function AddSowing() {
                 setOpenSnackbar(true);
             }
         } catch (error) {
-            setSnackbarMessage('Error: ' + error.message);
+            // Backend'den gelen hata mesajını kullan
+            const errorMessage = error.response && error.response.data
+                ? error.response.data // Hata mesajını doğrudan al
+                : 'Bir hata oluştu. Lütfen tekrar deneyin.';
+            setSnackbarMessage(errorMessage);
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
         }
@@ -205,7 +209,7 @@ function AddSowing() {
                 />
 
                 <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-                    Add Sowing
+                    Ekim Ekle
                 </Button>
             </Box>
 

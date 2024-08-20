@@ -3,6 +3,7 @@ package ercankara.proje.controller;
 import ercankara.proje.dto.LandDTO;
 import ercankara.proje.entity.Land;
 import ercankara.proje.entity.User;
+import ercankara.proje.repository.LandRepository;
 import ercankara.proje.repository.UserRepository;
 import ercankara.proje.service.LandService;
 import ercankara.proje.service.UserService;
@@ -27,6 +28,8 @@ public class LandController {
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private LandRepository landRepository;
 
     @PostMapping
     public Land createLand(@RequestBody Land land) {
@@ -64,5 +67,9 @@ public class LandController {
         // LandService'i kullanarak araziyi güncelle
         return landService.updateLand(id, landDto);
     }
-
+    public int getAvailableLand(Long landId) {
+        Land land = landRepository.findById(landId)
+                .orElseThrow(() -> new RuntimeException("Arazi bulunamadı."));
+        return land.getRemainingArea();
+    }
 }
