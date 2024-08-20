@@ -1,36 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import { Container, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
 
 const SowingList = () => {
     const [sowings, setSowings] = useState([]);
-    const [lands, setLands] = useState([]); // Arazi verileri
+    const [lands, setLands] = useState([]);
     const [isAuthenticated, setIsAuthenticated] = useState(true);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Sowing verilerini almak
-        axios.get('http://localhost:8080/sowings', { withCredentials: true })
-            .then(response => {
-                setSowings(response.data);
-            })
-            .catch(error => {
+        const fetchData = async () => {
+            try {
+                const sowingResponse = await axios.get('http://localhost:8080/sowings', { withCredentials: true });
+                setSowings(sowingResponse.data);
+            } catch (error) {
                 console.error('Error fetching sowings:', error);
                 if (error.response && error.response.status === 401) {
                     setIsAuthenticated(false);
+                } else {
+                    setError('Ekim verileri alınırken bir hata oluştu.');
                 }
-            });
+            }
 
-        // Arazi verilerini almak
-        axios.get('http://localhost:8080/lands', { withCredentials: true })
-            .then(response => {
-                setLands(response.data);
-            })
-            .catch(error => {
+            try {
+                const landResponse = await axios.get('http://localhost:8080/lands', { withCredentials: true });
+                setLands(landResponse.data);
+            } catch (error) {
                 console.error('Error fetching lands:', error);
-            });
+                setError('Arazi verileri alınırken bir hata oluştu.');
+            }
+        };
+
+        fetchData();
     }, []);
 
     if (!isAuthenticated) {
@@ -45,16 +49,20 @@ const SowingList = () => {
         );
     }
 
-    // Arazi tipini almak için yardımcı fonksiyon
-    const getLandType = (landName) => {
-        const land = lands.find(land => land.name === landName);
-        return land ? land.landType : 'Bilinmiyor'; // `landType` yerine `landType` kullanıyoruz
+    const getLand = (landId) => {
+        return lands.find(land => land.id === landId);
     };
 
-    // Arazi boyutunu almak için yardımcı fonksiyon
-    const getLandSize = (landName) => {
-        const land = lands.find(land => land.name === landName);
-        return land ? land.landSize : 'Bilinmiyor';
+    const getRemainingSize = (landId) => {
+        const land = getLand(landId);
+        if (!land) return 0;
+
+        const landSize = land.landSize;
+        const totalSownAmount = sowings
+            .filter(sowing => sowing.landId === landId)
+            .reduce((sum, sowing) => sum + sowing.amount, 0);
+
+        return landSize - totalSownAmount;
     };
 
     const handleDetail = (id) => {
@@ -62,7 +70,7 @@ const SowingList = () => {
     };
 
     return (
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
             <Box>
                 <BreadcrumbComponent pageName="Ekimlerim" />
             </Box>
@@ -70,39 +78,44 @@ const SowingList = () => {
                 <Typography variant="h4" component="h2" gutterBottom>
                     Ekimlerim Listesi
                 </Typography>
-                <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} aria-label="sowings table">
+                {error && <Alert severity="error">{error}</Alert>}
+                <TableContainer component={Paper} sx={{ maxHeight: '75vh' }}>
+                    <Table sx={{ minWidth: 900 }} aria-label="sowings table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Arazim</TableCell>
-                                <TableCell align="right">Arazi Tipi</TableCell>
-                                <TableCell align="right">Bitki</TableCell>
-                                <TableCell align="right">Arazi Alanı</TableCell> {/* Yer değişti */}
-                                <TableCell align="right">Ekilen Alan</TableCell> {/* Yer değişti */}
-                                <TableCell align="right">Boş Alan</TableCell>
-                                <TableCell align="right">Zaman</TableCell>
-                                <TableCell align="right">Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazim</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Tipi</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Bitki</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Ekilen Alan</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Alanı</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Boş Alan</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Zaman</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Aksiyonlar</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {sowings.map((sowing) => (
-                                <TableRow key={sowing.id}>
-                                    <TableCell component="th" scope="row">
-                                        {sowing.landName}
-                                    </TableCell>
-                                    <TableCell align="right">{getLandType(sowing.landName)}</TableCell>
-                                    <TableCell align="right">{sowing.plantName}</TableCell>
-                                    <TableCell align="right">{getLandSize(sowing.landName)}</TableCell> {/* Yer değişti */}
-                                    <TableCell align="right">{sowing.amount}</TableCell> {/* Yer değişti */}
-                                    <TableCell align="right">{getLandSize(sowing.landName) - sowing.amount}</TableCell>
-                                    <TableCell align="right">{sowing.sowingDate}</TableCell>
-                                    <TableCell align="right">
-                                        <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} sx={{ ml: 2 }}>
-                                            Detay
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                            {sowings.map((sowing) => {
+                                const land = getLand(sowing.landId);
+                                const remainingSize = getRemainingSize(sowing.landId);
+                                return (
+                                    <TableRow key={sowing.id}>
+                                        <TableCell component="th" scope="row" sx={{ fontSize: '1rem' }}>
+                                            {land ? land.name : 'Bilinmiyor'}
+                                        </TableCell>
+                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{land ? land.landType : 'Bilinmiyor'}</TableCell>
+                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{sowing.plantName}</TableCell>
+                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{sowing.amount}</TableCell>
+                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{land ? land.landSize : 'Bilinmiyor'}</TableCell>
+                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{remainingSize < 0 ? 0 : remainingSize}</TableCell>
+                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{new Date(sowing.sowingDate).toLocaleDateString()}</TableCell>
+                                        <TableCell align="right">
+                                            <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} sx={{ ml: 2 }}>
+                                                Detay
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
                         </TableBody>
                     </Table>
                 </TableContainer>

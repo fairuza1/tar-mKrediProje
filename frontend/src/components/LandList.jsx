@@ -44,7 +44,7 @@ const LandList = () => {
     };
 
     return (
-        <Container maxWidth="md">
+        <Container maxWidth="lg"> {/* Tablonun genişliği için maxWidth 'lg' olarak ayarlandı */}
             <Box>
                 <BreadcrumbComponent pageName="Arazilerim" />
             </Box>
@@ -52,36 +52,36 @@ const LandList = () => {
                 <Typography variant="h4" component="h2" gutterBottom>
                     Lands List
                 </Typography>
-                <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} aria-label="lands table">
+                <TableContainer component={Paper} sx={{ maxHeight: '75vh' }}> {/* Yükseklik sınırlaması eklendi */}
+                    <Table sx={{ minWidth: 900 }} aria-label="lands table"> {/* minWidth artırıldı */}
                         <TableHead>
                             <TableRow>
-                                <TableCell>Arazi İsmi</TableCell>
-                                <TableCell align="right">Arazi Alanı (m²)</TableCell>
-                                <TableCell align="right">Şehir</TableCell>
-                                <TableCell align="right">İlçe</TableCell>
-                                <TableCell align="right">Köy</TableCell>
-                                <TableCell align="right">Arazi tipi</TableCell> {/* Arazi Tipi için yeni sütun */}
-                                <TableCell align="center" colSpan={2}>Actions</TableCell> {/* Sütunları birleştirip Actions başlığını ortalıyoruz */}
+                                <TableCell sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi İsmi</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Alanı (m²)</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Şehir</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>İlçe</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Köy</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi tipi</TableCell> {/* Arazi Tipi için yeni sütun */}
+                                <TableCell align="center" colSpan={2} sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Actions</TableCell> {/* Sütunları birleştirip Actions başlığını ortalıyoruz */}
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {lands.map((land) => (
                                 <TableRow key={land.id}>
-                                    <TableCell component="th" scope="row">
+                                    <TableCell component="th" scope="row" sx={{ fontSize: '1rem' }}>
                                         {land.name}
                                     </TableCell>
-                                    <TableCell align="right">{land.landSize}</TableCell>
-                                    <TableCell align="right">{land.city}</TableCell>
-                                    <TableCell align="right">{land.district}</TableCell>
-                                    <TableCell align="right">{land.village || 'N/A'}</TableCell>
-                                    <TableCell align="right">{land.landType || 'N/A'}</TableCell> {/* Arazi Tipi */}
-                                    <TableCell align="right">
+                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.landSize}</TableCell>
+                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.city}</TableCell>
+                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.district}</TableCell>
+                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.village || 'N/A'}</TableCell>
+                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.landType || 'N/A'}</TableCell> {/* Arazi Tipi */}
+                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>
                                         <Button variant="contained" color="primary" onClick={() => handleEdit(land.id)}>
                                             Düzenle
                                         </Button>
                                     </TableCell>
-                                    <TableCell align="center">
+                                    <TableCell align="center" sx={{ fontSize: '1rem' }}>
                                         <Button variant="outlined" color="secondary" onClick={() => handleDetail(land.id)}>
                                             Detay
                                         </Button>

@@ -38,16 +38,38 @@ public class SowingService {
             throw new RuntimeException("Land not found with ID: " + sowingDto.getLandId());
         }
 
+        // Arazi miktarını kontrol et
+        Land land = landOptional.get();
+        int availableLand = land.getRemainingArea(); // remainingArea kullan
+
+        // Ekim miktarını kontrol et
+        if (sowingDto.getAmount() <= 0) {
+            throw new RuntimeException("Ekim miktarı sıfır veya negatif olamaz.");
+        }
+
+        // Ekim miktarı mevcut arazi alanından fazla olmamalı
+        if (sowingDto.getAmount() > availableLand) {
+            throw new RuntimeException("Ekim miktarı mevcut arazi alanını aşıyor. Mevcut: " + availableLand);
+        }
+
         // Sowing nesnesini oluşturun ve set edin
         Sowing sowing = new Sowing();
         sowing.setPlant(plantOptional.get());
-        sowing.setLand(landOptional.get());
+        sowing.setLand(land);
         sowing.setSowingDate(sowingDto.getSowingDate());
-        sowing.setAmount(sowingDto.getAmount()); // Amount'ı set edin
+        sowing.setAmount(sowingDto.getAmount());
 
+        // Sowing nesnesini kaydet
         sowing = sowingRepository.save(sowing);
+
+        // remainingArea'yi güncelle
+        int newRemainingArea = availableLand - sowingDto.getAmount();
+        land.setRemainingArea(newRemainingArea < 0 ? 0 : newRemainingArea); // Boş alan sıfırın altına düşmemeli
+        landRepository.save(land); // Land nesnesini kaydet
+
         return convertToDto(sowing);
     }
+
 
     public List<SowingDTO> getSowingsByUser(Long userId) {
         return sowingRepository.findByLandUserId(userId).stream()
@@ -55,15 +77,21 @@ public class SowingService {
                 .collect(Collectors.toList());
     }
 
+    private int getTotalSowingAmount(Long landId) {
+        return sowingRepository.findByLandUserId(landId).stream()
+                .mapToInt(Sowing::getAmount)
+                .sum();
+    }
+
     private SowingDTO convertToDto(Sowing sowing) {
         SowingDTO dto = new SowingDTO();
         dto.setId(sowing.getId());
         dto.setPlantId(sowing.getPlant().getId());
-        dto.setPlantName(sowing.getPlant().getName()); // Bu yöntemlerin doğru olduğundan emin olun
+        dto.setPlantName(sowing.getPlant().getName());
         dto.setLandId(sowing.getLand().getId());
-        dto.setLandName(sowing.getLand().getName()); // Bu yöntemlerin doğru olduğundan emin olun
+        dto.setLandName(sowing.getLand().getName());
         dto.setSowingDate(sowing.getSowingDate());
-        dto.setAmount(sowing.getAmount()); // Amount'u set edin
+        dto.setAmount(sowing.getAmount());
         return dto;
     }
 }

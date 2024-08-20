@@ -18,8 +18,14 @@ public class LandDTO {
     @NotNull(message = "City cannot be null")
     private String city;
 
+    @NotNull(message = "Remaining area cannot be null") // Yeni ekleme
+    private int remainingArea; // Yeni ekleme
+
     private String district;
+
     private String village;
+
     private String landType; // Land Type Değeri
+
     private Long userId; // User ID Değeri
 }

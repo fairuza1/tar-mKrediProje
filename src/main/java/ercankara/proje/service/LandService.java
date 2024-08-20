@@ -29,12 +29,16 @@ public class LandService {
         User user = userRepository.findById(land.getUser().getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Land nesnesine User'ı set et
+        // Arazi nesnesine User'ı set et
         land.setUser(user);
+
+        // Başlangıçta remainingArea'yı landSize'a eşit yap
+        land.setRemainingArea(land.getLandSize());
 
         // Land'ı kaydet
         return landRepository.save(land);
     }
+
 
     public List<LandDTO> getAllLands() {
         return landRepository.findAll().stream().map(this::convertToDto).collect(Collectors.toList());

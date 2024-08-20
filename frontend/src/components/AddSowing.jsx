@@ -8,7 +8,7 @@ function AddSowing() {
     const [plantId, setPlantId] = useState('');
     const [sowingDate, setSowingDate] = useState('');
     const [landId, setLandId] = useState('');
-    const [amount, setAmount] = useState(''); // Ekilen miktar için state
+    const [amount, setAmount] = useState('');
     const [plants, setPlants] = useState([]);
     const [lands, setLands] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -63,11 +63,37 @@ function AddSowing() {
         fetchPlantsAndLands();
     }, []);
 
+    const getLandSize = (landId) => {
+        const land = lands.find(land => land.id === landId);
+        return land ? land.landSize : 0;
+    };
+
+    const getLandSownAmount = async (landId) => {
+        try {
+            const response = await axios.get(`http://localhost:8080/sowings/land/${landId}`, { withCredentials: true });
+            return response.data.reduce((total, sowing) => total + sowing.amount, 0);
+        } catch (error) {
+            console.error('Error fetching sowing amounts for land:', error);
+            return 0;
+        }
+    };
+
     const handleAddSowing = async (e) => {
         e.preventDefault();
 
-        if (!plantId, !landId, !amount, !sowingDate) { // Ekilen miktar için de kontrol
+        if (!plantId || !landId || !amount || !sowingDate) {
             setSnackbarMessage('Please fill in all the fields.');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+            return;
+        }
+
+        const landSize = getLandSize(landId);
+        const sownAmount = await getLandSownAmount(landId);
+        const remainingSize = landSize - sownAmount;
+
+        if (parseFloat(amount) > remainingSize) {
+            setSnackbarMessage('Eklenen alan, arazi alanından fazla.');
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
             return;
@@ -77,7 +103,8 @@ function AddSowing() {
             plantId: parseInt(plantId),
             sowingDate: sowingDate,
             landId: parseInt(landId),
-            amount: parseFloat(amount) // Miktarı ekledim
+            amount: parseFloat(amount),
+            remainingSize // Boş alanı ekleyelim
         };
 
         try {
@@ -90,7 +117,7 @@ function AddSowing() {
                 setPlantId('');
                 setSowingDate('');
                 setLandId('');
-                setAmount(''); // Miktar alanını sıfırlama
+                setAmount('');
             } else {
                 setSnackbarMessage('Failed to save the Sowing.');
                 setSnackbarSeverity('error');
@@ -114,7 +141,7 @@ function AddSowing() {
             </Box>
             <Box component="form" onSubmit={handleAddSowing} sx={{ mt: 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
-                   Ekim Yap
+                    Ekim Yap
                 </Typography>
 
                 <FormControl fullWidth margin="normal">

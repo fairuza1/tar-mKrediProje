@@ -32,6 +32,9 @@ public class Land {
 
     String village;
 
+    @Column(nullable = false)
+    private int remainingArea; // Buraya ekleyin
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonBackReference("user-land")
