@@ -70,17 +70,44 @@ public class SowingService {
         return convertToDto(sowing);
     }
 
-
     public List<SowingDTO> getSowingsByUser(Long userId) {
         return sowingRepository.findByLandUserId(userId).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    private int getTotalSowingAmount(Long landId) {
-        return sowingRepository.findByLandUserId(landId).stream()
-                .mapToInt(Sowing::getAmount)
-                .sum();
+    public SowingDTO getSowingById(Long id) {
+        Sowing sowing = sowingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sowing not found"));
+        return convertToDto(sowing);
+    }
+
+    public Sowing updateSowing(Long id, SowingDTO sowingDTO) {
+        Sowing existingSowing = sowingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sowing not found"));
+
+        existingSowing.setSowingDate(sowingDTO.getSowingDate());
+        existingSowing.setAmount(sowingDTO.getAmount());
+
+        if (sowingDTO.getLandId() != null) {
+            Land land = landRepository.findById(sowingDTO.getLandId())
+                    .orElseThrow(() -> new RuntimeException("Land not found"));
+            existingSowing.setLand(land);
+        }
+
+        if (sowingDTO.getPlantId() != null) {
+            Plant plant = plantRepository.findById(sowingDTO.getPlantId())
+                    .orElseThrow(() -> new RuntimeException("Plant not found"));
+            existingSowing.setPlant(plant);
+        }
+
+        return sowingRepository.save(existingSowing);
+    }
+
+    public int getAvailableLand(Long landId) {
+        Land land = landRepository.findById(landId)
+                .orElseThrow(() -> new RuntimeException("Land not found"));
+        return land.getRemainingArea();
     }
 
     private SowingDTO convertToDto(Sowing sowing) {

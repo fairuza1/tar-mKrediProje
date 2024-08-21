@@ -1,8 +1,8 @@
 package ercankara.proje.controller;
 
 import ercankara.proje.dto.SowingDTO;
+import ercankara.proje.entity.Sowing;
 import ercankara.proje.entity.User;
-import ercankara.proje.service.LandService;
 import ercankara.proje.service.SowingService;
 import ercankara.proje.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,6 @@ public class SowingController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private LandService landService; // LandService'i ekle
-
     @PostMapping
     public ResponseEntity<String> createSowing(@RequestBody SowingDTO sowingDto) {
         // Ekim miktarını kontrol et
@@ -37,7 +34,7 @@ public class SowingController {
         }
 
         // Mevcut arazi alanını kontrol etmek için gerekli kod
-        int availableLand = landService.getAvailableLand(sowingDto.getLandId()); // Arazi ID'sini kullanarak mevcut alanı al
+        int availableLand = sowingService.getAvailableLand(sowingDto.getLandId());
 
         // Ekim miktarını kontrol et
         if (sowingDto.getAmount() > availableLand) {
@@ -61,5 +58,16 @@ public class SowingController {
 
         // Kullanıcı ID'sine göre ekimleri getir
         return sowingService.getSowingsByUser(user.getId());
+    }
+
+    @GetMapping("/detail/{id}")
+    public SowingDTO getSowingById(@PathVariable Long id) {
+        return sowingService.getSowingById(id);
+    }
+
+    @PutMapping("/update/{id}")
+    public Sowing updateSowing(@PathVariable Long id, @RequestBody SowingDTO sowingDTO) {
+        // SowingService'i kullanarak ekimi güncelle
+        return sowingService.updateSowing(id, sowingDTO);
     }
 }

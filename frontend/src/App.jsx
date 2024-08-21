@@ -11,6 +11,7 @@ import LandList from './components/LandList';
 import LandDetails from './components/LandDetails';
 import AddSowing from './components/AddSowing';
 import SowingList from './components/SowingList'; // Burada SowingList import ediliyor
+import SowingDetails from './components/SowingDetails.jsx';
 import './App.css';
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
                 <Route path="/lands/detail/:id" element={isLoggedIn ? <LandDetails /> : <Navigate to="/login" />} />
                 <Route path="/sowings" element={isLoggedIn ? <AddSowing /> : <Navigate to="/login" />} />
                 <Route path="/sowing-list" element={isLoggedIn ? <SowingList /> : <Navigate to="/login" />} />
+                <Route path="/sowings/detail/:id" element={<SowingDetails />} />
             </Routes>
         </Router>
     );

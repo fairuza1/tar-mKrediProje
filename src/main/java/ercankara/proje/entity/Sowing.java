@@ -1,5 +1,6 @@
 package ercankara.proje.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,6 +20,7 @@ public class Sowing {
 
     @ManyToOne
     @JoinColumn(name = "land_id", nullable = false)
+    @JsonBackReference  // Bu alan serileştirilirken görmezden gelinir
     private Land land;
 
     @Column(nullable = false)

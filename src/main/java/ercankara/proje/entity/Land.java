@@ -2,6 +2,7 @@ package ercankara.proje.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -42,5 +43,6 @@ public class Land {
 
     @OneToMany(mappedBy = "land", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("land-sowing")
+    @JsonManagedReference  // Bu alan serileştirilirken dahil edilir
     private List<Sowing> sowings;
 }

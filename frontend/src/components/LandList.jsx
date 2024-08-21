@@ -39,10 +39,6 @@ const LandList = () => {
         navigate(`/lands/detail/${id}`);
     };
 
-    const handleEdit = (id) => {
-        navigate(`/lands/edit/${id}`);
-    };
-
     return (
         <Container maxWidth="lg"> {/* Tablonun genişliği için maxWidth 'lg' olarak ayarlandı */}
             <Box>
@@ -62,7 +58,7 @@ const LandList = () => {
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>İlçe</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Köy</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi tipi</TableCell> {/* Arazi Tipi için yeni sütun */}
-                                <TableCell align="center" colSpan={2} sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Actions</TableCell> {/* Sütunları birleştirip Actions başlığını ortalıyoruz */}
+                                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Actions</TableCell> {/* Sadece Actions başlığını bıraktık */}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -76,11 +72,6 @@ const LandList = () => {
                                     <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.district}</TableCell>
                                     <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.village || 'N/A'}</TableCell>
                                     <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.landType || 'N/A'}</TableCell> {/* Arazi Tipi */}
-                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>
-                                        <Button variant="contained" color="primary" onClick={() => handleEdit(land.id)}>
-                                            Düzenle
-                                        </Button>
-                                    </TableCell>
                                     <TableCell align="center" sx={{ fontSize: '1rem' }}>
                                         <Button variant="outlined" color="secondary" onClick={() => handleDetail(land.id)}>
                                             Detay
