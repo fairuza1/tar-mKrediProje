@@ -69,6 +69,12 @@ const SowingList = () => {
         navigate(`/sowings/detail/${id}`);
     };
 
+    const handleHarvest = (sowingId) => {
+        // Burada hasat etme işlemini gerçekleştiren bir fonksiyon çağırılabilir.
+        console.log(`Hasat ediliyor: ${sowingId}`);
+        // Örneğin, hasat etme API'sini çağırabilirsiniz.
+    };
+
     return (
         <Container maxWidth="lg">
             <Box>
@@ -111,6 +117,9 @@ const SowingList = () => {
                                         <TableCell align="right">
                                             <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} sx={{ ml: 2 }}>
                                                 Detay
+                                            </Button>
+                                            <Button variant="contained" color="secondary" onClick={() => handleHarvest(sowing.id)} sx={{ ml: 2 }}>
+                                                Hasat Et
                                             </Button>
                                         </TableCell>
                                     </TableRow>

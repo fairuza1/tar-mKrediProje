@@ -15,6 +15,7 @@ import card2 from '../assets/card2.jpg';
 import card3 from '../assets/card3.jpg';
 import card4 from '../assets/card4.jpg';
 import card5 from '../assets/card5.jpg';
+import card6 from '../assets/card6.jpg';
 
 
 const pageName = "Ekim Yap"
@@ -25,7 +26,7 @@ const cards = [
     { title: 'Veriminizi Degerlendiriniz', button: 'Verim Degerlendir', link: '/degerlendirme', image: card3 },
     { title: 'Ekim Yap', description: '', button: 'Ekim Yap', link: '/sowings', image: card4 },
     { title: 'Ekimlerim', description: '', button: 'Ekimlerim', link: '/sowing-list', image:card5 },
-    { title: 'Card 6', description: 'Description 6', link: '/link6', image: '' },
+    { title: 'Hasatlarım', description: '', button: 'Hasatlarım',link: '/harvest', image: card6 },
 ];
 
 function Home() {
