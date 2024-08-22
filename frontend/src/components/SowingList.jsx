@@ -21,7 +21,7 @@ const SowingList = () => {
                 if (error.response && error.response.status === 401) {
                     setIsAuthenticated(false);
                 } else {
-                    setError('Ekim verileri alınırken bir hata oluştu.');
+                    setError('Ekim verileri alınırken bir hata oluştu.');//
                 }
             }
 
