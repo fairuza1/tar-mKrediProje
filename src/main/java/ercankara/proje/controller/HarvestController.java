@@ -30,5 +30,14 @@ public class HarvestController {
         Harvest createdHarvest = harvestService.createHarvest(harvest);
         return new ResponseEntity<>(createdHarvest, HttpStatus.CREATED);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteHarvest(@PathVariable Long id) {
+        Harvest harvest = harvestService.getHarvestById(id); // Hasadı bul
+        if (harvest == null) {
+            return ResponseEntity.notFound().build(); // Hasat bulunamazsa 404 döndür
+        }
+        harvestService.deleteHarvest(id); // Hasadı sil
+        return ResponseEntity.noContent().build(); // Başarılı silme için 204 döndür
+    }
 }
 

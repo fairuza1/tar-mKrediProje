@@ -8,15 +8,11 @@ const SowingList = () => {
     const [sowings, setSowings] = useState([]);
     const [lands, setLands] = useState([]);
     const [isAuthenticated, setIsAuthenticated] = useState(true);
-    const [harvestedSowings, setHarvestedSowings] = useState([]); // hasat edilen ekimleri dizi olarak sakla
+    const [harvestedSowings, setHarvestedSowings] = useState(JSON.parse(localStorage.getItem('harvestedSowings')) || []);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Yerel depolamadan hasat edilen ekimleri al
-        const harvestedSowingsFromStorage = JSON.parse(localStorage.getItem('harvestedSowings')) || [];
-        setHarvestedSowings(harvestedSowingsFromStorage);
-
         const fetchData = async () => {
             try {
                 const sowingResponse = await axios.get('http://localhost:8080/sowings', { withCredentials: true });
@@ -76,7 +72,6 @@ const SowingList = () => {
 
     const handleHarvest = async (sowingId) => {
         const sowing = sowings.find(s => s.id === sowingId);
-
         if (!sowing) {
             console.error('Ekim bulunamadı:', sowingId);
             return;
@@ -91,7 +86,6 @@ const SowingList = () => {
             await axios.post('http://localhost:8080/harvests', harvestData, { withCredentials: true });
             const updatedHarvestedSowings = [...harvestedSowings, sowingId];
             setHarvestedSowings(updatedHarvestedSowings);
-            // Hasat edilen ekimleri yerel depolamada sakla
             localStorage.setItem('harvestedSowings', JSON.stringify(updatedHarvestedSowings));
             alert('Hasat başarıyla kaydedildi!');
         } catch (error) {
@@ -128,7 +122,7 @@ const SowingList = () => {
                             {sowings.map((sowing) => {
                                 const land = getLand(sowing.landId);
                                 const remainingSize = getRemainingSize(sowing.landId);
-                                const isHarvested = harvestedSowings.includes(sowing.id); // hasat edilmiş mi kontrol et
+                                const isHarvested = harvestedSowings.includes(sowing.id);
 
                                 return (
                                     <TableRow key={sowing.id}>

@@ -24,5 +24,11 @@ public class HarvestService {
         return harvestRepository.save(harvest);
     }
 
-    // Diğer gerekli metotlar eklenebilir
+    public void deleteHarvest(Long id) {
+        harvestRepository.deleteById(id);
+    }
+
+    public Harvest getHarvestById(Long id) {
+        return harvestRepository.findById(id).orElse(null); // Hasadı bul
+    }
 }

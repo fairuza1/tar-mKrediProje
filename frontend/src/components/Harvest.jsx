@@ -3,10 +3,11 @@ import { Container, Typography, Box, Table, TableBody, TableCell, TableContainer
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
 
-const Harvest = () => {
+const Harvest = ({ onSowingUpdate }) => {
     const [harvests, setHarvests] = useState([]);
     const [sowings, setSowings] = useState([]);
     const [lands, setLands] = useState([]);
+    const [harvestedSowings, setHarvestedSowings] = useState(JSON.parse(localStorage.getItem('harvestedSowings')) || []);
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -53,13 +54,24 @@ const Harvest = () => {
         return sowings.find(sowing => sowing.id === sowingId);
     };
 
-    const handleDelete = async (harvestId) => {
+    const handleDelete = async (harvestId, sowingId) => {
         try {
+            // Sunucuya silme isteği gönder
             await axios.delete(`http://localhost:8080/harvests/${harvestId}`, { withCredentials: true });
-            setHarvests(harvests.filter(harvest => harvest.id !== harvestId));
+
+            // Yerel durumu güncelle
+            const updatedHarvests = harvests.filter(h => h.id !== harvestId);
+            setHarvests(updatedHarvests);
+
+            // Yerel depolamayı güncelle
+            const updatedHarvestedSowings = harvestedSowings.filter(id => id !== sowingId);
+            setHarvestedSowings(updatedHarvestedSowings);
+            localStorage.setItem('harvestedSowings', JSON.stringify(updatedHarvestedSowings)); // Güncellenmiş veriyi yerel depolama yaz
+
+            onSowingUpdate(sowingId); // Hasat sonrası sowing güncelleniyor
             alert('Hasat başarıyla silindi!');
         } catch (error) {
-            console.error('Hasat silinirken bir hata oluştu:', error);
+            console.error('Hasat silme hatası:', error);
             setError('Hasat silinirken bir hata oluştu.');
         }
     };
@@ -93,16 +105,16 @@ const Harvest = () => {
                                 return (
                                     <TableRow key={harvest.id}>
                                         <TableCell component="th" scope="row" sx={{ fontSize: '1rem' }}>
-                                            {land ? land.name : 'Bilinmiyor'} {/* Arazi Adı */}
+                                            {land ? land.name : 'Bilinmiyor'}
                                         </TableCell>
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{land ? land.landType : 'Bilinmiyor'}</TableCell> {/* Arazi Tipi */}
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{sowing ? sowing.amount : 'Bilinmiyor'} m²</TableCell> {/* Ekilen Alan */}
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{new Date(harvest.harvestDate).toLocaleDateString()}</TableCell> {/* Hasat Tarihi */}
+                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{land ? land.landType : 'Bilinmiyor'}</TableCell>
+                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{sowing ? sowing.amount : 'Bilinmiyor'} m²</TableCell>
+                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{new Date(harvest.harvestDate).toLocaleDateString()}</TableCell>
                                         <TableCell align="right">
                                             <Button
                                                 variant="contained"
                                                 color="error"
-                                                onClick={() => handleDelete(harvest.id)}
+                                                onClick={() => handleDelete(harvest.id, sowing.id)}
                                             >
                                                 Sil
                                             </Button>
