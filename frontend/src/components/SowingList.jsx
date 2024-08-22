@@ -8,10 +8,15 @@ const SowingList = () => {
     const [sowings, setSowings] = useState([]);
     const [lands, setLands] = useState([]);
     const [isAuthenticated, setIsAuthenticated] = useState(true);
+    const [harvestedSowings, setHarvestedSowings] = useState([]); // hasat edilen ekimleri dizi olarak sakla
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Yerel depolamadan hasat edilen ekimleri al
+        const harvestedSowingsFromStorage = JSON.parse(localStorage.getItem('harvestedSowings')) || [];
+        setHarvestedSowings(harvestedSowingsFromStorage);
+
         const fetchData = async () => {
             try {
                 const sowingResponse = await axios.get('http://localhost:8080/sowings', { withCredentials: true });
@@ -21,7 +26,7 @@ const SowingList = () => {
                 if (error.response && error.response.status === 401) {
                     setIsAuthenticated(false);
                 } else {
-                    setError('Ekim verileri alınırken bir hata oluştu.');//
+                    setError('Ekim verileri alınırken bir hata oluştu.');
                 }
             }
 
@@ -84,8 +89,11 @@ const SowingList = () => {
 
         try {
             await axios.post('http://localhost:8080/harvests', harvestData, { withCredentials: true });
+            const updatedHarvestedSowings = [...harvestedSowings, sowingId];
+            setHarvestedSowings(updatedHarvestedSowings);
+            // Hasat edilen ekimleri yerel depolamada sakla
+            localStorage.setItem('harvestedSowings', JSON.stringify(updatedHarvestedSowings));
             alert('Hasat başarıyla kaydedildi!');
-            fetchData(); // Ekim verilerini yeniden yükle
         } catch (error) {
             console.error('Hasat kaydetme hatası:', error);
             setError('Hasat kaydedilirken bir hata oluştu.');
@@ -120,6 +128,8 @@ const SowingList = () => {
                             {sowings.map((sowing) => {
                                 const land = getLand(sowing.landId);
                                 const remainingSize = getRemainingSize(sowing.landId);
+                                const isHarvested = harvestedSowings.includes(sowing.id); // hasat edilmiş mi kontrol et
+
                                 return (
                                     <TableRow key={sowing.id}>
                                         <TableCell component="th" scope="row" sx={{ fontSize: '1rem' }}>
@@ -132,8 +142,16 @@ const SowingList = () => {
                                         <TableCell align="right" sx={{ fontSize: '1rem' }}>{remainingSize < 0 ? 0 : remainingSize}</TableCell>
                                         <TableCell align="right" sx={{ fontSize: '1rem' }}>{new Date(sowing.sowingDate).toLocaleDateString()}</TableCell>
                                         <TableCell align="right" sx={{ fontSize: '1rem' }}>
-                                            <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)}>Detay</Button>
-                                            <Button variant="contained" color="success" onClick={() => handleHarvest(sowing.id)} sx={{ ml: 1 }}>Hasat Et</Button>
+                                            <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} disabled={isHarvested}>Detay</Button>
+                                            <Button
+                                                variant="contained"
+                                                color="success"
+                                                onClick={() => handleHarvest(sowing.id)}
+                                                sx={{ ml: 1 }}
+                                                disabled={isHarvested}
+                                            >
+                                                {isHarvested ? 'Hasat Edildi' : 'Hasat Et'}
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 );
