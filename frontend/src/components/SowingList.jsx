@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Alert } from '@mui/material';
+import { Container, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Alert, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
@@ -10,6 +10,9 @@ const SowingList = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(true);
     const [harvestedSowings, setHarvestedSowings] = useState(JSON.parse(localStorage.getItem('harvestedSowings')) || []);
     const [error, setError] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -23,6 +26,9 @@ const SowingList = () => {
                     setIsAuthenticated(false);
                 } else {
                     setError('Ekim verileri alınırken bir hata oluştu.');
+                    setSnackbarSeverity('error');
+                    setSnackbarMessage('Ekim verileri alınırken bir hata oluştu.');
+                    setSnackbarOpen(true);
                 }
             }
 
@@ -32,6 +38,9 @@ const SowingList = () => {
             } catch (error) {
                 console.error('Error fetching lands:', error);
                 setError('Arazi verileri alınırken bir hata oluştu.');
+                setSnackbarSeverity('error');
+                setSnackbarMessage('Arazi verileri alınırken bir hata oluştu.');
+                setSnackbarOpen(true);
             }
         };
 
@@ -87,11 +96,20 @@ const SowingList = () => {
             const updatedHarvestedSowings = [...harvestedSowings, sowingId];
             setHarvestedSowings(updatedHarvestedSowings);
             localStorage.setItem('harvestedSowings', JSON.stringify(updatedHarvestedSowings));
-            alert('Hasat başarıyla kaydedildi!');
+            setSnackbarSeverity('success');
+            setSnackbarMessage('Hasat başarıyla kaydedildi!');
+            setSnackbarOpen(true);
         } catch (error) {
             console.error('Hasat kaydetme hatası:', error);
             setError('Hasat kaydedilirken bir hata oluştu.');
+            setSnackbarSeverity('error');
+            setSnackbarMessage('Hasat kaydedilirken bir hata oluştu.');
+            setSnackbarOpen(true);
         }
+    };
+
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
     };
 
     return (
@@ -154,6 +172,15 @@ const SowingList = () => {
                     </Table>
                 </TableContainer>
             </Box>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+            >
+                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };
