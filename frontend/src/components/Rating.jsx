@@ -23,7 +23,7 @@ import {
     InputAdornment,
     TextField
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom'; // useParams ekleniyor
 import axios from "axios";
 
 // Icon büyütme stili
@@ -36,9 +36,12 @@ const StyledIcon = styled('div')(({ selected }) => ({
     },
 }));
 
-const RatingComponent = () => {
+const Rating = () => {
     const navigate = useNavigate();
-    const [harvestId, setHarvestId] = React.useState(null);
+
+    // URL'den harvestId'yi almak için useParams kullanılıyor
+    const { id: harvestId } = useParams(); // harvestId dinamik olarak alınıyor
+
     const [harvestCondition, setHarvestCondition] = React.useState(0);
     const [productQuality, setProductQuality] = React.useState(0);
     const [overallRating, setOverallRating] = React.useState(0);
@@ -50,7 +53,8 @@ const RatingComponent = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!harvestId || !productQuantity || harvestCondition === 0 || productQuality === 0) {
+        // Tüm alanların doldurulup doldurulmadığını kontrol et
+        if (!harvestId || !productQuantity || harvestCondition === 0 || productQuality === 0 || overallRating === 0) {
             setSnackbarMessage('Lütfen tüm alanları doldurun.');
             setSnackbarSeverity('warning');
             setSnackbarOpen(true);
@@ -58,7 +62,7 @@ const RatingComponent = () => {
         }
 
         const newEvaluation = {
-            harvestId,
+            harvestId, // harvestId artık prop olarak kullanılıyor
             harvestCondition,
             productQuality,
             productQuantity: parseFloat(productQuantity),
@@ -182,21 +186,15 @@ const RatingComponent = () => {
                                 </TableCell>
                                 <TableCell colSpan={5} align="center">
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                                        <StyledIcon>
-                                            <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744' }} />
-                                        </StyledIcon>
-                                        <StyledIcon>
-                                            <SentimentDissatisfiedIcon style={{ color: '#FF9100' }} />
-                                        </StyledIcon>
-                                        <StyledIcon>
-                                            <SentimentSatisfiedIcon style={{ color: '#FFD600' }} />
-                                        </StyledIcon>
-                                        <StyledIcon>
-                                            <SentimentSatisfiedAltIcon style={{ color: '#76FF03' }} />
-                                        </StyledIcon>
-                                        <StyledIcon>
-                                            <SentimentVerySatisfiedIcon style={{ color: '#00E676' }} />
-                                        </StyledIcon>
+                                        {[1, 2, 3, 4, 5].map((value) => (
+                                            <StyledIcon key={value} selected={overallRating === value} onClick={() => setOverallRating(value)}>
+                                                {value === 1 && <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744' }} />}
+                                                {value === 2 && <SentimentDissatisfiedIcon style={{ color: '#FF9100' }} />}
+                                                {value === 3 && <SentimentSatisfiedIcon style={{ color: '#FFD600' }} />}
+                                                {value === 4 && <SentimentSatisfiedAltIcon style={{ color: '#76FF03' }} />}
+                                                {value === 5 && <SentimentVerySatisfiedIcon style={{ color: '#00E676' }} />}
+                                            </StyledIcon>
+                                        ))}
                                     </Box>
                                 </TableCell>
                             </TableRow>
@@ -220,8 +218,9 @@ const RatingComponent = () => {
     );
 };
 
-RatingComponent.propTypes = {
+// harvestId prop'unun gerekli olduğunu belirt
+Rating.propTypes = {
     harvestId: PropTypes.string.isRequired,
 };
 
-export default RatingComponent;
+export default Rating;

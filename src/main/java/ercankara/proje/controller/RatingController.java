@@ -31,4 +31,16 @@ public class RatingController {
         List<RatingDTO> ratings = ratingService.getAllRatings();
         return new ResponseEntity<>(ratings, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RatingDTO> getRatingById(@PathVariable Long id) {
+        RatingDTO ratingDTO = ratingService.getRatingById(id); // 'getRatingById0' yerine 'getRatingById' olacak
+        return new ResponseEntity<>(ratingDTO, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRating(@PathVariable Long id) {
+        ratingService.deleteRating(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

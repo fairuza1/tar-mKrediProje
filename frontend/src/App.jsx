@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import AddLand from './components/AddLand';
@@ -10,7 +10,7 @@ import Login from './components/Login.jsx';
 import LandList from './components/LandList';
 import LandDetails from './components/LandDetails';
 import AddSowing from './components/AddSowing';
-import SowingList from './components/SowingList'; // Burada SowingList import ediliyor
+import SowingList from './components/SowingList';
 import SowingDetails from './components/SowingDetails.jsx';
 import Harvest from './components/Harvest.jsx';
 import Rating from './components/Rating.jsx';
@@ -18,7 +18,7 @@ import './App.css';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [loading, setLoading] = useState(true); // Yüklenme durumu
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -37,14 +37,14 @@ function App() {
                 console.error('Error checking authentication:', error);
                 setIsLoggedIn(false);
             } finally {
-                setLoading(false); // Yüklenme durumunu güncelle
+                setLoading(false);
             }
         };
         checkAuth();
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>; // Yüklenme sırasında bir mesaj veya spinner gösterebilirsiniz
+        return <div>Loading...</div>;
     }
 
     return (
@@ -64,7 +64,8 @@ function App() {
                 <Route path="/sowing-list" element={isLoggedIn ? <SowingList /> : <Navigate to="/login" />} />
                 <Route path="/sowings/detail/:id" element={<SowingDetails />} />
                 <Route path="/harvest" element={<Harvest />} />
-                <Route path="/rating" element={<Rating />} />
+                {/* harvestId parametreli route */}
+                <Route path="/rating/:id" element={<Rating />} />
             </Routes>
         </Router>
     );

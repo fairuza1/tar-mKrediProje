@@ -92,13 +92,21 @@ const SowingList = () => {
         };
 
         try {
-            await axios.post('http://localhost:8080/harvests', harvestData, { withCredentials: true });
+            const response = await axios.post('http://localhost:8080/harvests', harvestData, { withCredentials: true });
+            const harvestedId = response.data.id; // Hasat kaydı oluşturulduktan sonra gelen ID
+
             const updatedHarvestedSowings = [...harvestedSowings, sowingId];
             setHarvestedSowings(updatedHarvestedSowings);
             localStorage.setItem('harvestedSowings', JSON.stringify(updatedHarvestedSowings));
             setSnackbarSeverity('success');
             setSnackbarMessage('Hasat başarıyla kaydedildi!');
             setSnackbarOpen(true);
+
+            // Hasat başarılı ise 3 saniye sonra değerlendirme sayfasına yönlendir
+            setTimeout(() => {
+                navigate(`/rating/${harvestedId}`, { state: { harvestId: harvestedId } });
+            }, 3000); // 3 saniye gecikme
+
         } catch (error) {
             console.error('Hasat kaydetme hatası:', error);
             setError('Hasat kaydedilirken bir hata oluştu.');

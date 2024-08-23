@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RatingDTO {
-    private Long harvestId;
+    private Long id;
+    private Long harvestId; // İlgili hasat ID'si (gerekli olacak)
     private int harvestCondition; // 1-5 arası
     private int productQuality;    // 1-5 arası
     private double productQuantity; // kg cinsinden
