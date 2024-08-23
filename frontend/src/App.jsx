@@ -14,6 +14,7 @@ import SowingList from './components/SowingList';
 import SowingDetails from './components/SowingDetails.jsx';
 import Harvest from './components/Harvest.jsx';
 import Rating from './components/Rating.jsx';
+import RatingList from './components/RatingList.jsx'
 import './App.css';
 
 function App() {
@@ -65,7 +66,9 @@ function App() {
                 <Route path="/sowings/detail/:id" element={<SowingDetails />} />
                 <Route path="/harvest" element={<Harvest />} />
                 {/* harvestId parametreli route */}
-                <Route path="/rating/:id" element={<Rating />} />
+                <Route path="/rating/:harvestId" element={<Rating />} />
+                <Route path="/rating-list" element={isLoggedIn ? <RatingList /> : <Navigate to="/login" />} />
+
             </Routes>
         </Router>
     );

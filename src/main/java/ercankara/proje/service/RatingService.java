@@ -23,6 +23,11 @@ public class RatingService {
         this.harvestRepository = harvestRepository;
     }
 
+    // Hasat ID'sine göre değerlendirmeleri bul
+    public List<Rating> findByHarvestId(Long harvestId) {
+        return ratingRepository.findByHarvestId(harvestId);
+    }
+
     public Rating createRating(RatingDTO ratingDTO) {
         Harvest harvest = harvestRepository.findById(ratingDTO.getHarvestId())
                 .orElseThrow(() -> new RuntimeException("Harvest not found"));

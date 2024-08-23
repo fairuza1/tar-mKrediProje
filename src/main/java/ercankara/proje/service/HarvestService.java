@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HarvestService {
@@ -30,5 +31,9 @@ public class HarvestService {
 
     public Harvest getHarvestById(Long id) {
         return harvestRepository.findById(id).orElse(null); // Hasadı bul
+    }
+    public Harvest findById(Long id) {
+        Optional<Harvest> harvestOptional = harvestRepository.findById(id);
+        return harvestOptional.orElse(null); // Eğer hasat bulunamazsa null döndür
     }
 }

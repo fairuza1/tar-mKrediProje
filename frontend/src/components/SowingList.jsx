@@ -130,18 +130,18 @@ const SowingList = () => {
                     Ekimlerim Listesi
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
-                <TableContainer component={Paper} sx={{ maxHeight: '75vh' }}>
-                    <Table sx={{ minWidth: 900 }} aria-label="sowings table">
+                <TableContainer component={Paper} sx={{ maxHeight: '75vh', width: '100%' }}> {/* Genişlik artırıldı */}
+                    <Table sx={{ minWidth: 1000 }} aria-label="sowings table"> {/* minWidth artırıldı */}
                         <TableHead>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazim</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Tipi</TableCell>
+                                <TableCell align="left" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Tipi</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Bitki</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Alanı</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Ekilen Alan</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Boş Alan</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Zaman</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Aksiyonlar</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Aksiyonlar</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -155,11 +155,11 @@ const SowingList = () => {
                                         <TableCell component="th" scope="row" sx={{ fontSize: '1rem' }}>
                                             {land ? land.name : 'Bilinmiyor'}
                                         </TableCell>
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{land ? land.landType : 'Bilinmiyor'}</TableCell>
+                                        <TableCell align="center" sx={{ fontSize: '1rem' }}>{land ? land.landType : 'Bilinmiyor'}</TableCell>
                                         <TableCell align="right" sx={{ fontSize: '1rem' }}>{sowing.plantName}</TableCell>
                                         <TableCell align="right" sx={{ fontSize: '1rem' }}>{land ? land.landSize : 'Bilinmiyor'}</TableCell>
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{sowing.amount}</TableCell>
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{remainingSize < 0 ? 0 : remainingSize}</TableCell>
+                                        <TableCell align="center" sx={{ fontSize: '1rem' }}>{sowing.amount}</TableCell>
+                                        <TableCell align="center" sx={{ fontSize: '1rem' }}>{remainingSize < 0 ? 0 : remainingSize}</TableCell>
                                         <TableCell align="right" sx={{ fontSize: '1rem' }}>{new Date(sowing.sowingDate).toLocaleDateString()}</TableCell>
                                         <TableCell align="right" sx={{ fontSize: '1rem' }}>
                                             <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} disabled={isHarvested}>Detay</Button>

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
@@ -23,14 +23,13 @@ import {
     InputAdornment,
     TextField
 } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom'; // useParams ekleniyor
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from "axios";
 
-// Icon büyütme stili
 const StyledIcon = styled('div')(({ selected }) => ({
     cursor: 'pointer',
     transition: 'transform 0.2s',
-    transform: selected ? 'scale(2)' : 'scale(1)', // Seçildiğinde 2 katı büyüt
+    transform: selected ? 'scale(2)' : 'scale(1)',
     '&:hover': {
         transform: 'scale(3)',
     },
@@ -38,22 +37,20 @@ const StyledIcon = styled('div')(({ selected }) => ({
 
 const Rating = () => {
     const navigate = useNavigate();
+    const { harvestId } = useParams();
 
-    // URL'den harvestId'yi almak için useParams kullanılıyor
-    const { id: harvestId } = useParams(); // harvestId dinamik olarak alınıyor
-
-    const [harvestCondition, setHarvestCondition] = React.useState(0);
-    const [productQuality, setProductQuality] = React.useState(0);
-    const [overallRating, setOverallRating] = React.useState(0);
-    const [productQuantity, setProductQuantity] = React.useState('');
-    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-    const [snackbarMessage, setSnackbarMessage] = React.useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = React.useState('success');
+    const [harvestCondition, setHarvestCondition] = useState(0);
+    const [productQuality, setProductQuality] = useState(0);
+    const [overallRating, setOverallRating] = useState(0);
+    const [productQuantity, setProductQuantity] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Tüm alanların doldurulup doldurulmadığını kontrol et
+        // Gerekli kontroller
         if (!harvestId || !productQuantity || harvestCondition === 0 || productQuality === 0 || overallRating === 0) {
             setSnackbarMessage('Lütfen tüm alanları doldurun.');
             setSnackbarSeverity('warning');
@@ -61,8 +58,15 @@ const Rating = () => {
             return;
         }
 
+        if (isNaN(productQuantity) || parseFloat(productQuantity) <= 0) {
+            setSnackbarMessage('Lütfen geçerli bir ürün miktarı girin.');
+            setSnackbarSeverity('warning');
+            setSnackbarOpen(true);
+            return;
+        }
+
         const newEvaluation = {
-            harvestId, // harvestId artık prop olarak kullanılıyor
+            harvestId,
             harvestCondition,
             productQuality,
             productQuantity: parseFloat(productQuantity),
@@ -70,18 +74,24 @@ const Rating = () => {
         };
 
         try {
-            const response = await axios.post('http://localhost:8080/rating', newEvaluation, { withCredentials: true });
+            const response = await axios.post('http://localhost:8080/api/ratings', newEvaluation, { withCredentials: true });
 
-            if (response.status === 200) {
+            if (response.status === 201) {
                 setSnackbarMessage('Değerlendirme başarıyla yapıldı.');
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
+                // Formu temizle
+                setHarvestCondition(0);
+                setProductQuality(0);
+                setOverallRating(0);
+                setProductQuantity('');
                 setTimeout(() => navigate('/'), 3000);
             } else {
                 setSnackbarMessage('Değerlendirme kaydedilemedi.');
                 setSnackbarSeverity('error');
                 setSnackbarOpen(true);
             }
+
         } catch (error) {
             console.error('Hata oluştu:', error);
             setSnackbarMessage('Hata: ' + error.message);
@@ -166,17 +176,15 @@ const Rating = () => {
                                 <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd' }}>
                                     Ürün Miktarı
                                 </TableCell>
-                                <TableCell colSpan={5} align="center">
+                                <TableCell colSpan={5}>
                                     <TextField
-                                        label="Ürün Miktarı"
+                                        fullWidth
+                                        variant="outlined"
                                         value={productQuantity}
                                         onChange={(e) => setProductQuantity(e.target.value)}
-                                        type="number"
                                         InputProps={{
                                             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
                                         }}
-                                        fullWidth
-                                        variant="outlined"
                                     />
                                 </TableCell>
                             </TableRow>
@@ -186,15 +194,21 @@ const Rating = () => {
                                 </TableCell>
                                 <TableCell colSpan={5} align="center">
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                                        {[1, 2, 3, 4, 5].map((value) => (
-                                            <StyledIcon key={value} selected={overallRating === value} onClick={() => setOverallRating(value)}>
-                                                {value === 1 && <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744' }} />}
-                                                {value === 2 && <SentimentDissatisfiedIcon style={{ color: '#FF9100' }} />}
-                                                {value === 3 && <SentimentSatisfiedIcon style={{ color: '#FFD600' }} />}
-                                                {value === 4 && <SentimentSatisfiedAltIcon style={{ color: '#76FF03' }} />}
-                                                {value === 5 && <SentimentVerySatisfiedIcon style={{ color: '#00E676' }} />}
-                                            </StyledIcon>
-                                        ))}
+                                        <StyledIcon selected={overallRating === 1} onClick={() => setOverallRating(1)}>
+                                            <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744' }} />
+                                        </StyledIcon>
+                                        <StyledIcon selected={overallRating === 2} onClick={() => setOverallRating(2)}>
+                                            <SentimentDissatisfiedIcon style={{ color: '#FF9100' }} />
+                                        </StyledIcon>
+                                        <StyledIcon selected={overallRating === 3} onClick={() => setOverallRating(3)}>
+                                            <SentimentSatisfiedIcon style={{ color: '#FFD600' }} />
+                                        </StyledIcon>
+                                        <StyledIcon selected={overallRating === 4} onClick={() => setOverallRating(4)}>
+                                            <SentimentSatisfiedAltIcon style={{ color: '#76FF03' }} />
+                                        </StyledIcon>
+                                        <StyledIcon selected={overallRating === 5} onClick={() => setOverallRating(5)}>
+                                            <SentimentVerySatisfiedIcon style={{ color: '#00E676' }} />
+                                        </StyledIcon>
                                     </Box>
                                 </TableCell>
                             </TableRow>
@@ -202,25 +216,25 @@ const Rating = () => {
                     </Table>
                 </TableContainer>
 
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                    <Button variant="contained" onClick={handleSubmit}>
-                        Değerlendirmeyi Gönder
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button variant="contained" color="primary" onClick={handleSubmit}>
+                        Gönder
                     </Button>
                 </Box>
-
-                <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
-                    <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                        {snackbarMessage}
-                    </Alert>
-                </Snackbar>
             </Box>
+
+            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };
 
-// harvestId prop'unun gerekli olduğunu belirt
+// PropTypes kısmını kaldırabilirsin
 Rating.propTypes = {
-    harvestId: PropTypes.string.isRequired,
+    // harvestId: PropTypes.string.isRequired // Bu satırı kaldır
 };
 
 export default Rating;

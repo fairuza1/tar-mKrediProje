@@ -22,8 +22,12 @@ public class RatingController {
 
     @PostMapping
     public ResponseEntity<Rating> createRating(@RequestBody RatingDTO ratingDTO) {
-        Rating createdRating = ratingService.createRating(ratingDTO);
-        return new ResponseEntity<>(createdRating, HttpStatus.CREATED);
+        try {
+            Rating rating = ratingService.createRating(ratingDTO);
+            return new ResponseEntity<>(rating, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping

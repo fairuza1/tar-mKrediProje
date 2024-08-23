@@ -24,7 +24,6 @@ const LandDetails = () => {
         try {
             const response = await fetch(`http://localhost:8080/lands/detail/${id}`);
             const data = await response.json();
-            // Hesaplama işlemi
             const remainingArea = data.landSize - data.sowedArea;
             setLand({ ...data, remainingArea });
             if (data.city) {
@@ -32,16 +31,18 @@ const LandDetails = () => {
                     .filter(item => item.il.localeCompare(data.city, undefined, { sensitivity: 'base' }) === 0)
                     .map(item => item.ilce);
                 setIlceler(ilceList);
-            }
-            if (data.city && data.district) {
-                const koyList = koylerData
-                    .filter(item => item.il.localeCompare(data.city, undefined, { sensitivity: 'base' }) === 0 && item.ilce.localeCompare(data.district, undefined, { sensitivity: 'base' }) === 0)
-                    .map(item => item.mahalle_koy);
-                setKoyler(koyList);
+                fetchKoyler(data.city, data.district); // İlk başta köyleri yükle
             }
         } catch (error) {
             console.error('Error fetching land details:', error);
         }
+    };
+
+    const fetchKoyler = (city, district) => {
+        const koyList = koylerData
+            .filter(item => item.il.localeCompare(city, undefined, { sensitivity: 'base' }) === 0 && item.ilce.localeCompare(district, undefined, { sensitivity: 'base' }) === 0)
+            .map(item => item.mahalle_koy);
+        setKoyler(koyList);
     };
 
     const handleEditToggle = () => {
@@ -60,13 +61,13 @@ const LandDetails = () => {
             .then(data => {
                 setLand(data);
                 setIsEditing(false);
-                setSnackbarMessage('Land updated successfully!');
+                setSnackbarMessage('Arazi bilgileri başarıyla güncellendi!');
                 setSnackbarSeverity('success');
                 setOpenSnackbar(true);
             })
             .catch(error => {
                 console.error('Error updating land details:', error);
-                setSnackbarMessage('Failed to update the Land.');
+                setSnackbarMessage('Arazi güncellenemedi.');
                 setSnackbarSeverity('error');
                 setOpenSnackbar(true);
             });
@@ -78,20 +79,20 @@ const LandDetails = () => {
         })
             .then(response => {
                 if (response.ok) {
-                    setSnackbarMessage('Land deleted successfully!');
+                    setSnackbarMessage('Arazi başarıyla silindi!');
                     setSnackbarSeverity('success');
                     setOpenSnackbar(true);
                     setOpenDeleteDialog(false);
-                    navigate('/lands'); // Silme işleminden sonra kullanıcıyı liste sayfasına yönlendir
+                    navigate('/lands');
                 } else {
-                    setSnackbarMessage('Failed to delete the Land.');
+                    setSnackbarMessage('Arazi silinemedi.');
                     setSnackbarSeverity('error');
                     setOpenSnackbar(true);
                 }
             })
             .catch(error => {
                 console.error('Error deleting land:', error);
-                setSnackbarMessage('Failed to delete the Land.');
+                setSnackbarMessage('Arazi silinemedi.');
                 setSnackbarSeverity('error');
                 setOpenSnackbar(true);
             });
@@ -115,13 +116,25 @@ const LandDetails = () => {
             ...prevState,
             [name]: value,
         }));
+
+        // İl ve ilçe değiştiğinde köyleri güncelle
+        if (name === 'city') {
+            const ilceList = ilIlceData
+                .filter(item => item.il.localeCompare(value, undefined, { sensitivity: 'base' }) === 0)
+                .map(item => item.ilce);
+            setIlceler(ilceList);
+            setKoyler([]); // İl değiştiğinde köyleri sıfırla
+            setLand(prevState => ({ ...prevState, district: '', village: '' })); // Seçimlerde sıfırla
+        } else if (name === 'district') {
+            fetchKoyler(land.city, value); // İlçe değiştiğinde köyleri yükle
+        }
     };
 
     // Benzersiz şehir isimlerini elde etme
     const uniqueCities = Array.from(new Set(ilIlceData.map(item => item.il)));
 
     if (!land) {
-        return <Typography>Loading...</Typography>;
+        return <Typography>Yükleniyor...</Typography>;
     }
 
     return (

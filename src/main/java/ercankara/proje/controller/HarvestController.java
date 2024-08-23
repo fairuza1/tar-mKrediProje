@@ -1,7 +1,9 @@
 package ercankara.proje.controller;
 
 import ercankara.proje.entity.Harvest;
+import ercankara.proje.entity.Rating;
 import ercankara.proje.service.HarvestService;
+import ercankara.proje.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +15,12 @@ import java.util.List;
 @RequestMapping("/harvests")
 public class HarvestController {
     private final HarvestService harvestService;
+    private final RatingService ratingService;
 
     @Autowired
-    public HarvestController(HarvestService harvestService) {
+    public HarvestController(HarvestService harvestService, RatingService ratingService) {
         this.harvestService = harvestService;
+        this.ratingService = ratingService;
     }
 
     @GetMapping
@@ -30,14 +34,24 @@ public class HarvestController {
         Harvest createdHarvest = harvestService.createHarvest(harvest);
         return new ResponseEntity<>(createdHarvest, HttpStatus.CREATED);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHarvest(@PathVariable Long id) {
-        Harvest harvest = harvestService.getHarvestById(id); // Hasadı bul
+        Harvest harvest = harvestService.findById(id);
         if (harvest == null) {
-            return ResponseEntity.notFound().build(); // Hasat bulunamazsa 404 döndür
+            return ResponseEntity.notFound().build();
         }
-        harvestService.deleteHarvest(id); // Hasadı sil
-        return ResponseEntity.noContent().build(); // Başarılı silme için 204 döndür
+
+        try {
+            // Hasat ile ilişkili değerlendirmeleri sil
+            List<Rating> ratings = ratingService.findByHarvestId(id);
+            for (Rating rating : ratings) {
+                ratingService.deleteRating(rating.getId());
+            }
+            harvestService.deleteHarvest(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
-

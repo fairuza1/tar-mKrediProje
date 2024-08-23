@@ -55,8 +55,8 @@ const LandList = () => {
                                 <TableCell sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi İsmi</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Alanı (m²)</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Şehir</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>İlçe</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Köy</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>İlçe</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Köy</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi tipi</TableCell> {/* Arazi Tipi için yeni sütun */}
                                 <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Actions</TableCell> {/* Sadece Actions başlığını bıraktık */}
                             </TableRow>
@@ -67,11 +67,13 @@ const LandList = () => {
                                     <TableCell component="th" scope="row" sx={{ fontSize: '1rem' }}>
                                         {land.name}
                                     </TableCell>
-                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.landSize}</TableCell>
+                                    <TableCell align="center" sx={{ fontSize: '1rem' }}>{land.landSize}</TableCell>
                                     <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.city}</TableCell>
-                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.district}</TableCell>
-                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.village || 'N/A'}</TableCell>
-                                    <TableCell align="right" sx={{ fontSize: '1rem' }}>{land.landType || 'N/A'}</TableCell> {/* Arazi Tipi */}
+                                    <TableCell align="center" sx={{ fontSize: '1rem' }}>{land.district}</TableCell>
+                                    <TableCell align={land.village ? 'center' : 'center'} sx={{ fontSize: '1rem' }}> {/* Align koşullu olarak ayarlandı */}
+                                        {land.village ? land.village : '-'} {/* '-' ifadesi eklendi */}
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ fontSize: '1rem' }}>{land.landType || 'N/A'}</TableCell> {/* Arazi Tipi */}
                                     <TableCell align="center" sx={{ fontSize: '1rem' }}>
                                         <Button variant="outlined" color="secondary" onClick={() => handleDetail(land.id)}>
                                             Detay
