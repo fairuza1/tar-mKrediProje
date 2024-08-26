@@ -1,6 +1,5 @@
 package ercankara.proje.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +21,5 @@ public class Harvest {
     private LocalDate harvestDate;
 
     @Column(name = "sowing_id", nullable = false)
-    private Long sowingId; // Sowing ID'si
-
-    // Diğer alanlar yerine başka bir kaynaktan alacağınız bilgileri tutabilirsiniz
+    private Long sowingId;
 }

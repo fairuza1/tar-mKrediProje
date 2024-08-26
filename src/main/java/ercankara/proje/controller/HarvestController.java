@@ -1,7 +1,6 @@
 package ercankara.proje.controller;
 
-import ercankara.proje.entity.Harvest;
-import ercankara.proje.entity.Rating;
+import ercankara.proje.dto.HarvestDTO;
 import ercankara.proje.service.HarvestService;
 import ercankara.proje.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,30 +23,27 @@ public class HarvestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Harvest>> getAllHarvests() {
-        List<Harvest> harvests = harvestService.getAllHarvests();
+    public ResponseEntity<List<HarvestDTO>> getAllHarvests() {
+        List<HarvestDTO> harvests = harvestService.getAllHarvests();
         return new ResponseEntity<>(harvests, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Harvest> createHarvest(@RequestBody Harvest harvest) {
-        Harvest createdHarvest = harvestService.createHarvest(harvest);
+    public ResponseEntity<HarvestDTO> createHarvest(@RequestBody HarvestDTO harvestDTO) {
+        HarvestDTO createdHarvest = harvestService.createHarvest(harvestDTO);
         return new ResponseEntity<>(createdHarvest, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHarvest(@PathVariable Long id) {
-        Harvest harvest = harvestService.findById(id);
+        HarvestDTO harvest = harvestService.getHarvestById(id);
         if (harvest == null) {
             return ResponseEntity.notFound().build();
         }
 
         try {
             // Hasat ile ilişkili değerlendirmeleri sil
-            List<Rating> ratings = ratingService.findByHarvestId(id);
-            for (Rating rating : ratings) {
-                ratingService.deleteRating(rating.getId());
-            }
+            ratingService.deleteRatingsByHarvestId(id);
             harvestService.deleteHarvest(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

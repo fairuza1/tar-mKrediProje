@@ -68,4 +68,10 @@ public class RatingService {
         ratingDTO.setOverallRating(rating.getOverallRating());
         return ratingDTO;
     }
+    public void deleteRatingsByHarvestId(Long harvestId) {
+        List<Rating> ratings = findByHarvestId(harvestId);
+        for (Rating rating : ratings) {
+            deleteRating(rating.getId());
+        }
+    }
 }
