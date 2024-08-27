@@ -6,6 +6,7 @@ import {
     Grid,
     Card,
     CardContent,
+    CardMedia, // CardMedia'yı import ediyoruz.
     Button,
     Alert,
     Snackbar,
@@ -114,6 +115,13 @@ const Harvest = ({ onSowingUpdate }) => {
                                             padding: '16px',
                                         }}
                                     >
+                                        <CardMedia
+                                            component="img"
+                                            height="140"
+                                            image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
+                                            alt={land?.name || 'Unknown Land'}
+                                            sx={{borderRadius:"8px"}}
+                                        />
                                         <CardContent>
                                             <Typography gutterBottom variant="h5" component="div">
                                                 {land ? land.name : 'Bilinmiyor'}

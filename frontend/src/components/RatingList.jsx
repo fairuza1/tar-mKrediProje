@@ -6,6 +6,7 @@ import {
     Card,
     CardContent,
     CardHeader,
+    CardMedia, // CardMedia'yı import ediyoruz.
     Snackbar,
     Alert,
     CircularProgress,
@@ -96,6 +97,13 @@ const RatingList = () => {
                                     padding: '16px',
                                 }}
                             >
+                                <CardMedia
+                                    component="img"
+                                    height="140"
+                                    image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
+                                    alt={land?.name || 'Unknown Land'}
+                                    sx={{borderRadius:"8px"}}
+                                />
                                 <CardHeader
                                     title={`Arazi Adı: ${land ? land.name : 'Bilinmiyor'}`}
                                     subheader={`Arazi Türü: ${land ? land.landType : 'Bilinmiyor'}`}

@@ -85,7 +85,7 @@ const Rating = () => {
                 setProductQuality(0);
                 setOverallRating(0);
                 setProductQuantity('');
-                setTimeout(() => navigate('/'), 3000);
+                setTimeout(() => navigate('/rating-list'), 3000);
             } else {
                 setSnackbarMessage('Değerlendirme kaydedilemedi.');
                 setSnackbarSeverity('error');
@@ -104,6 +104,15 @@ const Rating = () => {
         setSnackbarOpen(false);
     };
 
+    // Bu fonksiyonu ekledim, yalnızca sayı ve ondalık değerlere izin veriyor
+    const handleProductQuantityChange = (e) => {
+        const value = e.target.value;
+        // Girişin yalnızca sayı ve ondalık değer olmasını kontrol ediyor
+        if (/^\d*\.?\d*$/.test(value)) {
+            setProductQuantity(value); // Eğer geçerliyse değeri günceller
+        }
+    };
+
     return (
         <Container maxWidth="xl">
             <Box sx={{ mt: 4 }}>
@@ -116,11 +125,11 @@ const Rating = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell sx={{ borderRight: '1px solid #ddd' }}></TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>1</TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>2</TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>3</TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>4</TableCell>
-                                <TableCell align="center">5</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>Çok Kötü</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>Kötü</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>Ne İyi Ne Kötü</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>İyi</TableCell>
+                                <TableCell align="center">Çok iyi</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -129,7 +138,7 @@ const Rating = () => {
                                     Hasat Koşulları
                                 </TableCell>
                                 <TableCell colSpan={5} align="center">
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                                    <Box sx={{ display:'flex', justifyContent: 'space-between', mt: 1 }}>
                                         <StyledIcon selected={harvestCondition === 1} onClick={() => setHarvestCondition(1)}>
                                             <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744' }} />
                                         </StyledIcon>
@@ -181,7 +190,7 @@ const Rating = () => {
                                         fullWidth
                                         variant="outlined"
                                         value={productQuantity}
-                                        onChange={(e) => setProductQuantity(e.target.value)}
+                                        onChange={handleProductQuantityChange} // Burada, sadece sayı girişine izin vermek için handleProductQuantityChange fonksiyonunu ekledim
                                         InputProps={{
                                             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
                                         }}
@@ -230,11 +239,6 @@ const Rating = () => {
             </Snackbar>
         </Container>
     );
-};
-
-// PropTypes kısmını kaldırabilirsin
-Rating.propTypes = {
-    // harvestId: PropTypes.string.isRequired // Bu satırı kaldır
 };
 
 export default Rating;

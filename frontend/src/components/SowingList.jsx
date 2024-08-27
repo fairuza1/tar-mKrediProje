@@ -153,7 +153,7 @@ const SowingList = () => {
                                     <CardMedia
                                         component="img"
                                         height="140"
-                                        image={land?.imageUrl || "../../src/assets/DefaultImage/defaultLand.png"}
+                                        image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
                                         alt={land?.name || 'Unknown Land'}
                                         sx={{borderRadius:"8px"}}
                                     />
