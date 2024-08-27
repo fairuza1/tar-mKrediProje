@@ -130,8 +130,9 @@ const Harvest = ({ onSowingUpdate }) => {
                                                 Arazi Tipi: {land ? land.landType : 'Bilinmiyor'}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Bitki: {sowing.plantName}
+                                                Bitki: {sowing ? sowing.plantName : 'Bilinmiyor'}
                                             </Typography>
+
                                             <Typography variant="body2" color="text.secondary">
                                                 Ekilen Alan: {sowing ? sowing.amount : 'Bilinmiyor'} m²
                                             </Typography>
