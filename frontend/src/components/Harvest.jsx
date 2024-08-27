@@ -3,15 +3,11 @@ import {
     Container,
     Typography,
     Box,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    Alert,
+    Grid,
+    Card,
+    CardContent,
     Button,
+    Alert,
     Snackbar,
     CircularProgress
 } from '@mui/material';
@@ -22,7 +18,7 @@ const Harvest = ({ onSowingUpdate }) => {
     const [harvests, setHarvests] = useState([]);
     const [sowings, setSowings] = useState([]);
     const [lands, setLands] = useState([]);
-    const [loading, setLoading] = useState(true); // Loading state
+    const [loading, setLoading] = useState(true);
     const [harvestedSowings, setHarvestedSowings] = useState(JSON.parse(localStorage.getItem('harvestedSowings')) || []);
     const [error, setError] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -45,7 +41,7 @@ const Harvest = ({ onSowingUpdate }) => {
                 console.error('Veri çekme hatası:', error);
                 setError('Veriler alınırken bir hata oluştu.');
             } finally {
-                setLoading(false); // Set loading to false after fetch
+                setLoading(false);
             }
         };
 
@@ -64,7 +60,7 @@ const Harvest = ({ onSowingUpdate }) => {
             setHarvestedSowings(updatedHarvestedSowings);
             localStorage.setItem('harvestedSowings', JSON.stringify(updatedHarvestedSowings));
 
-            if (onSowingUpdate && typeof onSowingUpdate === 'function') { // Check if onSowingUpdate is a function
+            if (onSowingUpdate && typeof onSowingUpdate === 'function') {
                 onSowingUpdate(sowingId);
             }
 
@@ -93,48 +89,62 @@ const Harvest = ({ onSowingUpdate }) => {
                     Hasat Listesi
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
-                {loading ? ( // Display loading indicator
-                    <CircularProgress />
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+                        <CircularProgress />
+                    </Box>
                 ) : (
-                    <TableContainer component={Paper} sx={{ maxHeight: '75vh' }}>
-                        <Table sx={{ minWidth: 900 }} aria-label="harvests table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Adı</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Tipi</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Ekilen Alan (m²)</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Hasat Tarihi</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Aksiyonlar</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {harvests.map((harvest) => {
-                                    const sowing = getSowing(harvest.sowingId);
-                                    const land = sowing ? getLand(sowing.landId) : null;
+                    <Grid container spacing={3}>
+                        {harvests.map((harvest) => {
+                            const sowing = getSowing(harvest.sowingId);
+                            const land = sowing ? getLand(sowing.landId) : null;
 
-                                    return (
-                                        <TableRow key={harvest.id}>
-                                            <TableCell component="th" scope="row" sx={{ fontSize: '1rem' }}>
+                            return (
+                                <Grid item xs={12} sm={6} md={4} key={harvest.id}>
+                                    <Card
+                                        sx={{
+                                            maxWidth: 345,
+                                            boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
+                                            background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+                                            borderRadius: '12px',
+                                            '&:hover': {
+                                                boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)',
+                                                transform: 'translateY(-4px)',
+                                            },
+                                            padding: '16px',
+                                        }}
+                                    >
+                                        <CardContent>
+                                            <Typography gutterBottom variant="h5" component="div">
                                                 {land ? land.name : 'Bilinmiyor'}
-                                            </TableCell>
-                                            <TableCell align="right" sx={{ fontSize: '1rem' }}>{land ? land.landType : 'Bilinmiyor'}</TableCell>
-                                            <TableCell align="right" sx={{ fontSize: '1rem' }}>{sowing ? sowing.amount : 'Bilinmiyor'} m²</TableCell>
-                                            <TableCell align="right" sx={{ fontSize: '1rem' }}>{new Date(harvest.harvestDate).toLocaleDateString()}</TableCell>
-                                            <TableCell align="right">
-                                                <Button
-                                                    variant="contained"
-                                                    color="error"
-                                                    onClick={() => handleDelete(harvest.id, sowing.id)}
-                                                >
-                                                    Sil
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Arazi Tipi: {land ? land.landType : 'Bilinmiyor'}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Bitki: {sowing.plantName}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Ekilen Alan: {sowing ? sowing.amount : 'Bilinmiyor'} m²
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Hasat Tarihi: {new Date(harvest.harvestDate).toLocaleDateString()}
+                                            </Typography>
+                                        </CardContent>
+                                        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                                            <Button
+                                                variant="contained"
+                                                color="error"
+                                                onClick={() => handleDelete(harvest.id, sowing.id)}
+                                            >
+                                                Sil
+                                            </Button>
+                                        </Box>
+                                    </Card>
+                                </Grid>
+                            );
+                        })}
+                    </Grid>
                 )}
             </Box>
             <Snackbar

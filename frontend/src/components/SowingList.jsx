@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Alert, Snackbar } from '@mui/material';
+import { Container, Typography, Box, Grid, Card, CardContent, CardMedia, Button, Alert, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
@@ -93,7 +93,7 @@ const SowingList = () => {
 
         try {
             const response = await axios.post('http://localhost:8080/harvests', harvestData, { withCredentials: true });
-            const harvestedId = response.data.id; // Hasat kaydı oluşturulduktan sonra gelen ID
+            const harvestedId = response.data.id;
 
             const updatedHarvestedSowings = [...harvestedSowings, sowingId];
             setHarvestedSowings(updatedHarvestedSowings);
@@ -102,10 +102,9 @@ const SowingList = () => {
             setSnackbarMessage('Hasat başarıyla kaydedildi!');
             setSnackbarOpen(true);
 
-            // Hasat başarılı ise 3 saniye sonra değerlendirme sayfasına yönlendir
             setTimeout(() => {
                 navigate(`/rating/${harvestedId}`, { state: { harvestId: harvestedId } });
-            }, 3000); // 3 saniye gecikme
+            }, 3000);
 
         } catch (error) {
             console.error('Hasat kaydetme hatası:', error);
@@ -130,55 +129,76 @@ const SowingList = () => {
                     Ekimlerim Listesi
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
-                <TableContainer component={Paper} sx={{ maxHeight: '75vh', width: '100%' }}> {/* Genişlik artırıldı */}
-                    <Table sx={{ minWidth: 1000 }} aria-label="sowings table"> {/* minWidth artırıldı */}
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazim</TableCell>
-                                <TableCell align="left" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Tipi</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Bitki</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Arazi Alanı</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Ekilen Alan</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Boş Alan</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Zaman</TableCell>
-                                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Aksiyonlar</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {sowings.map((sowing) => {
-                                const land = getLand(sowing.landId);
-                                const remainingSize = getRemainingSize(sowing.landId);
-                                const isHarvested = harvestedSowings.includes(sowing.id);
+                <Grid container spacing={3}>
+                    {sowings.map((sowing) => {
+                        const land = getLand(sowing.landId);
+                        const remainingSize = getRemainingSize(sowing.landId);
+                        const isHarvested = harvestedSowings.includes(sowing.id);
 
-                                return (
-                                    <TableRow key={sowing.id}>
-                                        <TableCell component="th" scope="row" sx={{ fontSize: '1rem' }}>
+                        return (
+                            <Grid item xs={12} sm={6} md={4} key={sowing.id}>
+                                <Card
+                                    sx={{
+                                        maxWidth: 345,
+                                        boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
+                                        background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+                                        borderRadius: '12px',
+                                        '&:hover': {
+                                            boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)',
+                                            transform: 'translateY(-4px)',
+                                        },
+                                        padding: '16px',
+                                    }}
+                                >
+                                    <CardMedia
+                                        component="img"
+                                        height="140"
+                                        image={land?.imageUrl || "../../src/assets/DefaultImage/defaultLand.png"}
+                                        alt={land?.name || 'Unknown Land'}
+                                        sx={{borderRadius:"8px"}}
+                                    />
+                                    <CardContent>
+                                        <Typography gutterBottom variant="h5" component="div">
                                             {land ? land.name : 'Bilinmiyor'}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ fontSize: '1rem' }}>{land ? land.landType : 'Bilinmiyor'}</TableCell>
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{sowing.plantName}</TableCell>
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{land ? land.landSize : 'Bilinmiyor'}</TableCell>
-                                        <TableCell align="center" sx={{ fontSize: '1rem' }}>{sowing.amount}</TableCell>
-                                        <TableCell align="center" sx={{ fontSize: '1rem' }}>{remainingSize < 0 ? 0 : remainingSize}</TableCell>
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>{new Date(sowing.sowingDate).toLocaleDateString()}</TableCell>
-                                        <TableCell align="right" sx={{ fontSize: '1rem' }}>
-                                            <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} disabled={isHarvested}>Detay</Button>
-                                            <Button
-                                                variant="contained"
-                                                color="success"
-                                                onClick={() => handleHarvest(sowing.id)}
-                                                sx={{ ml: 1 }}
-                                                disabled={isHarvested}
-                                            >
-                                                {isHarvested ? 'Hasat Edildi' : 'Hasat Et'}
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Arazi Tipi: {land ? land.landType : 'Bilinmiyor'}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Bitki: {sowing.plantName}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Arazi Alanı: {land ? land.landSize : 'Bilinmiyor'} m²
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Ekilen Alan: {sowing.amount} m²
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Boş Alan: {remainingSize < 0 ? 0 : remainingSize} m²
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Ekim Tarihi: {new Date(sowing.sowingDate).toLocaleDateString()}
+                                        </Typography>
+                                    </CardContent>
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                                        <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} disabled={isHarvested}>
+                                            Detay
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="success"
+                                            onClick={() => handleHarvest(sowing.id)}
+                                            sx={{ ml: 1 }}
+                                            disabled={isHarvested}
+                                        >
+                                            {isHarvested ? 'Hasat Edildi' : 'Hasat Et'}
+                                        </Button>
+                                    </Box>
+                                </Card>
+                            </Grid>
+                        );
+                    })}
+                </Grid>
             </Box>
             <Snackbar
                 open={snackbarOpen}

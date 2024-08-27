@@ -5,14 +5,16 @@ import koylerData from '../Data/koyler.json';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
+import ImageUploader from './ImageUploader'; // Import the ImageUploader component
 
 function AddLand() {
     const [landName, setLandName] = useState('');
     const [landSize, setLandSize] = useState('');
-    const [landType, setLandType] = useState(''); // Yeni state
+    const [landType, setLandType] = useState('');
     const [selectedIl, setSelectedIl] = useState('');
     const [selectedIlce, setSelectedIlce] = useState('');
     const [selectedKoy, setSelectedKoy] = useState('');
+    const [imageUrl, setImageUrl] = useState(''); // State to store the uploaded image URL
     const [ilceler, setIlceler] = useState([]);
     const [koyler, setKoyler] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -47,8 +49,8 @@ function AddLand() {
     const handleAddLand = async (e) => {
         e.preventDefault();
 
-        // Boş alan kontrolü
-        if (!landName || !landSize || !selectedIl || !selectedIlce || !landType) { // landType kontrolü eklendi
+        // Validate fields
+        if (!landName || !landSize || !selectedIl || !selectedIlce || !landType || !imageUrl) { // imageUrl validation added
             setSnackbarMessage('Please fill in all the fields.');
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
@@ -60,26 +62,32 @@ function AddLand() {
         const newLand = {
             name: landName,
             landSize: parseInt(landSize),
-            landType: landType, // Yeni ekleme
+            landType: landType,
             city: selectedIl,
             district: selectedIlce,
             village: selectedKoy,
-            user: { id: parseInt(userId) }
+            userId: parseInt(userId)  // Burada `userId`'nin doğru olduğundan emin olun
         };
 
+        const formData = new FormData();
+        formData.append('land', new Blob([JSON.stringify(newLand)], { type: "application/json" }));
+        formData.append('file', imageUrl); // Resmi ekleyin
+
+
         try {
-            const response = await axios.post('http://localhost:8080/lands', newLand, { withCredentials: true });
-            if (response.status === 200) {
+            const response = await axios.post('http://localhost:8080/lands', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                withCredentials: true
+            });
+
+            if (response.status === 201) {
                 setSnackbarMessage('Land saved successfully!');
                 setSnackbarSeverity('success');
                 setOpenSnackbar(true);
                 setTimeout(() => navigate('/land-list'), 3000);
-                setLandName('');
-                setLandSize('');
-                setLandType(''); // Yeni ekleme
-                setSelectedIl('');
-                setSelectedIlce('');
-                setSelectedKoy('');
+                resetForm();
             } else {
                 setSnackbarMessage('Failed to save the Land.');
                 setSnackbarSeverity('error');
@@ -90,6 +98,16 @@ function AddLand() {
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
         }
+    };
+
+    const resetForm = () => {
+        setLandName('');
+        setLandSize('');
+        setLandType('');
+        setSelectedIl('');
+        setSelectedIlce('');
+        setSelectedKoy('');
+        setImageUrl(''); // Clear the image URL after successful submission
     };
 
     const handleCloseSnackbar = () => {
@@ -122,7 +140,6 @@ function AddLand() {
                     onChange={(e) => setLandSize(e.target.value)}
                 />
 
-                {/* Arazi Tipi için ComboBox */}
                 <FormControl fullWidth margin="normal">
                     <InputLabel>Arazi Tipi</InputLabel>
                     <Select
@@ -171,6 +188,10 @@ function AddLand() {
                         ))}
                     </Select>
                 </FormControl>
+
+                {/* Image Uploader Component */}
+                <ImageUploader onImageUpload={setImageUrl} />
+
                 <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
                     Add Land
                 </Button>

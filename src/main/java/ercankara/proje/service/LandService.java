@@ -1,21 +1,30 @@
 package ercankara.proje.service;
 
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ercankara.proje.dto.LandDTO;
 import ercankara.proje.entity.Land;
 import ercankara.proje.entity.User;
 import ercankara.proje.repository.LandRepository;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import ercankara.proje.repository.UserRepository;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class LandService {
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Autowired
     private LandRepository landRepository;
@@ -23,27 +32,29 @@ public class LandService {
     @Autowired
     private UserRepository userRepository;
 
-    public Land saveLand(Land land) {
-        User user = userRepository.findById(land.getUser().getId())
+    public Land saveLand(LandDTO landDto, MultipartFile imageFile) {
+        User user = userRepository.findById(landDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        Land land = new Land();
+        land.setName(landDto.getName());
+        land.setLandSize(landDto.getLandSize());
+        land.setCity(landDto.getCity());
+        land.setDistrict(landDto.getDistrict());
+        land.setVillage(landDto.getVillage());
+        land.setLandType(landDto.getLandType());
         land.setUser(user);
-        land.setRemainingArea(land.getLandSize());
+        land.setRemainingArea(landDto.getLandSize());
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageUrl = uploadImage(imageFile);
+            land.setImage(imageUrl);
+        }
 
         return landRepository.save(land);
     }
 
-    public List<LandDTO> getAllLands() {
-        return landRepository.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
-    }
-
-    public LandDTO getLandById(Long id) {
-        Land land = landRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Land not found"));
-        return convertToDto(land);
-    }
-
-    public Land updateLand(@PathVariable Long id, @Valid @RequestBody LandDTO landDto) {
+    public Land updateLand(Long id, @Valid LandDTO landDto, MultipartFile file) {
         Land existingLand = landRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Land not found"));
 
@@ -60,7 +71,24 @@ public class LandService {
             existingLand.setUser(user);
         }
 
+        if (file != null && !file.isEmpty()) {
+            String imageUrl = uploadImage(file);
+            existingLand.setImage(imageUrl);
+        }
+
         return landRepository.save(existingLand);
+    }
+
+    private String uploadImage(MultipartFile file) {
+        try {
+            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path path = Paths.get(uploadDir + File.separator + fileName);
+            Files.createDirectories(path.getParent());
+            Files.write(path, file.getBytes());
+            return "../../src/assets/LandList/" + fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store image", e);
+        }
     }
 
     public List<LandDTO> getLandsByUser(Long userId) {
@@ -68,11 +96,10 @@ public class LandService {
         return lands.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-    // Yeni: Mevcut arazi alanını döndüren yöntem
-    public int getAvailableLand(Long landId) {
-        Land land = landRepository.findById(landId)
+    public LandDTO getLandById(Long id) {
+        Land land = landRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Land not found"));
-        return land.getRemainingArea(); // Kalan alanı döndür
+        return convertToDto(land);
     }
 
     private LandDTO convertToDto(Land land) {
@@ -83,9 +110,10 @@ public class LandService {
         landDto.setCity(land.getCity());
         landDto.setDistrict(land.getDistrict());
         landDto.setVillage(land.getVillage());
-        landDto.setUserId(land.getUser().getId());
         landDto.setLandType(land.getLandType());
-
+        landDto.setUserId(land.getUser().getId());
+        landDto.setRemainingArea(land.getRemainingArea());
+        landDto.setImageUrl(land.getImage());
         return landDto;
     }
 }

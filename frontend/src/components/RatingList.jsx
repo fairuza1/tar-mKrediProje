@@ -2,15 +2,14 @@ import React, { useEffect, useState } from 'react';
 import {
     Container,
     Typography,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
+    Grid,
+    Card,
+    CardContent,
+    CardHeader,
     Snackbar,
-    Alert
+    Alert,
+    CircularProgress,
+    Box
 } from '@mui/material';
 import axios from 'axios';
 
@@ -19,7 +18,7 @@ const RatingList = () => {
     const [harvests, setHarvests] = useState([]);
     const [sowings, setSowings] = useState([]);
     const [lands, setLands] = useState([]);
-    const [plants, setPlants] = useState([]); // Bitki bilgilerini tutacak state
+    const [plants, setPlants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -33,14 +32,14 @@ const RatingList = () => {
                     axios.get('http://localhost:8080/harvests', { withCredentials: true }),
                     axios.get('http://localhost:8080/sowings', { withCredentials: true }),
                     axios.get('http://localhost:8080/lands', { withCredentials: true }),
-                    axios.get('http://localhost:8080/plants', { withCredentials: true }) // Bitki bilgilerini çekiyoruz
+                    axios.get('http://localhost:8080/plants', { withCredentials: true })
                 ]);
 
                 setRatings(ratingsResponse.data);
                 setHarvests(harvestsResponse.data);
                 setSowings(sowingsResponse.data);
                 setLands(landsResponse.data);
-                setPlants(plantsResponse.data); // Bitki bilgilerini state'e atıyoruz
+                setPlants(plantsResponse.data);
             } catch (error) {
                 console.error('Hata oluştu:', error);
                 setSnackbarMessage('Veriler alınırken bir hata oluştu.');
@@ -56,14 +55,18 @@ const RatingList = () => {
 
     const getSowing = (sowingId) => sowings.find(sowing => sowing.id === sowingId);
     const getLand = (landId) => lands.find(land => land.id === landId);
-    const getPlantName = (plantId) => plants.find(plant => plant.id === plantId)?.name || 'Bilinmiyor'; // Bitki adını alıyoruz
+    const getPlantName = (plantId) => plants.find(plant => plant.id === plantId)?.name || 'Bilinmiyor';
 
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+                <CircularProgress />
+            </Box>
+        );
     }
 
     return (
@@ -71,44 +74,58 @@ const RatingList = () => {
             <Typography variant="h4" component="h1" gutterBottom>
                 Değerlendirme Listesi
             </Typography>
+            <Grid container spacing={3}>
+                {ratings.map((rating) => {
+                    const harvest = harvests.find(h => h.id === rating.harvestId);
+                    const sowing = harvest ? getSowing(harvest.sowingId) : null;
+                    const land = sowing ? getLand(sowing.landId) : null;
+                    const plantName = sowing ? getPlantName(sowing.plantId) : 'Bilinmiyor';
 
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Hasat ID</TableCell>
-                            <TableCell>Arazi Adı</TableCell>
-                            <TableCell>Bitki Adı</TableCell>
-                            <TableCell>Ekilen Alan (m²)</TableCell>
-                            <TableCell>Hasat Koşulları</TableCell>
-                            <TableCell>Ürün Kalitesi</TableCell>
-                            <TableCell>Ürün Miktarı (kg)</TableCell>
-                            <TableCell>Genel Değerlendirme</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {ratings.map((rating) => {
-                            const harvest = harvests.find(h => h.id === rating.harvestId);
-                            const sowing = harvest ? getSowing(harvest.sowingId) : null;
-                            const land = sowing ? getLand(sowing.landId) : null;
-                            const plantName = sowing ? getPlantName(sowing.plantId) : 'Bilinmiyor'; // Bitki adı
+                    return (
+                        <Grid item xs={12} sm={6} md={4} key={rating.harvestId}>
+                            <Card
+                                sx={{
+                                    maxWidth: 345,
+                                    boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
+                                    background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+                                    borderRadius: '12px',
+                                    '&:hover': {
+                                        boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)',
+                                        transform: 'translateY(-4px)',
+                                    },
+                                    padding: '16px',
+                                }}
+                            >
+                                <CardHeader
+                                    title={`Arazi Adı: ${land ? land.name : 'Bilinmiyor'}`}
+                                    subheader={`Arazi Türü: ${land ? land.landType : 'Bilinmiyor'}`}
+                                />
 
-                            return (
-                                <TableRow key={rating.harvestId}>
-                                    <TableCell>{rating.harvestId}</TableCell>
-                                    <TableCell>{land ? land.name : 'Bilinmiyor'}</TableCell>
-                                    <TableCell>{plantName}</TableCell> {/* Bitki adını gösteriyoruz */}
-                                    <TableCell>{sowing ? sowing.amount : 'Bilinmiyor'} m²</TableCell>
-                                    <TableCell>{rating.harvestCondition}</TableCell>
-                                    <TableCell>{rating.productQuality}</TableCell>
-                                    <TableCell>{rating.productQuantity}</TableCell>
-                                    <TableCell>{rating.overallRating}</TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                                <CardContent>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Bitki Adı: {plantName}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Ekilen Alan: {sowing ? sowing.amount : 'Bilinmiyor'} m²
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Hasat Koşulları: {rating.harvestCondition}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Ürün Kalitesi: {rating.productQuality}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Ürün Miktarı: {rating.productQuantity} kg
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Genel Değerlendirme: {rating.overallRating}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    );
+                })}
+            </Grid>
 
             <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
                 <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>

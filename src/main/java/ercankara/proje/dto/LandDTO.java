@@ -28,4 +28,6 @@ public class LandDTO {
     private String landType; // Land Type Değeri
 
     private Long userId; // User ID Değeri
+
+    private String imageUrl; // Resim URL'si
 }

@@ -1,13 +1,11 @@
 package ercankara.proje.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
-
 
 @Data
 @Entity
@@ -34,7 +32,10 @@ public class Land {
     String village;
 
     @Column(nullable = false)
-    private int remainingArea; // Buraya ekleyin
+    private int remainingArea;
+
+    @Column(nullable = true)
+    String image; // Resim URL'si için alan
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -43,6 +44,6 @@ public class Land {
 
     @OneToMany(mappedBy = "land", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("land-sowing")
-    @JsonManagedReference  // Bu alan serileştirilirken dahil edilir
+    @JsonManagedReference
     private List<Sowing> sowings;
 }
