@@ -1,5 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Paper, Button, TextField, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import {
+    Container,
+    Typography,
+    Box,
+    Paper,
+    Button,
+    TextField,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Select,
+    Snackbar,
+    Alert,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Card, CardMedia, CardContent
+} from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import ilIlceData from '../Data/il-ilce.json';
 import koylerData from '../Data/koyler.json';
@@ -14,6 +33,7 @@ const LandDetails = () => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,7 +51,7 @@ const LandDetails = () => {
                     .filter(item => item.il.localeCompare(data.city, undefined, { sensitivity: 'base' }) === 0)
                     .map(item => item.ilce);
                 setIlceler(ilceList);
-                fetchKoyler(data.city, data.district); // İlk başta köyleri yükle
+                fetchKoyler(data.city, data.district);
             }
         } catch (error) {
             console.error('Error fetching land details:', error);
@@ -50,14 +70,23 @@ const LandDetails = () => {
     };
 
     const handleSave = () => {
+        const formData = new FormData();
+        formData.append('land', new Blob([JSON.stringify(land)], { type: "application/json" }));
+        if (selectedFile) {
+            formData.append('file', selectedFile);
+        }
+
         fetch(`http://localhost:8080/lands/update/${id}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(land),
+            body: formData,
+            credentials: 'include', // Gerekirse çerezlerle birlikte isteği gönderir
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 setLand(data);
                 setIsEditing(false);
@@ -117,20 +146,23 @@ const LandDetails = () => {
             [name]: value,
         }));
 
-        // İl ve ilçe değiştiğinde köyleri güncelle
         if (name === 'city') {
             const ilceList = ilIlceData
                 .filter(item => item.il.localeCompare(value, undefined, { sensitivity: 'base' }) === 0)
                 .map(item => item.ilce);
             setIlceler(ilceList);
-            setKoyler([]); // İl değiştiğinde köyleri sıfırla
-            setLand(prevState => ({ ...prevState, district: '', village: '' })); // Seçimlerde sıfırla
+            setKoyler([]);
+            setLand(prevState => ({ ...prevState, district: '', village: '' }));
         } else if (name === 'district') {
-            fetchKoyler(land.city, value); // İlçe değiştiğinde köyleri yükle
+            fetchKoyler(land.city, value);
         }
     };
 
-    // Benzersiz şehir isimlerini elde etme
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        setSelectedFile(file);
+    };
+
     const uniqueCities = Array.from(new Set(ilIlceData.map(item => item.il)));
 
     if (!land) {
@@ -206,16 +238,42 @@ const LandDetails = () => {
                                     ))}
                                 </Select>
                             </FormControl>
+                            <TextField
+                                type="file"
+                                fullWidth
+                                name="image"
+                                margin="normal"
+                                onChange={handleImageUpload}
+                            />
                         </>
                     ) : (
-                        <>
-                            <Typography variant="h6">Boyut: {land.landSize} m²</Typography>
-                            <Typography variant="h6">Ekili Alan: {land.sowedArea} m²</Typography>
-                            <Typography variant="h6">Boş Alan: {land.remainingArea} m²</Typography>
-                            <Typography variant="h6">Şehir: {land.city}</Typography>
-                            <Typography variant="h6">İlçe: {land.district}</Typography>
-                            <Typography variant="h6">Köy: {land.village || 'N/A'}</Typography>
-                        </>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                            <Card sx={{ maxWidth: 345, borderRadius: 2, boxShadow: 3 }}>
+                                <CardMedia
+                                    component="img"
+                                    height="200"
+                                    image={land.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
+                                    alt={land.name}
+                                    sx={{ borderRadius: 2 }}
+                                />
+                                <CardContent>
+                                    <Typography variant="h6" color="textSecondary">
+                                        {land.name}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        {land.city}, {land.district}, {land.village || 'N/A'}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                            <Box>
+                                <Typography variant="h6">Boyut: {land.landSize} m²</Typography>
+                                <Typography variant="h6">Ekili Alan: {land.sowedArea} m²</Typography>
+                                <Typography variant="h6">Boş Alan: {land.remainingArea} m²</Typography>
+                                <Typography variant="h6">Şehir: {land.city}</Typography>
+                                <Typography variant="h6">İlçe: {land.district}</Typography>
+                                <Typography variant="h6">Köy: {land.village || 'N/A'}</Typography>
+                            </Box>
+                        </Box>
                     )}
                 </Paper>
                 <Box sx={{ marginTop: 3 }}>
@@ -252,7 +310,6 @@ const LandDetails = () => {
                 </Alert>
             </Snackbar>
 
-            {/* Silme Onay Modalı */}
             <Dialog
                 open={openDeleteDialog}
                 onClose={handleCloseDeleteDialog}

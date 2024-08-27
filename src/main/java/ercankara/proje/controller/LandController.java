@@ -71,9 +71,10 @@ public class LandController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<LandDTO> updateLand(@PathVariable Long id,
-                                              @RequestPart("land") LandDTO landDto,
-                                              @RequestPart(value = "file", required = false) MultipartFile file) {
+    public ResponseEntity<LandDTO> updateLand(
+            @PathVariable Long id,
+            @RequestPart("land") LandDTO landDto,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
         // Kullanıcıyı userId ile bul
         User user = userRepository.findById(landDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
