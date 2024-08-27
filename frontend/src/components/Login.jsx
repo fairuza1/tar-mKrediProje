@@ -170,6 +170,13 @@ function Login({ setIsLoggedIn }) {
                             >
                                 E-Devlet ile Giriş Yap
                             </Button>
+                            <Grid container justifyContent="flex-end">
+                                <Grid item>
+                                    <Link href="/signup" variant="body2">
+                                        Hesabınız yok mu? Kayıt olun
+                                    </Link>
+                                </Grid>
+                            </Grid>
                         </Box>
                     </Grid>
                 </Paper>
