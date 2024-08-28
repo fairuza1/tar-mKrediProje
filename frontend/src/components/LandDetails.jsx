@@ -22,6 +22,8 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import ilIlceData from '../Data/il-ilce.json';
 import koylerData from '../Data/koyler.json';
+import sowingList from "./SowingList.jsx";
+import sowingDetails from "./SowingDetails.jsx";
 
 const LandDetails = () => {
     const { id } = useParams();
@@ -195,15 +197,7 @@ const LandDetails = () => {
                                 onChange={handleChange}
                                 margin="normal"
                             />
-                            <TextField
-                                fullWidth
-                                label="Ekili Alan (m²)"
-                                name="sowedArea"
-                                type="number" // Number input type
-                                value={land.sowedArea}
-                                onChange={handleChange}
-                                margin="normal"
-                            />
+
                             <FormControl fullWidth margin="normal">
                                 <InputLabel>İl</InputLabel>
                                 <Select
@@ -269,8 +263,6 @@ const LandDetails = () => {
                             </Card>
                             <Box>
                                 <Typography variant="h6">Boyut: {land.landSize} m²</Typography>
-                                <Typography variant="h6">Ekili Alan: {land.sowedArea} m²</Typography>
-                                <Typography variant="h6">Boş Alan: {land.remainingArea} m²</Typography>
                                 <Typography variant="h6">Şehir: {land.city}</Typography>
                                 <Typography variant="h6">İlçe: {land.district}</Typography>
                                 <Typography variant="h6">Köy: {land.village || 'N/A'}</Typography>

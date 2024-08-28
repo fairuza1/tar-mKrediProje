@@ -107,34 +107,37 @@ const SowingDetails = () => {
             try {
                 const response = await fetch(`http://localhost:8080/sowings/detail/${id}`);
                 const data = await response.json();
+                console.log("Fetched Sowing Data:", data); // Kategori bilgisinin olup olmadığını kontrol etmek için
                 setSowing(data);
                 setSelectedCategory(data.category);
                 await fetchLands();
                 await fetchSowings();
+                fetchCategoriesAndPlants(data.category); // Kategori bilgilerini çek
                 calculateRemainingSize();
-                fetchCategoriesAndPlants(data.category);
             } catch (error) {
                 console.error('Ekim detayları alınırken hata oluştu:', error);
             }
         };
 
+
         fetchSowingDetails();
 
-        const fetchCategoriesAndPlants = async (categoryId) => {
-            try {
-                const categoriesResponse = await axios.get('http://localhost:8080/categories', { withCredentials: true });
-                setCategories(categoriesResponse.data);
-
-                if (categoryId) {
-                    const plantsResponse = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${categoryId}`, { withCredentials: true });
-                    setPlants(plantsResponse.data);
-                }
-            } catch (error) {
-                console.error('Kategoriler ve bitkiler alınırken hata oluştu:', error);
-            }
-        };
-
     }, [id, lands.length, sowings.length]);
+
+    const fetchCategoriesAndPlants = async (categoryId) => {
+        try {
+            const categoriesResponse = await axios.get('http://localhost:8080/categories', { withCredentials: true });
+            setCategories(categoriesResponse.data);
+
+            if (categoryId) {
+                const plantsResponse = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${categoryId}`, { withCredentials: true });
+                setPlants(plantsResponse.data);
+            }
+        } catch (error) {
+            console.error('Kategoriler ve bitkiler alınırken hata oluştu:', error);
+        }
+    };
+
 
     const handleCategoryChange = (event) => {
         const newCategory = event.target.value;
@@ -252,7 +255,6 @@ const SowingDetails = () => {
                             <Typography variant="h6">Arazi Adı: {sowing.landName}</Typography>
                             <Typography variant="h6">Ekim Adı: {sowing.plantName}</Typography>
                             <Typography variant="h6">Tarih: {sowing.sowingDate.split('T')[0]}</Typography>
-                            <Typography variant="h6">Kategori: {sowing.category}</Typography>
                             <Typography variant="h6">Ekilen Alan: {sowing.amount}</Typography>
                             <Typography variant="h6">Düzenlenebilir Max Alan: {remainingSize < 0 ? 0 : remainingSize} m²</Typography>
                         </>
