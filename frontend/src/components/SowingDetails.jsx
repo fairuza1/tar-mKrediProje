@@ -8,18 +8,73 @@ const SowingDetails = () => {
     const [sowing, setSowing] = useState(null);
     const [categories, setCategories] = useState([]);
     const [plants, setPlants] = useState([]);
+    const [lands, setLands] = useState([]);
+    const [sowings, setSowings] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [remainingSize, setRemainingSize] = useState(0);
     const navigate = useNavigate();
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
     };
 
+    const fetchLands = async () => {
+        try {
+            const landResponse = await axios.get('http://localhost:8080/lands', { withCredentials: true });
+            setLands(landResponse.data);
+        } catch (error) {
+            console.error('Arazi verileri alınırken hata oluştu:', error);
+            setSnackbarMessage('Arazi verileri alınırken bir hata oluştu.');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+        }
+    };
+
+    const fetchSowings = async () => {
+        try {
+            const sowingResponse = await axios.get('http://localhost:8080/sowings', { withCredentials: true });
+            setSowings(sowingResponse.data);
+        } catch (error) {
+            console.error('Ekim verileri alınırken hata oluştu:', error);
+            setSnackbarMessage('Ekim verileri alınırken bir hata oluştu.');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+        }
+    };
+
+    const calculateRemainingSize = () => {
+        if (!sowing || !lands.length || !sowings.length) return;
+
+        const land = lands.find(land => land.id === sowing.landId);
+        if (!land) return;
+
+        const landSize = land.landSize;
+
+        // Aynı araziye yapılmış diğer ekimleri dahil ederek toplam ekilen miktarı hesapla
+        const totalSownAmount = sowings
+            .filter(s => s.landId === sowing.landId && s.id !== sowing.id) // Aynı arazi ve farklı ekim id'si (mevcut düzenlenen ekim hariç)
+            .reduce((total, s) => total + s.amount, 0);
+
+        const remaining = landSize - totalSownAmount;
+
+        setRemainingSize(remaining);
+    };
+
     const handleSave = async () => {
+        const land = lands.find(land => land.id === sowing.landId);
+        const newAmount = parseFloat(sowing.amount);
+
+        if (newAmount > remainingSize) {
+            setSnackbarMessage(`Ekilen alan, kalan alandan büyük olamaz. Kalan alan: ${remainingSize} m²`);
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+            return;
+        }
+
         try {
             await fetch(`http://localhost:8080/sowings/update/${id}`, {
                 method: 'PUT',
@@ -29,7 +84,6 @@ const SowingDetails = () => {
                 body: JSON.stringify(sowing),
             });
 
-            // Güncellemeyi başarıyla kaydettikten sonra en son verileri tekrar al
             const updatedDataResponse = await fetch(`http://localhost:8080/sowings/detail/${id}`);
             const updatedData = await updatedDataResponse.json();
             setSowing(updatedData);
@@ -37,6 +91,9 @@ const SowingDetails = () => {
             setSnackbarMessage('Ekim güncellendi!');
             setSnackbarSeverity('success');
             setOpenSnackbar(true);
+
+            // Kalan alanı yeniden hesapla
+            calculateRemainingSize();
         } catch (error) {
             console.error('Ekim güncellenirken hata oluştu:', error);
             setSnackbarMessage('Ekim güncellenemedi.');
@@ -46,14 +103,16 @@ const SowingDetails = () => {
     };
 
     useEffect(() => {
-        // Ekim detaylarını al
         const fetchSowingDetails = async () => {
             try {
                 const response = await fetch(`http://localhost:8080/sowings/detail/${id}`);
                 const data = await response.json();
                 setSowing(data);
-                setSelectedCategory(data.category); // Mevcut kategori ayarlanıyor
-                fetchCategoriesAndPlants(data.category); // Kategoriyi aldıktan sonra bitkileri yükle
+                setSelectedCategory(data.category);
+                await fetchLands();
+                await fetchSowings();
+                calculateRemainingSize();
+                fetchCategoriesAndPlants(data.category);
             } catch (error) {
                 console.error('Ekim detayları alınırken hata oluştu:', error);
             }
@@ -61,13 +120,11 @@ const SowingDetails = () => {
 
         fetchSowingDetails();
 
-        // Kategori ve bitkileri al
         const fetchCategoriesAndPlants = async (categoryId) => {
             try {
                 const categoriesResponse = await axios.get('http://localhost:8080/categories', { withCredentials: true });
                 setCategories(categoriesResponse.data);
 
-                // Kategori seçildiğinde bitkileri yükle
                 if (categoryId) {
                     const plantsResponse = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${categoryId}`, { withCredentials: true });
                     setPlants(plantsResponse.data);
@@ -77,8 +134,7 @@ const SowingDetails = () => {
             }
         };
 
-        fetchSowingDetails();
-    }, [id]);
+    }, [id, lands.length, sowings.length]);
 
     const handleCategoryChange = (event) => {
         const newCategory = event.target.value;
@@ -86,9 +142,9 @@ const SowingDetails = () => {
         setSowing(prevState => ({
             ...prevState,
             category: newCategory,
-            plantId: '' // Yeni kategori seçildiğinde bitkiyi sıfırlıyoruz
+            plantId: ''
         }));
-        fetchPlants(newCategory); // Yeni kategori seçildiğinde bitkileri yükle
+        fetchPlants(newCategory);
     };
 
     const fetchPlants = async (categoryId) => {
@@ -106,6 +162,10 @@ const SowingDetails = () => {
             ...prevState,
             [name]: value,
         }));
+
+        if (name === 'amount') {
+            calculateRemainingSize();
+        }
     };
 
     const handleCloseSnackbar = () => {
@@ -113,7 +173,7 @@ const SowingDetails = () => {
     };
 
     const handleBack = () => {
-        navigate('/sowings'); // SowingList sayfasına yönlendir
+        navigate('/sowings');
     };
 
     if (!sowing) {
@@ -182,6 +242,10 @@ const SowingDetails = () => {
                                 margin="normal"
                                 InputLabelProps={{ shrink: true }}
                             />
+
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                                Kalan Alan: {remainingSize < 0 ? 0 : remainingSize} m²
+                            </Typography>
                         </>
                     ) : (
                         <>
@@ -190,6 +254,7 @@ const SowingDetails = () => {
                             <Typography variant="h6">Tarih: {sowing.sowingDate.split('T')[0]}</Typography>
                             <Typography variant="h6">Kategori: {sowing.category}</Typography>
                             <Typography variant="h6">Ekilen Alan: {sowing.amount}</Typography>
+                            <Typography variant="h6">Kalan Alan: {remainingSize < 0 ? 0 : remainingSize} m²</Typography>
                         </>
                     )}
                 </Paper>
