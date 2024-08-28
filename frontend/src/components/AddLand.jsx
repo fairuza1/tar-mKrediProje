@@ -136,6 +136,7 @@ function AddLand() {
                     label="Arazi boyutu giriniz (m²)"
                     variant="outlined"
                     margin="normal"
+                    type="number" // Number input type
                     value={landSize}
                     onChange={(e) => setLandSize(e.target.value)}
                 />

@@ -191,6 +191,7 @@ const LandDetails = () => {
                                 label="Boyut (m²)"
                                 name="landSize"
                                 value={land.landSize}
+                                type="number" // Number input type
                                 onChange={handleChange}
                                 margin="normal"
                             />
@@ -198,6 +199,7 @@ const LandDetails = () => {
                                 fullWidth
                                 label="Ekili Alan (m²)"
                                 name="sowedArea"
+                                type="number" // Number input type
                                 value={land.sowedArea}
                                 onChange={handleChange}
                                 margin="normal"

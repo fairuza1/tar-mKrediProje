@@ -6,7 +6,7 @@ import {
     Card,
     CardContent,
     CardHeader,
-    CardMedia, // CardMedia'yı import ediyoruz.
+    CardMedia,
     Snackbar,
     Alert,
     CircularProgress,
@@ -24,6 +24,8 @@ const RatingList = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+    const userId = parseInt(localStorage.getItem('userId')); // Kullanıcı ID'sini al
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -54,6 +56,14 @@ const RatingList = () => {
         fetchAllData();
     }, []);
 
+    // Belirli kullanıcıya ait verileri filtreleyin
+    const filteredRatings = ratings.filter(rating => {
+        const harvest = harvests.find(h => h.id === rating.harvestId);
+        const sowing = harvest ? sowings.find(s => s.id === harvest.sowingId) : null;
+        const land = sowing ? lands.find(l => l.id === sowing.landId) : null;
+        return land && land.userId === userId; // Sadece kullanıcıya ait verileri döndür
+    });
+
     const getSowing = (sowingId) => sowings.find(sowing => sowing.id === sowingId);
     const getLand = (landId) => lands.find(land => land.id === landId);
     const getPlantName = (plantId) => plants.find(plant => plant.id === plantId)?.name || 'Bilinmiyor';
@@ -76,7 +86,7 @@ const RatingList = () => {
                 Değerlendirme Listesi
             </Typography>
             <Grid container spacing={3}>
-                {ratings.map((rating) => {
+                {filteredRatings.map((rating) => {
                     const harvest = harvests.find(h => h.id === rating.harvestId);
                     const sowing = harvest ? getSowing(harvest.sowingId) : null;
                     const land = sowing ? getLand(sowing.landId) : null;
@@ -102,7 +112,7 @@ const RatingList = () => {
                                     height="140"
                                     image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
                                     alt={land?.name || 'Unknown Land'}
-                                    sx={{borderRadius:"8px"}}
+                                    sx={{ borderRadius: "8px" }}
                                 />
                                 <CardHeader
                                     title={`Arazi Adı: ${land ? land.name : 'Bilinmiyor'}`}

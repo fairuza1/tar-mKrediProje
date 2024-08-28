@@ -15,7 +15,7 @@ import {Link, useNavigate} from 'react-router-dom';
 import axios from 'axios'; // axios'u import edin
 import Logo from '../assets/logo.png'; // Logo dosyasının yolu
 
-const pages = ['Add Land','Land List','Sowings','Sowing List','Harvest','Rating List','Signup','Login',];
+const pages = ['Add Land','Land List','Sowings','Sowing List','Harvest','Rating List'];
 
 const Navbar = ({isLoggedIn, setIsLoggedIn}) => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);

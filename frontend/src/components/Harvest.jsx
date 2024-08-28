@@ -6,7 +6,7 @@ import {
     Grid,
     Card,
     CardContent,
-    CardMedia, // CardMedia'yı import ediyoruz.
+    CardMedia,
     Button,
     Alert,
     Snackbar,
@@ -25,6 +25,8 @@ const Harvest = ({ onSowingUpdate }) => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+    const userId = parseInt(localStorage.getItem('userId')); // Kullanıcı ID'sini al
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -51,6 +53,13 @@ const Harvest = ({ onSowingUpdate }) => {
 
     const getLand = (landId) => lands.find(land => land.id === landId);
     const getSowing = (sowingId) => sowings.find(sowing => sowing.id === sowingId);
+
+    // Belirli kullanıcıya ait hasatları filtreleyin
+    const filteredHarvests = harvests.filter(harvest => {
+        const sowing = getSowing(harvest.sowingId);
+        const land = sowing ? getLand(sowing.landId) : null;
+        return land && land.userId === userId; // Sadece kullanıcıya ait verileri döndür
+    });
 
     const handleDelete = async (harvestId, sowingId) => {
         try {
@@ -96,7 +105,7 @@ const Harvest = ({ onSowingUpdate }) => {
                     </Box>
                 ) : (
                     <Grid container spacing={3}>
-                        {harvests.map((harvest) => {
+                        {filteredHarvests.map((harvest) => {
                             const sowing = getSowing(harvest.sowingId);
                             const land = sowing ? getLand(sowing.landId) : null;
 
@@ -132,7 +141,6 @@ const Harvest = ({ onSowingUpdate }) => {
                                             <Typography variant="body2" color="text.secondary">
                                                 Bitki: {sowing ? sowing.plantName : 'Bilinmiyor'}
                                             </Typography>
-
                                             <Typography variant="body2" color="text.secondary">
                                                 Ekilen Alan: {sowing ? sowing.amount : 'Bilinmiyor'} m²
                                             </Typography>
