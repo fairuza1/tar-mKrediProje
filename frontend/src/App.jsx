@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import NavbarWrapper from './components/NavbarWrapper'; // Yeni NavbarWrapper bileşeni
 import Home from './components/Home';
 import AddLand from './components/AddLand';
 import Profile from './components/Profile';
@@ -14,7 +14,7 @@ import SowingList from './components/SowingList';
 import SowingDetails from './components/SowingDetails.jsx';
 import Harvest from './components/Harvest.jsx';
 import Rating from './components/Rating.jsx';
-import RatingList from './components/RatingList.jsx'
+import RatingList from './components/RatingList.jsx';
 import './App.css';
 
 function App() {
@@ -28,7 +28,6 @@ function App() {
                     method: 'GET',
                     credentials: 'include',
                 });
-                console.log(response);
                 if (response.ok) {
                     setIsLoggedIn(true);
                 } else {
@@ -50,25 +49,29 @@ function App() {
 
     return (
         <Router>
-            <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+            {/* NavbarWrapper, Router'ın çocuk bileşeni olarak kullanılır */}
+            <NavbarWrapper isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
             <Routes>
-                <Route path="/" element={<Navigate to={isLoggedIn ? "/home" : "/login"} />} />
+                {/* Giriş yapılmamışsa "/" rotası login sayfasına yönlendirir */}
+                <Route path="/" element={<Navigate to={isLoggedIn ? "/login" : "/login"} />} />
+
+                {/* Korunan sayfalar, giriş yapılmamışsa login sayfasına yönlendirir */}
                 <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
                 <Route path="/add-land" element={isLoggedIn ? <AddLand /> : <Navigate to="/login" />} />
                 <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
                 <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
                 <Route path="/land-list" element={isLoggedIn ? <LandList /> : <Navigate to="/login" />} />
                 <Route path="/lands/detail/:id" element={isLoggedIn ? <LandDetails /> : <Navigate to="/login" />} />
-                <Route path="/sowings" element={isLoggedIn ? <AddSowing /> : <Navigate to="/login" />} />
+                <Route path="/add-sowing" element={isLoggedIn ? <AddSowing /> : <Navigate to="/login" />} />
                 <Route path="/sowing-list" element={isLoggedIn ? <SowingList /> : <Navigate to="/login" />} />
-                <Route path="/sowings/detail/:id" element={<SowingDetails />} />
-                <Route path="/harvest" element={<Harvest />} />
-                {/* harvestId parametreli route */}
-                <Route path="/rating/:harvestId" element={<Rating />} />
+                <Route path="/sowings/detail/:id" element={isLoggedIn ? <SowingDetails /> : <Navigate to="/login" />} />
+                <Route path="/harvest" element={isLoggedIn ? <Harvest /> : <Navigate to="/login" />} />
+                <Route path="/rating/:harvestId" element={isLoggedIn ? <Rating /> : <Navigate to="/login" />} />
                 <Route path="/rating-list" element={isLoggedIn ? <RatingList /> : <Navigate to="/login" />} />
 
+                {/* Giriş yapmadan ulaşılabilen sayfalar */}
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
             </Routes>
         </Router>
     );
