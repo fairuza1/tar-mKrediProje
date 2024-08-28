@@ -244,7 +244,7 @@ const SowingDetails = () => {
                             />
 
                             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                                Kalan Alan: {remainingSize < 0 ? 0 : remainingSize} m²
+                                Düzenlenebilir Max Alan: {remainingSize < 0 ? 0 : remainingSize} m²
                             </Typography>
                         </>
                     ) : (
@@ -254,7 +254,7 @@ const SowingDetails = () => {
                             <Typography variant="h6">Tarih: {sowing.sowingDate.split('T')[0]}</Typography>
                             <Typography variant="h6">Kategori: {sowing.category}</Typography>
                             <Typography variant="h6">Ekilen Alan: {sowing.amount}</Typography>
-                            <Typography variant="h6">Kalan Alan: {remainingSize < 0 ? 0 : remainingSize} m²</Typography>
+                            <Typography variant="h6">Düzenlenebilir Max Alan: {remainingSize < 0 ? 0 : remainingSize} m²</Typography>
                         </>
                     )}
                 </Paper>
