@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Button, CssBaseline, TextField, Link, Grid, Box, Typography, Paper } from '@mui/material';
+import { Avatar, Button, CssBaseline, TextField, Link, Grid, Box, Typography, Paper, CircularProgress } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import backgroundImage from 'C:/Users/ercan kara/IdeaProjects/TarimKrediProjem/frontend/public/images/farm-background.jpg'; // Arka plan resminin yolu
@@ -13,23 +13,30 @@ function Login({ setIsLoggedIn }) {
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false); // Spinner için loading durumu
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setLoading(true); // Giriş yapma işlemi başladığında loading'i true yap
         try {
             const response = await axios.post('http://localhost:8080/auth/login', { user, password }, { withCredentials: true });
             if (response.status === 200) {
                 const data = response.data;
                 localStorage.setItem('userId', data.userId);
                 setIsLoggedIn(true);
-                navigate('/home');
+                setTimeout(() => {
+                    setLoading(false); // Yönlendirme öncesinde loading'i false yap
+                    navigate('/home'); // Yönlendirmeyi 2 saniye geciktirin
+                }, 2000);
             } else {
                 setError('Invalid credentials');
+                setLoading(false); // Hata olduğunda loading'i false yap
             }
         } catch (error) {
             setError('An error occurred');
             console.error('Error:', error);
+            setLoading(false); // Hata olduğunda loading'i false yap
         }
     };
 
@@ -57,8 +64,8 @@ function Login({ setIsLoggedIn }) {
                         width: '80%',
                         maxWidth: '950px',
                         borderRadius: '12px', // Tüm köşeleri yuvarlar
-                        borderTopLeftRadius:'100px',
-                        borderBottomRightRadius:'100px',
+                        borderTopLeftRadius: '100px',
+                        borderBottomRightRadius: '100px',
                         overflow: 'hidden',
                     }}
                 >
@@ -112,6 +119,10 @@ function Login({ setIsLoggedIn }) {
                         <Typography component="h1" variant="h5">
                             E-Koop Bilgi Sistemi
                         </Typography>
+                        {/* Spinner */}
+                        {loading && (
+                            <CircularProgress size={24} sx={{ mt: 2, mb: 2 }} />
+                        )}
                         <Box component="form" noValidate onSubmit={handleLogin} sx={{ mt: 1 }}>
                             <TextField
                                 variant="outlined"
@@ -125,6 +136,7 @@ function Login({ setIsLoggedIn }) {
                                 autoFocus
                                 value={user}
                                 onChange={(e) => setUser(e.target.value)}
+                                disabled={loading} // Giriş yaparken alanları devre dışı bırak
                             />
                             <TextField
                                 variant="outlined"
@@ -138,6 +150,7 @@ function Login({ setIsLoggedIn }) {
                                 autoComplete="current-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                disabled={loading} // Giriş yaparken alanları devre dışı bırak
                             />
                             {error && (
                                 <Typography variant="body2" color="error" align="center">
@@ -149,6 +162,7 @@ function Login({ setIsLoggedIn }) {
                                     id="rememberMe"
                                     type="checkbox"
                                     sx={{ marginLeft: '8px', marginRight: '8px' }}
+                                    disabled={loading} // Giriş yaparken alanları devre dışı bırak
                                 />
                                 <Typography variant="body2">Beni Hatırla</Typography>
                                 <Link href="#" variant="body2">
@@ -160,6 +174,7 @@ function Login({ setIsLoggedIn }) {
                                 fullWidth
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2, bgcolor: '#6c757d' }}
+                                disabled={loading} // Giriş yaparken butonu devre dışı bırak
                             >
                                 Giriş Yap
                             </Button>
@@ -167,6 +182,7 @@ function Login({ setIsLoggedIn }) {
                                 fullWidth
                                 variant="contained"
                                 sx={{ mt: 1, mb: 2, bgcolor: '#dc3545' }}
+                                disabled={loading} // Giriş yaparken butonu devre dışı bırak
                             >
                                 E-Devlet ile Giriş Yap
                             </Button>

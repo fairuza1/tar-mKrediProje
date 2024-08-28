@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Button, CssBaseline, TextField, Link, Grid, Box, Typography, Paper } from '@mui/material';
+import { Avatar, Button, CssBaseline, TextField, Link, Grid, Box, Typography, Paper, CircularProgress } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import backgroundImage from 'C:/Users/ercan kara/IdeaProjects/TarimKrediProjem/frontend/public/images/farm-background.jpg'; // Arka plan resminin yolu
@@ -16,21 +16,26 @@ function Signup() {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false); // Spinner için loading durumu
     const navigate = useNavigate();
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        setLoading(true); // Kayıt işlemi başladığında loading'i true yap
         try {
             const response = await axios.post('http://localhost:8080/auth/signup', { user, password, email, phoneNumber });
             if (response.status === 200) { // Eğer durum kodu 200 ise başarılı kabul edelim
                 setMessage('Kayıt başarılı. Giriş sayfasına yönlendiriliyorsunuz...');
                 setTimeout(() => {
+                    setLoading(false); // Yönlendirme öncesinde loading'i false yap
                     navigate('/login');
                 }, 2000);
             } else if (response.data && response.data.message === 'User already exists') {
                 setError('Bu kullanıcı adı zaten mevcut.');
+                setLoading(false); // Hata olduğunda loading'i false yap
             } else {
                 setError('Bir hata oluştu. Lütfen tekrar deneyin.');
+                setLoading(false); // Hata olduğunda loading'i false yap
             }
         } catch (error) {
             if (error.response) {
@@ -38,6 +43,7 @@ function Signup() {
             } else {
                 setError('Bir hata oluştu');
             }
+            setLoading(false); // Hata olduğunda loading'i false yap
         }
     };
 
@@ -120,6 +126,10 @@ function Signup() {
                         <Typography component="h1" variant="h5">
                             E-Koop Bilgi Sistemi - Kayıt Ol
                         </Typography>
+                        {/* Spinner */}
+                        {loading && (
+                            <CircularProgress size={24} sx={{ mt: 2, mb: 2 }} />
+                        )}
                         <Box component="form" noValidate onSubmit={handleSignup} sx={{ mt: 1 }}>
                             <TextField
                                 variant="outlined"
@@ -133,6 +143,7 @@ function Signup() {
                                 autoFocus
                                 value={user}
                                 onChange={(e) => setUser(e.target.value)}
+                                disabled={loading} // Kayıt yaparken alanları devre dışı bırak
                             />
                             <TextField
                                 variant="outlined"
@@ -146,6 +157,7 @@ function Signup() {
                                 autoComplete="current-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                disabled={loading} // Kayıt yaparken alanları devre dışı bırak
                             />
                             <TextField
                                 variant="outlined"
@@ -158,6 +170,7 @@ function Signup() {
                                 autoComplete="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                disabled={loading} // Kayıt yaparken alanları devre dışı bırak
                             />
                             <TextField
                                 variant="outlined"
@@ -170,6 +183,7 @@ function Signup() {
                                 autoComplete="phoneNumber"
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
+                                disabled={loading} // Kayıt yaparken alanları devre dışı bırak
                             />
                             {error && (
                                 <Typography variant="body2" color="error" align="center">
@@ -186,6 +200,7 @@ function Signup() {
                                 fullWidth
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2, bgcolor: '#6c757d' }}
+                                disabled={loading} // Kayıt yaparken butonu devre dışı bırak
                             >
                                 Kayıt Ol
                             </Button>

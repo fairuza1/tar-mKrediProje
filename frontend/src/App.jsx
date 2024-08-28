@@ -62,7 +62,7 @@ function App() {
                 <Route path="/settings" element={isLoggedIn ? <Settings /> : <Navigate to="/login" />} />
                 <Route path="/land-list" element={isLoggedIn ? <LandList /> : <Navigate to="/login" />} />
                 <Route path="/lands/detail/:id" element={isLoggedIn ? <LandDetails /> : <Navigate to="/login" />} />
-                <Route path="/add-sowing" element={isLoggedIn ? <AddSowing /> : <Navigate to="/login" />} />
+                <Route path="/sowings" element={isLoggedIn ? <AddSowing /> : <Navigate to="/login" />} />
                 <Route path="/sowing-list" element={isLoggedIn ? <SowingList /> : <Navigate to="/login" />} />
                 <Route path="/sowings/detail/:id" element={isLoggedIn ? <SowingDetails /> : <Navigate to="/login" />} />
                 <Route path="/harvest" element={isLoggedIn ? <Harvest /> : <Navigate to="/login" />} />
