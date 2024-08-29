@@ -36,7 +36,7 @@ public class LandController {
 
     @PostMapping
     public ResponseEntity<LandDTO> createLand(@RequestPart("land") LandDTO landDto,
-                                              @RequestPart("file") MultipartFile file) {
+                                              @RequestPart(value = "file", required = false) MultipartFile file) {
         if (landDto.getUserId() == null) {
             throw new IllegalArgumentException("User ID must not be null");
         }
@@ -52,6 +52,7 @@ public class LandController {
         LandDTO savedLandDto = landService.getLandById(land.getId());
         return new ResponseEntity<>(savedLandDto, HttpStatus.CREATED);
     }
+
     @GetMapping
     public List<LandDTO> getLandsByUser() {
         // Oturum açan kullanıcının kimliğini al
@@ -87,6 +88,7 @@ public class LandController {
         LandDTO updatedLandDto = landService.getLandById(updatedLand.getId());
         return new ResponseEntity<>(updatedLandDto, HttpStatus.OK);
     }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteLand(@PathVariable Long id) {
         Land land = landRepository.findById(id)
@@ -96,5 +98,4 @@ public class LandController {
 
         return ResponseEntity.noContent().build();
     }
-
 }

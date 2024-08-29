@@ -49,9 +49,9 @@ function AddLand() {
     const handleAddLand = async (e) => {
         e.preventDefault();
 
-        // Validate fields
-        if (!landName || !landSize || !selectedIl || !selectedIlce || !landType || !imageUrl) { // imageUrl validation added
-            setSnackbarMessage('Please fill in all the fields.');
+        // Validate fields (remove imageUrl from validation)
+        if (!landName || !landSize || !selectedIl || !selectedIlce || !landType) {
+            setSnackbarMessage('Please fill in all the mandatory fields.');
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
             return;
@@ -66,13 +66,16 @@ function AddLand() {
             city: selectedIl,
             district: selectedIlce,
             village: selectedKoy,
-            userId: parseInt(userId)  // Burada `userId`'nin doğru olduğundan emin olun
+            userId: parseInt(userId)
         };
 
         const formData = new FormData();
         formData.append('land', new Blob([JSON.stringify(newLand)], { type: "application/json" }));
-        formData.append('file', imageUrl); // Resmi ekleyin
 
+        // Only append the image if one is provided
+        if (imageUrl) {
+            formData.append('file', imageUrl);
+        }
 
         try {
             const response = await axios.post('http://localhost:8080/lands', formData, {
@@ -99,6 +102,7 @@ function AddLand() {
             setOpenSnackbar(true);
         }
     };
+
 
     const resetForm = () => {
         setLandName('');
