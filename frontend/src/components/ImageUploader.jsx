@@ -50,7 +50,7 @@ function ImageUploader({ onImageUpload }) {
                 >
                     <CloudUploadIcon sx={{ fontSize: 40, color: '#ccc' }} />
                     <Typography variant="h6" sx={{ mt: 1, color: '#777' }}>
-                        Drag & drop or click to select an image
+                        İsterseniz resmi sürükleyip bırakın veya seçmek için tıklayın
                     </Typography>
                     <input
                         type="file"

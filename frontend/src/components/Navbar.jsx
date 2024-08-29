@@ -11,11 +11,22 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuIcon from '@mui/icons-material/Menu';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios'; // axios'u import edin
 import Logo from '../assets/logo.png'; // Logo dosyasının yolu
 
-const pages = ['Add Land','Land List','Sowings','Sowing List','Harvest','Rating List'];
+// Diğer kodlar burada
+
+
+
+const pages = [
+    { title: 'Arazi Ekle', link: 'add-land' },
+    { title: 'Araziler Listesi', link: 'land-list' },
+    { title: 'Ekim Yap', link: 'sowings' },
+    { title: 'Ekim Listesi', link: 'sowing-list' },
+    { title: 'Hasat Listesi', link: 'harvest' },
+    { title: 'Değerlendirme Listesi', link: 'rating-list' }
+];
 
 const Navbar = ({isLoggedIn, setIsLoggedIn}) => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -105,11 +116,11 @@ const Navbar = ({isLoggedIn, setIsLoggedIn}) => {
                             }}
                         >
                             {pages.map((page) => (
-                                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                                <MenuItem key={page.link} onClick={handleCloseNavMenu}>
                                     <Typography textAlign="center" sx={{fontFamily: 'Poppins, sans-serif'}}>
-                                        <Link to={`/${page.toLowerCase().replace(/ /g, '-')}`}
+                                        <Link to={`/${page.link}`}
                                               style={{textDecoration: 'none', color: 'inherit'}}>
-                                            {page}
+                                            {page.title}
                                         </Link>
                                     </Typography>
                                 </MenuItem>
@@ -134,13 +145,13 @@ const Navbar = ({isLoggedIn, setIsLoggedIn}) => {
                     <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
                         {pages.map((page) => (
                             <Button
-                                key={page}
+                                key={page.link}
                                 onClick={handleCloseNavMenu}
                                 sx={{my: 2, color: 'white', display: 'block', fontFamily: 'Poppins, sans-serif'}}
                                 component={Link}
-                                to={`/${page.toLowerCase().replace(/ /g, '-')}`}
+                                to={`/${page.link}`}
                             >
-                                {page}
+                                {page.title}
                             </Button>
                         ))}
                     </Box>

@@ -1,9 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { TextField, Button, Container, Typography, Box, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert } from '@mui/material';
+import React, {useState, useEffect} from 'react';
+import {
+    TextField,
+    Button,
+    Container,
+    Typography,
+    Box,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Select,
+    Snackbar,
+    Alert
+} from '@mui/material';
 import ilIlceData from '../Data/il-ilce.json';
 import koylerData from '../Data/koyler.json';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
 import ImageUploader from './ImageUploader'; // Import the ImageUploader component
 
@@ -25,7 +37,7 @@ function AddLand() {
     useEffect(() => {
         if (selectedIl) {
             const ilceList = ilIlceData
-                .filter(item => item.il.localeCompare(selectedIl, undefined, { sensitivity: 'base' }) === 0)
+                .filter(item => item.il.localeCompare(selectedIl, undefined, {sensitivity: 'base'}) === 0)
                 .map(item => item.ilce);
             setIlceler(ilceList);
             setSelectedIlce('');
@@ -37,7 +49,7 @@ function AddLand() {
     useEffect(() => {
         if (selectedIlce) {
             const koyList = koylerData
-                .filter(item => item.il.localeCompare(selectedIl, undefined, { sensitivity: 'base' }) === 0 && item.ilce.localeCompare(selectedIlce, undefined, { sensitivity: 'base' }) === 0)
+                .filter(item => item.il.localeCompare(selectedIl, undefined, {sensitivity: 'base'}) === 0 && item.ilce.localeCompare(selectedIlce, undefined, {sensitivity: 'base'}) === 0)
                 .map(item => item.mahalle_koy);
             setKoyler(koyList);
             setSelectedKoy('');
@@ -70,7 +82,7 @@ function AddLand() {
         };
 
         const formData = new FormData();
-        formData.append('land', new Blob([JSON.stringify(newLand)], { type: "application/json" }));
+        formData.append('land', new Blob([JSON.stringify(newLand)], {type: "application/json"}));
 
         // Only append the image if one is provided
         if (imageUrl) {
@@ -121,11 +133,11 @@ function AddLand() {
     return (
         <Container maxWidth="sm">
             <Box>
-                <BreadcrumbComponent pageName="Arazi Ekle" />
+                <BreadcrumbComponent pageName="Arazi Ekle"/>
             </Box>
-            <Box component="form" onSubmit={handleAddLand} sx={{ mt: 3 }}>
+            <Box component="form" onSubmit={handleAddLand} sx={{mt: 3}}>
                 <Typography variant="h4" component="h2" gutterBottom>
-                    Add Land
+                    Arazi Ekle
                 </Typography>
                 <TextField
                     fullWidth
@@ -145,11 +157,13 @@ function AddLand() {
                     onChange={(e) => setLandSize(e.target.value)}
                 />
 
-                <FormControl fullWidth margin="normal">
+                <FormControl fullWidth margin="normal" variant="outlined">
                     <InputLabel>Arazi Tipi</InputLabel>
                     <Select
+                        fullWidth
                         value={landType}
                         onChange={(e) => setLandType(e.target.value)}
+                        label="Arazi Tipi"
                     >
                         <MenuItem value="Tarla">Tarla</MenuItem>
                         <MenuItem value="Bahçe">Bahçe</MenuItem>
@@ -160,33 +174,36 @@ function AddLand() {
                     </Select>
                 </FormControl>
 
-                <FormControl fullWidth margin="normal">
+                <FormControl fullWidth margin="normal" variant="outlined">
                     <InputLabel>İl</InputLabel>
                     <Select
                         value={selectedIl}
                         onChange={(e) => setSelectedIl(e.target.value)}
+                        label="İl"
                     >
                         {Array.from(new Set(ilIlceData.map(item => item.il))).map(il => (
                             <MenuItem key={il} value={il}>{il}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
-                <FormControl fullWidth margin="normal" disabled={!selectedIl}>
+                <FormControl fullWidth margin="normal" variant="outlined" disabled={!selectedIl}>
                     <InputLabel>İlçe</InputLabel>
                     <Select
                         value={selectedIlce}
                         onChange={(e) => setSelectedIlce(e.target.value)}
+                        label="İlçe"
                     >
                         {ilceler.map((ilce, index) => (
                             <MenuItem key={index} value={ilce}>{ilce}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
-                <FormControl fullWidth margin="normal" disabled={!selectedIlce || koyler.length === 0}>
+                <FormControl fullWidth margin="normal" variant="outlined" disabled={!selectedIlce || koyler.length === 0}>
                     <InputLabel>Köy/Mahalle</InputLabel>
                     <Select
                         value={selectedKoy}
                         onChange={(e) => setSelectedKoy(e.target.value)}
+                        label="Köy/Mahalle"
                     >
                         {koyler.map((koy, index) => (
                             <MenuItem key={index} value={koy}>{koy}</MenuItem>
@@ -195,10 +212,10 @@ function AddLand() {
                 </FormControl>
 
                 {/* Image Uploader Component */}
-                <ImageUploader onImageUpload={setImageUrl} />
+                <ImageUploader onImageUpload={setImageUrl}/>
 
-                <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-                    Add Land
+                <Button type="submit" variant="contained" color="primary" fullWidth sx={{mt: 2}}>
+                    Arazi Ekle
                 </Button>
             </Box>
 
@@ -207,7 +224,7 @@ function AddLand() {
                 autoHideDuration={3000}
                 onClose={handleCloseSnackbar}
             >
-                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{width: '100%'}}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

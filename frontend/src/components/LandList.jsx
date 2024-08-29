@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Grid, Card, CardContent, CardMedia, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React, {useState, useEffect} from 'react';
+import {Container, Typography, Box, Grid, Card, CardContent, CardMedia, Button, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
 
 const LandList = () => {
     const [lands, setLands] = useState([]);
     const [isAuthenticated, setIsAuthenticated] = useState(true);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [landToDelete, setLandToDelete] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/lands', { withCredentials: true })
+        axios.get('http://localhost:8080/lands', {withCredentials: true})
             .then(response => {
                 setLands(response.data);
             })
@@ -25,7 +30,7 @@ const LandList = () => {
     if (!isAuthenticated) {
         return (
             <Container maxWidth="md">
-                <Box sx={{ mt: 3 }}>
+                <Box sx={{mt: 3}}>
                     <Typography variant="h6" color="error">
                         Oturum açmadan görüntüleyemezsiniz.
                     </Typography>
@@ -38,14 +43,43 @@ const LandList = () => {
         navigate(`/lands/detail/${id}`);
     };
 
+    const handleDelete = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/lands/delete/${landToDelete}`, { withCredentials: true });
+            setLands(lands.filter(land => land.id !== landToDelete));
+            setSnackbarMessage('Arazi başarıyla silindi!');
+            setSnackbarSeverity('success');
+            setOpenSnackbar(true);
+            setOpenDeleteDialog(false);
+        } catch (error) {
+            console.error('Error deleting land:', error);
+            setSnackbarMessage('Arazi silinemedi.');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+        }
+    };
+
+    const handleOpenDeleteDialog = (id) => {
+        setLandToDelete(id);
+        setOpenDeleteDialog(true);
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setOpenDeleteDialog(false);
+    };
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
+
     return (
-        <Container maxWidth="lg" sx={{marginBottom:"60px"}}>
+        <Container maxWidth="lg" sx={{marginBottom: "60px"}}>
             <Box>
-                <BreadcrumbComponent pageName="Arazilerim" />
+                <BreadcrumbComponent pageName="Arazilerim"/>
             </Box>
-            <Box sx={{ mt: 3 }}>
+            <Box sx={{mt: 3}}>
                 <Typography variant="h4" component="h2" gutterBottom>
-                    Lands List
+                    Araziler Listesi
                 </Typography>
                 <Grid container spacing={3}>
                     {lands.map((land) => (
@@ -68,7 +102,7 @@ const LandList = () => {
                                     height="140"
                                     image={land.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
                                     alt={land.name}
-                                    sx={{borderRadius:"8px"}}
+                                    sx={{borderRadius: "8px"}}
                                 />
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div">
@@ -90,9 +124,12 @@ const LandList = () => {
                                         Arazi Tipi: {land.landType || 'N/A'}
                                     </Typography>
                                 </CardContent>
-                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                                <Box sx={{display: 'flex', justifyContent: 'center', gap: 2, mb: 2}}>
                                     <Button variant="contained" color="primary" onClick={() => handleDetail(land.id)}>
-                                        Detay
+                                        Güncelleme
+                                    </Button>
+                                    <Button variant="contained" color="error" onClick={() => handleOpenDeleteDialog(land.id)}>
+                                        Sil
                                     </Button>
                                 </Box>
                             </Card>
@@ -100,6 +137,39 @@ const LandList = () => {
                     ))}
                 </Grid>
             </Box>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
+
+            <Dialog
+                open={openDeleteDialog}
+                onClose={handleCloseDeleteDialog}
+                aria-labelledby="delete-dialog-title"
+                aria-describedby="delete-dialog-description"
+            >
+                <DialogTitle id="delete-dialog-title">Silmek istediğinizden emin misiniz?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-dialog-description">
+                        Bu işlem geri alınamaz. Silmek istediğinizden emin misiniz?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteDialog} color="primary">
+                        İptal
+                    </Button>
+                    <Button onClick={handleDelete} color="error" autoFocus>
+                        Sil
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 };

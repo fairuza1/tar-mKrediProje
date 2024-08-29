@@ -21,12 +21,12 @@ import card6 from '../assets/card6.jpg';
 const pageName = "Ekim Yap"
 
 const cards = [
-    { title: 'Arazi Ekle', description: '', link: '/add-land', button: 'Arazi Ekle', image: card1 },
-    { title: 'Arazilerim', description: '', button: 'Arazilerimi Görüntüle', link: '/land-list', image: card2 },
-    { title: 'Ekim Yap', description: '', button: 'Ekim Yap', link: '/sowings', image: card4 },
-    { title: 'Ekimlerim', description: '', button: 'Ekimlerim', link: '/sowing-list', image:card5 },
-    { title: 'Hasatlarım', description: '', button: 'Hasatlarım',link: '/harvest', image: card6 },
-    { title: 'Değerlendirmelerim', button: 'Hasatları Değerlendir', link: '/rating-list', image: card3 },
+    { title: '', description: '', link: '/add-land', button: 'Arazi Ekle', image: card1 },
+    { title: '', description: '', button: 'Arazilerimi Görüntüle', link: '/land-list', image: card2 },
+    { title: '', description: '', button: 'Ekim Yap', link: '/sowings', image: card4 },
+    { title: '', description: '', button: 'Ekimlerim', link: '/sowing-list', image:card5 },
+    { title: '', description: '', button: 'Hasatlarım',link: '/harvest', image: card6 },
+    { title: '', button: 'Hasatları Değerlendir', link: '/rating-list', image: card3 },
 
 ];
 
