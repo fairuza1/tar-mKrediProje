@@ -87,4 +87,14 @@ public class LandController {
         LandDTO updatedLandDto = landService.getLandById(updatedLand.getId());
         return new ResponseEntity<>(updatedLandDto, HttpStatus.OK);
     }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteLand(@PathVariable Long id) {
+        Land land = landRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Land not found"));
+
+        landRepository.delete(land);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

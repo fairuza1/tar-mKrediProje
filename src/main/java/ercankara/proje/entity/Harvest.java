@@ -1,5 +1,6 @@
 package ercankara.proje.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class Harvest {
     @Column(name = "harvest_date", nullable = false)
     private LocalDate harvestDate;
 
-    @Column(name = "sowing_id", nullable = false)
-    private Long sowingId;
+    @ManyToOne
+    @JoinColumn(name = "sowing_id", nullable = false)
+    @JsonManagedReference // Bu alan serileştirilirken referans olarak görünecek
+    private Sowing sowing;
 }

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -26,6 +28,9 @@ public class Sowing {
     @Column(nullable = false)
     private LocalDate sowingDate;
 
-    @Column(nullable = false)  // Add this line
+    @Column(nullable = false)
     private int amount; // amount alanını ekleyin
+
+    @OneToMany(mappedBy = "sowing", cascade = CascadeType.REMOVE)
+    private List<Harvest> harvests;
 }

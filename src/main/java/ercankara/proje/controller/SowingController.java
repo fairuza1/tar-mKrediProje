@@ -70,4 +70,14 @@ public class SowingController {
         // SowingService'i kullanarak ekimi güncelle
         return sowingService.updateSowing(id, sowingDTO);
     }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteSowing(@PathVariable Long id) {
+        try {
+            sowingService.deleteSowing(id);
+            return ResponseEntity.ok("Ekim başarıyla silindi!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
 }

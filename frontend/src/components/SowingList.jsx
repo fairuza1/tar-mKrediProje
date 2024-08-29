@@ -181,7 +181,7 @@ const SowingList = () => {
                                         </Typography>
                                     </CardContent>
                                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                                        <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)} disabled={isHarvested}>
+                                        <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)}>
                                             Detay
                                         </Button>
                                         <Button
@@ -193,6 +193,7 @@ const SowingList = () => {
                                         >
                                             {isHarvested ? 'Hasat Edildi' : 'Hasat Et'}
                                         </Button>
+
                                     </Box>
                                 </Card>
                             </Grid>

@@ -121,4 +121,18 @@ public class SowingService {
         dto.setAmount(sowing.getAmount());
         return dto;
     }
+    public void deleteSowing(Long id) {
+        Sowing sowing = sowingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sowing not found"));
+
+        // Ekim kaydını silmeden önce, arazi alanını güncelle
+        Land land = sowing.getLand();
+        int updatedRemainingArea = land.getRemainingArea() + sowing.getAmount();
+        land.setRemainingArea(updatedRemainingArea);
+        landRepository.save(land); // Land nesnesini kaydet
+
+        // Ekim kaydını sil
+        sowingRepository.delete(sowing);
+    }
+
 }

@@ -96,11 +96,4 @@ public class AuthController {
         }
     }
 
-//    @GetMapping("/validate-token")
-//    public ResponseEntity<Void> validateToken(@CookieValue(name = "jwt", required = false) String jwt) {
-//        if (jwt != null && jwtUtil.validateToken(jwt, jwtUtil.extractUsername(jwt))) {
-//            return ResponseEntity.ok().build();
-//        }
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//    }
 }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Paper, Button, TextField, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Container, Typography, Box, Paper, Button, TextField, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import axios from 'axios';
 
 const SowingDetails = () => {
@@ -16,6 +18,7 @@ const SowingDetails = () => {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [remainingSize, setRemainingSize] = useState(0);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // Silme işlemi için onay diyaloğu
     const navigate = useNavigate();
 
     const handleEditToggle = () => {
@@ -54,9 +57,8 @@ const SowingDetails = () => {
 
         const landSize = land.landSize;
 
-        // Aynı araziye yapılmış diğer ekimleri dahil ederek toplam ekilen miktarı hesapla
         const totalSownAmount = sowings
-            .filter(s => s.landId === sowing.landId && s.id !== sowing.id) // Aynı arazi ve farklı ekim id'si (mevcut düzenlenen ekim hariç)
+            .filter(s => s.landId === sowing.landId && s.id !== sowing.id)
             .reduce((total, s) => total + s.amount, 0);
 
         const remaining = landSize - totalSownAmount;
@@ -92,11 +94,42 @@ const SowingDetails = () => {
             setSnackbarSeverity('success');
             setOpenSnackbar(true);
 
-            // Kalan alanı yeniden hesapla
             calculateRemainingSize();
         } catch (error) {
             console.error('Ekim güncellenirken hata oluştu:', error);
             setSnackbarMessage('Ekim güncellenemedi.');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+        }
+    };
+
+    const handleCancel = () => {
+        setIsEditing(false); // İptal işlemi düzenleme modunu kapatacak
+    };
+
+    const handleNavigateToDetails = () => {
+        window.location.href = 'http://localhost:5173/sowing-list'; // Ok işaretine tıklanınca yönlendirme
+    };
+
+    const handleOpenDeleteDialog = () => {
+        setOpenDeleteDialog(true);
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setOpenDeleteDialog(false);
+    };
+
+    const handleDelete = async () => {
+        try {
+            await axios.delete(`http://localhost:8080/sowings/delete/${id}`, { withCredentials: true });
+            setSnackbarMessage('Ekim başarıyla silindi!');
+            setSnackbarSeverity('success');
+            setOpenSnackbar(true);
+            setOpenDeleteDialog(false);
+            navigate('/sowing-list');
+        } catch (error) {
+            console.error('Ekim silinirken hata oluştu:', error);
+            setSnackbarMessage('Ekim silinirken bir hata oluştu.');
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
         }
@@ -107,18 +140,17 @@ const SowingDetails = () => {
             try {
                 const response = await fetch(`http://localhost:8080/sowings/detail/${id}`);
                 const data = await response.json();
-                console.log("Fetched Sowing Data:", data); // Kategori bilgisinin olup olmadığını kontrol etmek için
+                console.log("Fetched Sowing Data:", data);
                 setSowing(data);
                 setSelectedCategory(data.category);
                 await fetchLands();
                 await fetchSowings();
-                fetchCategoriesAndPlants(data.category); // Kategori bilgilerini çek
+                fetchCategoriesAndPlants(data.category);
                 calculateRemainingSize();
             } catch (error) {
                 console.error('Ekim detayları alınırken hata oluştu:', error);
             }
         };
-
 
         fetchSowingDetails();
 
@@ -137,7 +169,6 @@ const SowingDetails = () => {
             console.error('Kategoriler ve bitkiler alınırken hata oluştu:', error);
         }
     };
-
 
     const handleCategoryChange = (event) => {
         const newCategory = event.target.value;
@@ -175,10 +206,6 @@ const SowingDetails = () => {
         setOpenSnackbar(false);
     };
 
-    const handleBack = () => {
-        navigate('/sowings');
-    };
-
     if (!sowing) {
         return <Typography>Yükleniyor...</Typography>;
     }
@@ -189,7 +216,13 @@ const SowingDetails = () => {
                 <Typography variant="h4" component="h2" gutterBottom>
                     {isEditing ? 'Ekim Bilgilerini Düzenle' : `${sowing.plantName} Detayları`}
                 </Typography>
-                <Paper elevation={3} sx={{ p: 2 }}>
+                <Paper elevation={3} sx={{ p: 2, position: 'relative' }}>
+                    <IconButton
+                        onClick={handleNavigateToDetails}
+                        sx={{ position: 'absolute', top: 8, right: 8 }}
+                    >
+                        <ArrowBackIcon />
+                    </IconButton>
                     {isEditing ? (
                         <>
                             <Typography variant="h6" gutterBottom>
@@ -266,18 +299,20 @@ const SowingDetails = () => {
                             <Button variant="contained" color="primary" onClick={handleSave}>
                                 Kaydet
                             </Button>
-                            <Button variant="contained" color="secondary" onClick={handleEditToggle} sx={{ marginLeft: 2 }}>
+                            <Button variant="contained" color="secondary" onClick={handleCancel} sx={{ marginLeft: 2 }}>
                                 İptal
                             </Button>
                         </>
                     ) : (
-                        <Button variant="contained" color="primary" onClick={handleEditToggle}>
-                            Düzenle
-                        </Button>
+                        <>
+                            <Button variant="contained" color="primary" onClick={handleEditToggle}>
+                                Düzenle
+                            </Button>
+                            <Button variant="contained" color="error" onClick={handleOpenDeleteDialog} sx={{ marginLeft: 2 }}>
+                                Sil
+                            </Button>
+                        </>
                     )}
-                    <Button variant="outlined" onClick={handleBack} sx={{ marginLeft: 2 }}>
-                        Geri
-                    </Button>
                 </Box>
             </Box>
 
@@ -291,6 +326,28 @@ const SowingDetails = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+
+            <Dialog
+                open={openDeleteDialog}
+                onClose={handleCloseDeleteDialog}
+                aria-labelledby="delete-dialog-title"
+                aria-describedby="delete-dialog-description"
+            >
+                <DialogTitle id="delete-dialog-title">Silmek istediğinizden emin misiniz?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-dialog-description">
+                        Bu işlem geri alınamaz. Silmek istediğinizden emin misiniz?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteDialog} color="primary">
+                        İptal
+                    </Button>
+                    <Button onClick={handleDelete} color="error" autoFocus>
+                        Sil
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 };

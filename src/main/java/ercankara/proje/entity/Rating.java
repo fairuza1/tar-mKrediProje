@@ -22,7 +22,7 @@ public class Rating {
     private double productQuantity; // kg cinsinden
     private double overallRating;   // Genel değerlendirme
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "harvest_id", nullable = false)
-    private Harvest harvest; // Doğrudan Harvest nesnesi
+    private Harvest harvest;
 }

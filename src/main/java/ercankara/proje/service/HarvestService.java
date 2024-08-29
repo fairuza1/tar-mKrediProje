@@ -2,7 +2,9 @@ package ercankara.proje.service;
 
 import ercankara.proje.dto.HarvestDTO;
 import ercankara.proje.entity.Harvest;
+import ercankara.proje.entity.Sowing;
 import ercankara.proje.repository.HarvestRepository;
+import ercankara.proje.repository.SowingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +14,12 @@ import java.util.stream.Collectors;
 @Service
 public class HarvestService {
     private final HarvestRepository harvestRepository;
+    private final SowingRepository sowingRepository;
 
     @Autowired
-    public HarvestService(HarvestRepository harvestRepository) {
+    public HarvestService(HarvestRepository harvestRepository, SowingRepository sowingRepository) {
         this.harvestRepository = harvestRepository;
+        this.sowingRepository = sowingRepository;
     }
 
     public List<HarvestDTO> getAllHarvests() {
@@ -44,7 +48,9 @@ public class HarvestService {
         HarvestDTO harvestDTO = new HarvestDTO();
         harvestDTO.setId(harvest.getId());
         harvestDTO.setHarvestDate(harvest.getHarvestDate());
-        harvestDTO.setSowingId(harvest.getSowingId());
+        if (harvest.getSowing() != null) {
+            harvestDTO.setSowingId(harvest.getSowing().getId());
+        }
         return harvestDTO;
     }
 
@@ -52,7 +58,13 @@ public class HarvestService {
         Harvest harvest = new Harvest();
         harvest.setId(harvestDTO.getId());
         harvest.setHarvestDate(harvestDTO.getHarvestDate());
-        harvest.setSowingId(harvestDTO.getSowingId());
+
+        if (harvestDTO.getSowingId() != null) {
+            Sowing sowing = sowingRepository.findById(harvestDTO.getSowingId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid sowing ID: " + harvestDTO.getSowingId()));
+            harvest.setSowing(sowing);
+        }
+
         return harvest;
     }
 }
