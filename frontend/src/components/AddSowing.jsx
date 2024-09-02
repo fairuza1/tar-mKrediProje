@@ -266,7 +266,7 @@ function AddSowing() {
                                 {recommendations.map(([plantName, score], index) => (
                                     <TableRow key={index}>
                                         <TableCell>{plantName}</TableCell>
-                                        <TableCell align="right">{score.toFixed(2)}</TableCell>
+                                        <TableCell align="right">{(score * 20).toFixed(2)}%</TableCell> {/* Puanı yüzde olarak göster */}
                                         <TableCell align="right">{yieldPerSquareMeter !== null ? yieldPerSquareMeter.toFixed(2) : 'N/A'} kg/m²</TableCell>
                                     </TableRow>
                                 ))}
@@ -294,3 +294,4 @@ function AddSowing() {
 }
 
 export default AddSowing;
+
