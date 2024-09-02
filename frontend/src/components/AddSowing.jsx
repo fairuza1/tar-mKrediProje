@@ -257,7 +257,7 @@ function AddSowing() {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Bitki</TableCell>
+                                    <TableCell align="center">Bitki</TableCell>
                                     <TableCell align="right">Puan</TableCell>
                                     <TableCell align="right">Metrekare Başına Ürün (kg/m²)</TableCell>
                                 </TableRow>
