@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
@@ -28,11 +28,24 @@ import axios from "axios";
 
 const StyledIcon = styled('div')(({ selected }) => ({
     cursor: 'pointer',
-    transition: 'transform 0.2s',
-    transform: selected ? 'scale(2)' : 'scale(1)',
+    transition: 'transform 0.2s ease, z-index 0.2s ease',
+    transform: selected ? 'scale(2)' : 'scale(1)', // Ölçekleme oranı daha küçük yapıldı
     '&:hover': {
-        transform: 'scale(3)',
+        transform: 'scale(3)', // Hover durumunda aynı ölçekleme oranı kullanıldı
+        zIndex: 10, // Hover durumunda z-index düşük bir değer olarak ayarlandı
     },
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+    position: 'relative',
+    zIndex: selected ? 1 : 111, // Z-index değeri düşük bir seviyede tutuldu
+}));
+
+const TableCellCustom = styled(TableCell)(({ theme }) => ({
+    padding: '1px',
+    border: '1px solid #ddd', // Border geri eklendi
 }));
 
 const Rating = () => {
@@ -41,17 +54,25 @@ const Rating = () => {
 
     const [harvestCondition, setHarvestCondition] = useState(0);
     const [productQuality, setProductQuality] = useState(0);
-    const [overallRating, setOverallRating] = useState(0);
+    const [averageRating, setAverageRating] = useState(0);
     const [productQuantity, setProductQuantity] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
+    useEffect(() => {
+        if (harvestCondition > 0 && productQuality > 0) {
+            const average = (harvestCondition + productQuality) / 2;
+            setAverageRating(average);
+        } else {
+            setAverageRating(0);
+        }
+    }, [harvestCondition, productQuality]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Gerekli kontroller
-        if (!harvestId || !productQuantity || harvestCondition === 0 || productQuality === 0 || overallRating === 0) {
+        if (!harvestId || !productQuantity || harvestCondition === 0 || productQuality === 0) {
             setSnackbarMessage('Lütfen tüm alanları doldurun.');
             setSnackbarSeverity('warning');
             setSnackbarOpen(true);
@@ -70,7 +91,7 @@ const Rating = () => {
             harvestCondition,
             productQuality,
             productQuantity: parseFloat(productQuantity),
-            overallRating: parseFloat(overallRating)
+            overallRating: averageRating
         };
 
         try {
@@ -80,10 +101,8 @@ const Rating = () => {
                 setSnackbarMessage('Değerlendirme başarıyla yapıldı.');
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
-                // Formu temizle
                 setHarvestCondition(0);
                 setProductQuality(0);
-                setOverallRating(0);
                 setProductQuantity('');
                 setTimeout(() => navigate('/rating-list'), 3000);
             } else {
@@ -104,19 +123,17 @@ const Rating = () => {
         setSnackbarOpen(false);
     };
 
-    // Bu fonksiyonu ekledim, yalnızca sayı ve ondalık değerlere izin veriyor
     const handleProductQuantityChange = (e) => {
         const value = e.target.value;
-        // Girişin yalnızca sayı ve ondalık değer olmasını kontrol ediyor
         if (/^\d*\.?\d*$/.test(value)) {
-            setProductQuantity(value); // Eğer geçerliyse değeri günceller
+            setProductQuantity(value);
         }
     };
 
     return (
         <Container maxWidth="xl">
-            <Box sx={{ mt: 4 }}>
-                <Typography variant="h4" component="h2" gutterBottom>
+            <Box sx={{ mt: 6 }}>
+                <Typography variant="h4" component="h3" gutterBottom>
                     Değerlendirme Formu
                 </Typography>
 
@@ -124,116 +141,116 @@ const Rating = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ borderRight: '1px solid #ddd' }}></TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>Çok Kötü</TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>Kötü</TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>Ne İyi Ne Kötü</TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd' }}>İyi</TableCell>
-                                <TableCell align="center">Çok iyi</TableCell>
+                                <TableCell sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '8px' }}></TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '8px' }}>Çok Kötü</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '8px' }}>Kötü</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '8px' }}>Ne İyi Ne Kötü</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '8px' }}>İyi</TableCell>
+                                <TableCell align="center" sx={{ fontSize: '1.2rem', padding: '8px' }}>Çok iyi</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             <TableRow>
-                                <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd' }}>
+                                <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd', fontSize: '1.5rem', padding: '8px', paddingBottom: '16px' }}>
                                     Hasat Koşulları
                                 </TableCell>
-                                <TableCell colSpan={5} align="center">
-                                    <Box sx={{ display:'flex', justifyContent: 'space-between', mt: 1 }}>
-                                        <StyledIcon selected={harvestCondition === 1} onClick={() => setHarvestCondition(1)}>
-                                            <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={harvestCondition === 2} onClick={() => setHarvestCondition(2)}>
-                                            <SentimentDissatisfiedIcon style={{ color: '#FF9100' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={harvestCondition === 3} onClick={() => setHarvestCondition(3)}>
-                                            <SentimentSatisfiedIcon style={{ color: '#FFD600' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={harvestCondition === 4} onClick={() => setHarvestCondition(4)}>
-                                            <SentimentSatisfiedAltIcon style={{ color: '#76FF03' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={harvestCondition === 5} onClick={() => setHarvestCondition(5)}>
-                                            <SentimentVerySatisfiedIcon style={{ color: '#00E676' }} />
-                                        </StyledIcon>
-                                    </Box>
-                                </TableCell>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={harvestCondition === 1} onClick={() => setHarvestCondition(1)}>
+                                        <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744', fontSize: '1.8rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={harvestCondition === 2} onClick={() => setHarvestCondition(2)}>
+                                        <SentimentDissatisfiedIcon style={{ color: '#FF9100', fontSize: '1.8rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={harvestCondition === 3} onClick={() => setHarvestCondition(3)}>
+                                        <SentimentSatisfiedIcon style={{ color: '#FFD600', fontSize: '1.5rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={harvestCondition === 4} onClick={() => setHarvestCondition(4)}>
+                                        <SentimentSatisfiedAltIcon style={{ color: '#76FF03', fontSize: '1.8rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={harvestCondition === 5} onClick={() => setHarvestCondition(5)}>
+                                        <SentimentVerySatisfiedIcon style={{ color: '#00E676', fontSize: '1.8rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
                             </TableRow>
                             <TableRow>
-                                <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd' }}>
+                                <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd', fontSize: '1.5rem', padding: '8px', paddingTop: '16px' }}>
                                     Ürün Kalitesi
                                 </TableCell>
-                                <TableCell colSpan={5} align="center">
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                                        <StyledIcon selected={productQuality === 1} onClick={() => setProductQuality(1)}>
-                                            <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={productQuality === 2} onClick={() => setProductQuality(2)}>
-                                            <SentimentDissatisfiedIcon style={{ color: '#FF9100' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={productQuality === 3} onClick={() => setProductQuality(3)}>
-                                            <SentimentSatisfiedIcon style={{ color: '#FFD600' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={productQuality === 4} onClick={() => setProductQuality(4)}>
-                                            <SentimentSatisfiedAltIcon style={{ color: '#76FF03' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={productQuality === 5} onClick={() => setProductQuality(5)}>
-                                            <SentimentVerySatisfiedIcon style={{ color: '#00E676' }} />
-                                        </StyledIcon>
-                                    </Box>
-                                </TableCell>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={productQuality === 1} onClick={() => setProductQuality(1)}>
+                                        <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744', fontSize: '1.8rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={productQuality === 2} onClick={() => setProductQuality(2)}>
+                                        <SentimentDissatisfiedIcon style={{ color: '#FF9100', fontSize: '1.8rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={productQuality === 3} onClick={() => setProductQuality(3)}>
+                                        <SentimentSatisfiedIcon style={{ color: '#FFD600', fontSize: '1.8rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={productQuality === 4} onClick={() => setProductQuality(4)}>
+                                        <SentimentSatisfiedAltIcon style={{ color: '#76FF03', fontSize: '1.8rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
+                                <TableCellCustom align="center">
+                                    <StyledIcon selected={productQuality === 5} onClick={() => setProductQuality(5)}>
+                                        <SentimentVerySatisfiedIcon style={{ color: '#00E676', fontSize: '1.8rem' }} />
+                                    </StyledIcon>
+                                </TableCellCustom>
                             </TableRow>
                             <TableRow>
-                                <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd' }}>
-                                    Ürün Miktarı
-                                </TableCell>
-                                <TableCell colSpan={5}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        value={productQuantity}
-                                        onChange={handleProductQuantityChange} // Burada, sadece sayı girişine izin vermek için handleProductQuantityChange fonksiyonunu ekledim
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                        }}
-                                    />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd' }}>
+                                <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd', fontSize: '1.5rem', padding: '8px' }}>
                                     Genel Değerlendirme
                                 </TableCell>
-                                <TableCell colSpan={5} align="center">
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                                        <StyledIcon selected={overallRating === 1} onClick={() => setOverallRating(1)}>
-                                            <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={overallRating === 2} onClick={() => setOverallRating(2)}>
-                                            <SentimentDissatisfiedIcon style={{ color: '#FF9100' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={overallRating === 3} onClick={() => setOverallRating(3)}>
-                                            <SentimentSatisfiedIcon style={{ color: '#FFD600' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={overallRating === 4} onClick={() => setOverallRating(4)}>
-                                            <SentimentSatisfiedAltIcon style={{ color: '#76FF03' }} />
-                                        </StyledIcon>
-                                        <StyledIcon selected={overallRating === 5} onClick={() => setOverallRating(5)}>
-                                            <SentimentVerySatisfiedIcon style={{ color: '#00E676' }} />
-                                        </StyledIcon>
-                                    </Box>
+                                <TableCell colSpan={5} align="center" sx={{ padding: '8px' }}>
+                                    <Typography variant="h5">
+                                        Ortalama Puan: {averageRating.toFixed(2)}
+                                    </Typography>
                                 </TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
                 </TableContainer>
 
-                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button variant="contained" color="primary" onClick={handleSubmit}>
+                {/* Ürün Miktarı Alanı */}
+                <Box sx={{ mt: 4 }}>
+                    <Typography variant="h5" component="h3" gutterBottom>
+                        Ürün Miktarı
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        value={productQuantity}
+                        onChange={handleProductQuantityChange}
+                        InputProps={{
+                            endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                            sx: { fontSize: '1.5rem' }
+                        }}
+                        sx={{ fontSize: '1.5rem' }}
+                    />
+                </Box>
+
+                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button variant="contained" color="primary" sx={{ fontSize: '1rem', padding: '0.75rem 1rem' }} onClick={handleSubmit}>
                         Gönder
                     </Button>
                 </Box>
             </Box>
 
             <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%', fontSize: '1.2rem' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

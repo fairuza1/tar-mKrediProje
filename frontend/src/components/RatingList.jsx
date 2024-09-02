@@ -155,3 +155,16 @@ const RatingList = () => {
 };
 
 export default RatingList;
+// cursor: 'pointer',
+//     transition: 'transform 0.2s',
+//     transform: selected ? 'scale(2)' : 'scale(1)',
+//     '&:hover': {
+//         transform: 'scale(3)',
+//     },
+//     display: 'flex',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     height: '100%',
+//     width: '100%',
+//     // border: selected ? 'none' : 'none',  // İkonların çevresindeki border gizlendi
+//     borderRadius: '4px',
