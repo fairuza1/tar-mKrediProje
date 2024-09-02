@@ -33,7 +33,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(false) // eğer https kullanıyorsanız, bunu true yapın
                 .path("/")
-                .maxAge(15 * 60) // access token süresi (15 dakika)
+                .maxAge(60 * 60 *24) // access token süresi (15 dakika)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
@@ -85,7 +85,7 @@ public class AuthController {
                     .httpOnly(true)
                     .secure(false) // eğer https kullanıyorsanız, bunu true yapın
                     .path("/")
-                    .maxAge(15 * 60) // access token süresi (15 dakika)
+                    .maxAge(60 * 60 * 24) // access token süresi (1 gün)
                     .build();
 
             return ResponseEntity.ok()

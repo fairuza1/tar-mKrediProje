@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Container, Typography, Box, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert, Table, TableBody, TableCell, TableHead, TableRow, Grid } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert, Table, TableBody, TableCell, TableHead, TableRow, Grid, Avatar } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbComponent from "./BreadCrumb";
@@ -265,13 +265,24 @@ function AddSowing() {
                             <TableBody>
                                 {recommendations.map(([plantName, score], index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{plantName}</TableCell>
-                                        <TableCell align="right">{(score * 20).toFixed(2)}%</TableCell> {/* Puanı yüzde olarak göster */}
+                                        <TableCell>
+                                            <Box display="flex" alignItems="center">
+                                                <Avatar
+                                                    src={`/images/Plant/${plantName.toLowerCase()}.jpg`}
+                                                    alt={plantName}
+                                                    sx={{ mr: 2 }}
+                                                />
+
+                                                {plantName}
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell align="right">{(score * 20).toFixed(2)}%</TableCell>
                                         <TableCell align="right">{yieldPerSquareMeter !== null ? yieldPerSquareMeter.toFixed(2) : 'N/A'} kg/m²</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
+
                     ) : (
                         <Typography variant="body1">
                             Seçilen arazi için öneri bulunmamaktadır.
@@ -294,4 +305,3 @@ function AddSowing() {
 }
 
 export default AddSowing;
-
