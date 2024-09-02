@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ratings")
@@ -38,7 +39,7 @@ public class RatingController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RatingDTO> getRatingById(@PathVariable Long id) {
-        RatingDTO ratingDTO = ratingService.getRatingById(id); // 'getRatingById0' yerine 'getRatingById' olacak
+        RatingDTO ratingDTO = ratingService.getRatingById(id);
         return new ResponseEntity<>(ratingDTO, HttpStatus.OK);
     }
 
@@ -46,5 +47,12 @@ public class RatingController {
     public ResponseEntity<Void> deleteRating(@PathVariable Long id) {
         ratingService.deleteRating(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // Belirli bir şehir ve ilçe için bitki önerileri
+    @GetMapping("/recommendations")
+    public ResponseEntity<Map<String, Double>> getRecommendations(@RequestParam String city, @RequestParam String district) {
+        Map<String, Double> recommendations = ratingService.getPlantRecommendationsByHarvestLocation(city, district);
+        return new ResponseEntity<>(recommendations, HttpStatus.OK);
     }
 }

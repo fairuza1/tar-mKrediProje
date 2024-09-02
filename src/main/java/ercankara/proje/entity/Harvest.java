@@ -25,4 +25,5 @@ public class Harvest {
     @JoinColumn(name = "sowing_id", nullable = false)
     @JsonManagedReference // Bu alan serileştirilirken referans olarak görünecek
     private Sowing sowing;
+
 }
