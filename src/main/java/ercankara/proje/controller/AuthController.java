@@ -85,7 +85,7 @@ public class AuthController {
                     .httpOnly(true)
                     .secure(false) // eğer https kullanıyorsanız, bunu true yapın
                     .path("/")
-                    .maxAge(60 * 60) // access token süresi (60 dakika)
+                    .maxAge(15 * 60) // access token süresi (15 dakika)
                     .build();
 
             return ResponseEntity.ok()
