@@ -55,18 +55,16 @@ public class JwtUtil {
     }
 //Bu yöntem, 15 dakika geçerli olacak şekilde bir JWT oluşturur.
 //Kullanıcı adı ile ilişkili bir token döner.
-    public String generateToken(String username) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
-    }
-//Bu yöntem, verilen claims (alanlar) ve subject (konu) ile bir JWT oluşturur.
-//Token, HS256 algoritması ile imzalanır ve 15 dakika geçerli olur.
+public String generateToken(String username) {
+    Map<String, Object> claims = new HashMap<>();
+    return createToken(claims, username);
+}
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 )) // 30 gün geçerli
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15 dakika geçerli
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
