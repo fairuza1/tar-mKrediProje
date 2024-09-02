@@ -13,24 +13,24 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-//Bu değişken, tokenları imzalamak ve doğrulamak için kullanılan bir gizli anahtardır. "secret" kelimesi base64 formatında kodlanarak SECRET_KEY olarak saklanır.
+    //Bu değişken, tokenları imzalamak ve doğrulamak için kullanılan bir gizli anahtardır. "secret" kelimesi base64 formatında kodlanarak SECRET_KEY olarak saklanır.
     private String SECRET_KEY = Base64.getEncoder().encodeToString("secret".getBytes());
-//Bu yöntem, verilen token'ın içinden kullanıcı adını (subject) çıkartır.
+    //Bu yöntem, verilen token'ın içinden kullanıcı adını (subject) çıkartır.
 //Token içindeki "subject" (konu), genellikle kullanıcı adı gibi kimlik doğrulama ile ilgili bilgileri içerir.
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-//Bu yöntem, verilen token'ın geçerlilik süresinin bitiş tarihini çıkartır.
+    //Bu yöntem, verilen token'ın geçerlilik süresinin bitiş tarihini çıkartır.
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-//Bu yöntem, token'ın içindeki belirli bir alanı (claim) çıkartmak için genel bir yöntemdir.
+    //Bu yöntem, token'ın içindeki belirli bir alanı (claim) çıkartmak için genel bir yöntemdir.
 //claimsResolver fonksiyonu, token içindeki istenen bilgiyi çıkartmak için kullanılır.
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-//Bu yöntem, token'ın tamamını ayrıştırır ve tüm alanları (claims) döner.
+    //Bu yöntem, token'ın tamamını ayrıştırır ve tüm alanları (claims) döner.
 //Token, gizli anahtar kullanılarak ayrıştırılır. Eğer token geçersizse, bir hata fırlatılır.
     private Claims extractAllClaims(String token) {
         try {
@@ -39,11 +39,11 @@ public class JwtUtil {
             throw new RuntimeException("Invalid JWT token", e);
         }
     }
-//Bu yöntem, token'ın süresinin dolup dolmadığını kontrol eder.
+    //Bu yöntem, token'ın süresinin dolup dolmadığını kontrol eder.
     public Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
-//Bu yöntem, 30 gün geçerli olacak şekilde bir "refresh token" (yenileme token'ı) oluşturur.
+    //Bu yöntem, 30 gün geçerli olacak şekilde bir "refresh token" (yenileme token'ı) oluşturur.
 //"Refresh token" genellikle kullanıcı oturumunu yenilemek için kullanılır.
     public String generateRefreshToken(String username) {
         return Jwts.builder()
@@ -53,22 +53,24 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
-//Bu yöntem, 15 dakika geçerli olacak şekilde bir JWT oluşturur.
+    //Bu yöntem, 15 dakika geçerli olacak şekilde bir JWT oluşturur.
 //Kullanıcı adı ile ilişkili bir token döner.
-public String generateToken(String username) {
-    Map<String, Object> claims = new HashMap<>();
-    return createToken(claims, username);
-}
+    public String generateToken(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, username);
+    }
+    //Bu yöntem, verilen claims (alanlar) ve subject (konu) ile bir JWT oluşturur.
+//Token, HS256 algoritması ile imzalanır ve 15 dakika geçerli olur.
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15 dakika geçerli
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 *30 ))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
-//Bu yöntem, token'ın geçerli olup olmadığını ve doğru kullanıcıya ait olup olmadığını kontrol eder.
+    //Bu yöntem, token'ın geçerli olup olmadığını ve doğru kullanıcıya ait olup olmadığını kontrol eder.
 //Kullanıcı adı ve token'ın süresi kontrol edilerek doğrulama yapılır.
     public Boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
