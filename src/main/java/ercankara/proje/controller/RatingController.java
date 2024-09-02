@@ -55,4 +55,13 @@ public class RatingController {
         Map<String, Double> recommendations = ratingService.getPlantRecommendationsByHarvestLocation(city, district);
         return new ResponseEntity<>(recommendations, HttpStatus.OK);
     }
+
+    // Belirli bir şehir ve ilçe için tüm arazilerdeki metrekare başına düşen ürün miktarını döndürür
+    @GetMapping("/yield-per-square-meter")
+    public ResponseEntity<Double> getYieldPerSquareMeter(
+            @RequestParam String city,
+            @RequestParam String district) {
+        double yieldPerSquareMeter = ratingService.calculateYieldPerSquareMeter(city, district);
+        return new ResponseEntity<>(yieldPerSquareMeter, HttpStatus.OK);
+    }
 }

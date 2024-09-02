@@ -76,6 +76,8 @@ public class RatingService {
         ratingDTO.setProductQuality(rating.getProductQuality());
         ratingDTO.setProductQuantity(rating.getProductQuantity());
         ratingDTO.setOverallRating(rating.getOverallRating());
+        double landSize = rating.getHarvest().getSowing().getLand().getLandSize();
+        ratingDTO.setYieldPerSquareMeter(rating.getProductQuantity() / landSize); // Metrekare başına düşen ürün miktarını hesaplayıp DTO'ya ekle
         return ratingDTO;
     }
 
@@ -110,5 +112,21 @@ public class RatingService {
         }
 
         return plantScores;
+    }
+
+    // Tüm arazilerin toplam ürün miktarını ve ekilen alanı kullanarak metrekare başına düşen ürün miktarını hesaplama
+    public double calculateYieldPerSquareMeter(String city, String district) {
+        List<Rating> ratings = ratingRepository.findByHarvest_Sowing_Land_CityAndHarvest_Sowing_Land_District(city, district);
+
+        double totalProductQuantity = 0.0;
+        double totalSownArea = 0.0;
+
+        for (Rating rating : ratings) {
+            totalProductQuantity += rating.getProductQuantity();
+            totalSownArea += rating.getHarvest().getSowing().getAmount(); // Ekilen alan miktarı
+        }
+
+        // Metrekare başına düşen ürün miktarını hesapla
+        return totalSownArea > 0 ? totalProductQuantity / totalSownArea : 0.0;
     }
 }

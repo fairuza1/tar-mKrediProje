@@ -14,4 +14,6 @@ public class RatingDTO {
     private int productQuality;    // 1-5 arası
     private double productQuantity; // kg cinsinden
     private double overallRating;   // Genel değerlendirme
+    private double yieldPerSquareMeter; // Metrekare başına düşen ürün miktarı
+
 }

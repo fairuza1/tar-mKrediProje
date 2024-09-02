@@ -76,8 +76,13 @@ function AddSowing() {
                     try {
                         const response = await axios.get(`http://localhost:8080/api/ratings/recommendations?city=${city}&district=${district}`, { withCredentials: true });
                         setRecommendations(Object.entries(response.data));
+
+                        // Metrekare başına düşen ürün miktarını al
+                        const yieldResponse = await axios.get(`http://localhost:8080/api/ratings/yield-per-square-meter?city=${city}&district=${district}`, { withCredentials: true });
+                        setYieldPerSquareMeter(yieldResponse.data);
+
                     } catch (error) {
-                        console.error('Error fetching recommendations:', error);
+                        console.error('Error fetching recommendations and yield per square meter:', error);
                     }
                 };
 
@@ -241,11 +246,7 @@ function AddSowing() {
                             Ekim Ekle
                         </Button>
 
-                        {yieldPerSquareMeter !== null && (
-                            <Typography variant="h6" sx={{ mt: 2 }}>
-                                Metrekare başına düşen ürün miktarı: {yieldPerSquareMeter.toFixed(2)} kg/m²
-                            </Typography>
-                        )}
+
                     </Box>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -266,7 +267,7 @@ function AddSowing() {
                                     <TableRow key={index}>
                                         <TableCell>{plantName}</TableCell>
                                         <TableCell align="right">{score.toFixed(2)}</TableCell>
-                                        <TableCell align="right">{yieldPerSquareMeter ? yieldPerSquareMeter.toFixed(2) : 'N/A'}</TableCell>
+                                        <TableCell align="right">{yieldPerSquareMeter !== null ? yieldPerSquareMeter.toFixed(2) : 'N/A'} kg/m²</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
