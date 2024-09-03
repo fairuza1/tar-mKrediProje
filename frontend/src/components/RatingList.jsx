@@ -10,8 +10,15 @@ import {
     Snackbar,
     Alert,
     CircularProgress,
-    Box
+    Box,
+    TextField,
+    MenuItem,
+    Slider,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
 
 const RatingList = () => {
@@ -24,6 +31,11 @@ const RatingList = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+    // Filtreleme durumları
+    const [filterLand, setFilterLand] = useState('');
+    const [filterPlant, setFilterPlant] = useState('');
+    const [filterRating, setFilterRating] = useState([0, 5]);
 
     const userId = parseInt(localStorage.getItem('userId')); // Kullanıcı ID'sini al
 
@@ -56,12 +68,42 @@ const RatingList = () => {
         fetchAllData();
     }, []);
 
-    // Belirli kullanıcıya ait verileri filtreleyin
+    // Kullanıcının ekmiş olduğu bitkileri filtreleyin ve tekrarlananları kaldırın
+    const userSownPlants = Array.from(
+        new Set( // Set yapısı kullanılarak tekrar eden bitki adları kaldırılır
+            sowings
+                .filter(sowing => lands.find(land => land.id === sowing.landId)?.userId === userId)
+                .map(sowing => plants.find(plant => plant.id === sowing.plantId)?.name)
+                .filter(Boolean) // Undefined olanları filtrele
+        )
+    ).map(plantName => plants.find(plant => plant.name === plantName));
+
+    // Seçilen araziye ait bitkileri filtrele
+    const filteredPlants = filterLand
+        ? Array.from(
+            new Set(
+                sowings
+                    .filter(sowing => {
+                        const land = lands.find(land => land.id === sowing.landId);
+                        return land && land.name === filterLand && land.userId === userId;
+                    })
+                    .map(sowing => plants.find(plant => plant.id === sowing.plantId)?.name)
+                    .filter(Boolean)
+            )
+        ).map(plantName => plants.find(plant => plant.name === plantName))
+        : userSownPlants;
+
+    // Filtrelenmiş değerlendirme listesi
     const filteredRatings = ratings.filter(rating => {
         const harvest = harvests.find(h => h.id === rating.harvestId);
         const sowing = harvest ? sowings.find(s => s.id === harvest.sowingId) : null;
         const land = sowing ? lands.find(l => l.id === sowing.landId) : null;
-        return land && land.userId === userId; // Sadece kullanıcıya ait verileri döndür
+        const plant = sowing ? plants.find(p => p.id === sowing.plantId) : null;
+        const matchesLand = filterLand ? (land && land.name === filterLand) : true;
+        const matchesPlant = filterPlant ? (plant && plant.name === filterPlant) : true;
+        const matchesRating = rating.overallRating >= filterRating[0] && rating.overallRating <= filterRating[1];
+
+        return land && land.userId === userId && matchesLand && matchesPlant && matchesRating;
     });
 
     const getSowing = (sowingId) => sowings.find(sowing => sowing.id === sowingId);
@@ -72,19 +114,77 @@ const RatingList = () => {
         setSnackbarOpen(false);
     };
 
-    if (loading) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
+    const handleRatingChange = (event, newValue) => {
+        setFilterRating(newValue);
+    };
 
     return (
         <Container maxWidth="lg">
             <Typography variant="h4" component="h1" gutterBottom>
                 Değerlendirme Listesi
             </Typography>
+
+            {/* Filtreleme bölümü */}
+            <Accordion sx={{ mt: 3, mb: 3 }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                    <Typography>Filtreleme Seçenekleri</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Arazi Adı"
+                                value={filterLand}
+                                onChange={(e) => setFilterLand(e.target.value)}
+                                select
+                                fullWidth
+                            >
+                                <MenuItem value="">Hepsi</MenuItem>
+                                {lands.map((land) => (
+                                    <MenuItem key={land.id} value={land.name}>
+                                        {land.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Bitki Adı"
+                                value={filterPlant}
+                                onChange={(e) => setFilterPlant(e.target.value)}
+                                select
+                                fullWidth
+                            >
+                                <MenuItem value="">Hepsi</MenuItem>
+                                {filteredPlants.map((plant) => (
+                                    <MenuItem key={plant.id} value={plant.name}>
+                                        {plant.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <Typography variant="body1" gutterBottom>
+                                Genel Değerlendirme
+                            </Typography>
+                            <Slider
+                                value={filterRating}
+                                onChange={handleRatingChange}
+                                valueLabelDisplay="auto"
+                                step={0.1}
+                                min={0}
+                                max={5}
+                                marks={[
+                                    { value: 0, label: '0' },
+                                    { value: 5, label: '5' },
+                                ]}
+                                sx={{ marginBottom: 2 }}
+                            />
+                        </Grid>
+                    </Grid>
+                </AccordionDetails>
+            </Accordion>
+
             <Grid container spacing={3}>
                 {filteredRatings.map((rating) => {
                     const harvest = harvests.find(h => h.id === rating.harvestId);
@@ -155,16 +255,3 @@ const RatingList = () => {
 };
 
 export default RatingList;
-// cursor: 'pointer',
-//     transition: 'transform 0.2s',
-//     transform: selected ? 'scale(2)' : 'scale(1)',
-//     '&:hover': {
-//         transform: 'scale(3)',
-//     },
-//     display: 'flex',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     height: '100%',
-//     width: '100%',
-//     // border: selected ? 'none' : 'none',  // İkonların çevresindeki border gizlendi
-//     borderRadius: '4px',

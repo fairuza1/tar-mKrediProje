@@ -132,6 +132,24 @@ const SowingList = () => {
         setFilterAreaRange(newValue);
     };
 
+    // Seçilen araziye göre bitkileri filtrele
+    const filteredPlants = filterLand
+        ? Array.from(
+            new Set(
+                sowings
+                    .filter(sowing => {
+                        const land = lands.find(land => land.id === sowing.landId);
+                        return land && land.name === filterLand;
+                    })
+                    .map(sowing => sowing.plantName)
+            )
+        )
+        : Array.from(
+            new Set(
+                sowings.map(sowing => sowing.plantName)
+            )
+        );
+
     // Filtrelenmiş ekim listesi
     const filteredSowings = sowings.filter(sowing => {
         const land = getLand(sowing.landId);
@@ -178,8 +196,16 @@ const SowingList = () => {
                                 label="Bitki Adı"
                                 value={filterPlant}
                                 onChange={(e) => setFilterPlant(e.target.value)}
+                                select
                                 fullWidth
-                            />
+                            >
+                                <MenuItem value="">Hepsi</MenuItem>
+                                {filteredPlants.map((plantName, index) => (
+                                    <MenuItem key={index} value={plantName}>
+                                        {plantName}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
                         </Grid>
                         <Grid item xs={12} sm={4}>
                             <TextField
@@ -316,4 +342,3 @@ const SowingList = () => {
 };
 
 export default SowingList;
-

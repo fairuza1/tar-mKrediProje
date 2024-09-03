@@ -10,8 +10,15 @@ import {
     Button,
     Alert,
     Snackbar,
-    CircularProgress
+    CircularProgress,
+    TextField,
+    MenuItem,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Slider
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
 
@@ -25,6 +32,10 @@ const Harvest = ({ onSowingUpdate }) => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+    // Filtreleme durumları
+    const [filterLand, setFilterLand] = useState('');
+    const [filterAreaRange, setFilterAreaRange] = useState([0, 10000]);
 
     const userId = parseInt(localStorage.getItem('userId')); // Kullanıcı ID'sini al
 
@@ -58,7 +69,9 @@ const Harvest = ({ onSowingUpdate }) => {
     const filteredHarvests = harvests.filter(harvest => {
         const sowing = getSowing(harvest.sowingId);
         const land = sowing ? getLand(sowing.landId) : null;
-        return land && land.userId === userId; // Sadece kullanıcıya ait verileri döndür
+        const matchesLand = filterLand ? (land && land.name === filterLand) : true;
+        const matchesArea = sowing ? sowing.amount >= filterAreaRange[0] && sowing.amount <= filterAreaRange[1] : true;
+        return land && land.userId === userId && matchesLand && matchesArea; // Sadece kullanıcıya ait ve filtreye uyan verileri döndür
     });
 
     const handleDelete = async (harvestId, sowingId) => {
@@ -89,11 +102,60 @@ const Harvest = ({ onSowingUpdate }) => {
         setOpenSnackbar(false);
     };
 
+    const handleAreaChange = (event, newValue) => {
+        setFilterAreaRange(newValue);
+    };
+
     return (
         <Container maxWidth="lg">
             <Box sx={{ mt: 3 }}>
                 <BreadcrumbComponent pageName="Hasatlar" />
             </Box>
+
+            {/* Filtreleme bölümü */}
+            <Accordion sx={{ mt: 3, mb: 3 }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                    <Typography>Filtreleme Seçenekleri</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                label="Arazi Adı"
+                                value={filterLand}
+                                onChange={(e) => setFilterLand(e.target.value)}
+                                select
+                                fullWidth
+                            >
+                                <MenuItem value="">Hepsi</MenuItem>
+                                {lands.map((land) => (
+                                    <MenuItem key={land.id} value={land.name}>
+                                        {land.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Typography variant="body1" gutterBottom>
+                                Ekili Alan Aralığı (m²)
+                            </Typography>
+                            <Slider
+                                value={filterAreaRange}
+                                onChange={handleAreaChange}
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={10000}
+                                marks={[
+                                    { value: 0, label: '0 m²' },
+                                    { value: 10000, label: '10000 m²' },
+                                ]}
+                                sx={{ marginBottom: 2 }}
+                            />
+                        </Grid>
+                    </Grid>
+                </AccordionDetails>
+            </Accordion>
+
             <Box sx={{ mt: 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
                     Hasat Listesi
