@@ -14,7 +14,7 @@ function AddSowing() {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-    const [yieldPerSquareMeter, setYieldPerSquareMeter] = useState(null);
+    const [yieldPerSquareMeterByPlant, setYieldPerSquareMeterByPlant] = useState({});
     const navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
@@ -78,8 +78,8 @@ function AddSowing() {
                         setRecommendations(Object.entries(response.data));
 
                         // Metrekare başına düşen ürün miktarını al
-                        const yieldResponse = await axios.get(`http://localhost:8080/api/ratings/yield-per-square-meter?city=${city}&district=${district}`, { withCredentials: true });
-                        setYieldPerSquareMeter(yieldResponse.data);
+                        const yieldResponse = await axios.get(`http://localhost:8080/api/ratings/yield-per-square-meter-by-plant?city=${city}&district=${district}`, { withCredentials: true });
+                        setYieldPerSquareMeterByPlant(yieldResponse.data);
 
                     } catch (error) {
                         console.error('Error fetching recommendations and yield per square meter:', error);
@@ -141,10 +141,6 @@ function AddSowing() {
                 setSnackbarMessage('Sowing saved successfully!');
                 setSnackbarSeverity('success');
                 setOpenSnackbar(true);
-
-                // Metrekare başına düşen verim hesapla
-                const yieldPerSquareMeter = parseFloat(amount) / landSize;
-                setYieldPerSquareMeter(yieldPerSquareMeter);
 
                 setTimeout(() => navigate('/sowing-list'), 3000);
                 setPlantId('');
@@ -246,7 +242,6 @@ function AddSowing() {
                             Ekim Ekle
                         </Button>
 
-
                     </Box>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -272,17 +267,17 @@ function AddSowing() {
                                                     alt={plantName}
                                                     sx={{ mr: 2 }}
                                                 />
-
                                                 {plantName}
                                             </Box>
                                         </TableCell>
                                         <TableCell align="right">{(score * 20).toFixed(2)}%</TableCell>
-                                        <TableCell align="right">{yieldPerSquareMeter !== null ? yieldPerSquareMeter.toFixed(2) : 'N/A'} kg/m²</TableCell>
+                                        <TableCell align="right">
+                                            {yieldPerSquareMeterByPlant[plantName] ? yieldPerSquareMeterByPlant[plantName].toFixed(2) : 'N/A'} kg/m²
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
-
                     ) : (
                         <Typography variant="body1">
                             Seçilen arazi için öneri bulunmamaktadır.

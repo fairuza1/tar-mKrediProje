@@ -56,12 +56,12 @@ public class RatingController {
         return new ResponseEntity<>(recommendations, HttpStatus.OK);
     }
 
-    // Belirli bir şehir ve ilçe için tüm arazilerdeki metrekare başına düşen ürün miktarını döndürür
-    @GetMapping("/yield-per-square-meter")
-    public ResponseEntity<Double> getYieldPerSquareMeter(
+    // Belirli bir şehir ve ilçe için her bitkiye özel metrekare başına düşen ürün miktarını döndürür
+    @GetMapping("/yield-per-square-meter-by-plant")
+    public ResponseEntity<Map<String, Double>> getYieldPerSquareMeterByPlant(
             @RequestParam String city,
             @RequestParam String district) {
-        double yieldPerSquareMeter = ratingService.calculateYieldPerSquareMeter(city, district);
-        return new ResponseEntity<>(yieldPerSquareMeter, HttpStatus.OK);
+        Map<String, Double> yieldPerSquareMeterByPlant = ratingService.calculateYieldPerSquareMeterByPlant(city, district);
+        return new ResponseEntity<>(yieldPerSquareMeterByPlant, HttpStatus.OK);
     }
 }

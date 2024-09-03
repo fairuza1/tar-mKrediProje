@@ -9,10 +9,10 @@ import ercankara.proje.repository.RatingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,8 +76,11 @@ public class RatingService {
         ratingDTO.setProductQuality(rating.getProductQuality());
         ratingDTO.setProductQuantity(rating.getProductQuantity());
         ratingDTO.setOverallRating(rating.getOverallRating());
+
         double landSize = rating.getHarvest().getSowing().getLand().getLandSize();
-        ratingDTO.setYieldPerSquareMeter(rating.getProductQuantity() / landSize); // Metrekare başına düşen ürün miktarını hesaplayıp DTO'ya ekle
+        double yieldPerSquareMeter = rating.getProductQuantity() / landSize;
+
+        ratingDTO.setYieldPerSquareMeter(yieldPerSquareMeter); // Metrekare başına düşen ürün miktarını DTO'ya ekle
         return ratingDTO;
     }
 
@@ -114,19 +117,27 @@ public class RatingService {
         return plantScores;
     }
 
-    // Tüm arazilerin toplam ürün miktarını ve ekilen alanı kullanarak metrekare başına düşen ürün miktarını hesaplama
-    public double calculateYieldPerSquareMeter(String city, String district) {
+    // Her bitki için metrekare başına düşen ürün miktarını hesaplama
+    public Map<String, Double> calculateYieldPerSquareMeterByPlant(String city, String district) {
         List<Rating> ratings = ratingRepository.findByHarvest_Sowing_Land_CityAndHarvest_Sowing_Land_District(city, district);
 
-        double totalProductQuantity = 0.0;
-        double totalSownArea = 0.0;
+        Map<String, Double> totalProductQuantities = new HashMap<>();
+        Map<String, Double> totalSownAreas = new HashMap<>();
 
         for (Rating rating : ratings) {
-            totalProductQuantity += rating.getProductQuantity();
-            totalSownArea += rating.getHarvest().getSowing().getAmount(); // Ekilen alan miktarı
+            String plantName = rating.getHarvest().getSowing().getPlant().getName();
+
+            totalProductQuantities.put(plantName, totalProductQuantities.getOrDefault(plantName, 0.0) + rating.getProductQuantity());
+            totalSownAreas.put(plantName, totalSownAreas.getOrDefault(plantName, 0.0) + rating.getHarvest().getSowing().getAmount());
         }
 
-        // Metrekare başına düşen ürün miktarını hesapla
-        return totalSownArea > 0 ? totalProductQuantity / totalSownArea : 0.0;
+        Map<String, Double> yieldPerSquareMeterByPlant = new HashMap<>();
+        for (String plantName : totalProductQuantities.keySet()) {
+            double totalQuantity = totalProductQuantities.get(plantName);
+            double totalArea = totalSownAreas.get(plantName);
+            yieldPerSquareMeterByPlant.put(plantName, totalArea > 0 ? totalQuantity / totalArea : 0.0);
+        }
+
+        return yieldPerSquareMeterByPlant;
     }
 }
