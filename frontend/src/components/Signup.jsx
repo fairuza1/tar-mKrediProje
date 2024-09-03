@@ -17,15 +17,42 @@ function Signup() {
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false); // Spinner için loading durumu
+    const [isPasswordValid, setIsPasswordValid] = useState(false); // Şifrenin geçerliliği için durum
     const navigate = useNavigate();
+
+    const validateForm = () => {
+        if (!user) {
+            setError('Lütfen kullanıcı adını giriniz.');
+            return false;
+        }
+        if (!password) {
+            setError('Lütfen şifrenizi giriniz.');
+            return false;
+        }
+        if (!email) {
+            setError('Lütfen e-posta adresinizi giriniz.');
+            return false;
+        }
+        if (!isPasswordValid) {
+            setError('Lütfen geçerli bir şifre giriniz.');
+            return false;
+        }
+        return true;
+    };
 
     const handleSignup = async (e) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            return; // Form geçerli değilse işlem yapılmaz
+        }
+
         setLoading(true); // Kayıt işlemi başladığında loading'i true yap
         try {
             const response = await axios.post('http://localhost:8080/auth/signup', { user, password, email, phoneNumber });
             if (response.status === 200) { // Eğer durum kodu 200 ise başarılı kabul edelim
                 setMessage('Kayıt başarılı. Giriş sayfasına yönlendiriliyorsunuz...');
+                setError(''); // Hata mesajını temizle
                 setTimeout(() => {
                     setLoading(false); // Yönlendirme öncesinde loading'i false yap
                     navigate('/login');
@@ -44,6 +71,20 @@ function Signup() {
                 setError('Bir hata oluştu');
             }
             setLoading(false); // Hata olduğunda loading'i false yap
+        }
+    };
+
+    const handlePasswordChange = (e) => {
+        const passwordValue = e.target.value;
+        setPassword(passwordValue);
+
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+        if (!regex.test(passwordValue)) {
+            setError("Şifre en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.");
+            setIsPasswordValid(false); // Geçerli değilse, buton devre dışı kalır
+        } else {
+            setError(''); // Hata mesajını temizle
+            setIsPasswordValid(true); // Geçerliyse, buton aktif hale gelir
         }
     };
 
@@ -124,7 +165,7 @@ function Signup() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                              Kayıt Ol
+                            Kayıt Ol
                         </Typography>
                         {/* Spinner */}
                         {loading && (
@@ -156,7 +197,7 @@ function Signup() {
                                 id="password"
                                 autoComplete="current-password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={handlePasswordChange} // Burada handlePasswordChange fonksiyonunu kullanacağız
                                 disabled={loading} // Kayıt yaparken alanları devre dışı bırak
                             />
                             <TextField
@@ -199,7 +240,7 @@ function Signup() {
                                 fullWidth
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2, bgcolor: '#6c757d' }}
-                                disabled={loading} // Kayıt yaparken butonu devre dışı bırak
+                                disabled={loading} // Yükleme devam ediyorsa buton devre dışı
                             >
                                 Kayıt Ol
                             </Button>

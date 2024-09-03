@@ -4,6 +4,7 @@ import ercankara.proje.dto.LoginRequest;
 import ercankara.proje.dto.LoginResponse;
 import ercankara.proje.service.UserService;
 import ercankara.proje.util.JwtUtil;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -50,10 +51,11 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<LoginResponse> signup(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> signup(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = userService.signup(request);
         return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {

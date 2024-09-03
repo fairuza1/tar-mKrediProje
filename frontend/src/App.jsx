@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import NavbarWrapper from './components/NavbarWrapper'; // Yeni NavbarWrapper bileşeni
+import NavbarWrapper from './components/NavbarWrapper';
 import Home from './components/Home';
 import AddLand from './components/AddLand';
 import Profile from './components/Profile';
@@ -49,13 +49,9 @@ function App() {
 
     return (
         <Router>
-            {/* NavbarWrapper, Router'ın çocuk bileşeni olarak kullanılır */}
             <NavbarWrapper isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
             <Routes>
-                {/* Giriş yapılmamışsa "/" rotası login sayfasına yönlendirir */}
-                <Route path="/" element={<Navigate to={isLoggedIn ? "/login" : "/login"} />} />
-
-                {/* Korunan sayfalar, giriş yapılmamışsa login sayfasına yönlendirir */}
+                <Route path="/" element={<Navigate to={isLoggedIn ? "/home" : "/login"} />} />
                 <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
                 <Route path="/add-land" element={isLoggedIn ? <AddLand /> : <Navigate to="/login" />} />
                 <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
@@ -69,7 +65,6 @@ function App() {
                 <Route path="/rating/:harvestId" element={isLoggedIn ? <Rating /> : <Navigate to="/login" />} />
                 <Route path="/rating-list" element={isLoggedIn ? <RatingList /> : <Navigate to="/login" />} />
 
-                {/* Giriş yapmadan ulaşılabilen sayfalar */}
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
             </Routes>
