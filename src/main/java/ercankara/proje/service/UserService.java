@@ -28,12 +28,10 @@ public class UserService {
 //Yanıt: Bu token ve kullanıcı kimliği (userId), LoginResponse objesi olarak döndürülür.
 //Hata: Eğer kullanıcı adı bulunamazsa veya şifre yanlışsa, bir hata (RuntimeException) fırlatılır.
     public LoginResponse login(LoginRequest request) {
-        // Kullanıcıyı username ya da email ile bulmaya çalışıyoruz
         User user = userRepository.findByUsername(request.getUser())
-                .orElseGet(() -> userRepository.findByEmail(request.getUser())
-                        .orElseThrow(() -> new RuntimeException("User not found")));
+                .orElse(userRepository.findByEmail(request.getUser())
+                        .orElseThrow(() -> new RuntimeException("User not found"))); // Bu satırları güncelleyin
 
-        // Şifre kontrolü
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             String token = jwtUtil.generateToken(user.getUsername());
             return new LoginResponse(token, user.getId());
@@ -41,6 +39,7 @@ public class UserService {
             throw new RuntimeException("Invalid credentials");
         }
     }
+
 
     //Kayıt işlemi: Bu yöntem, yeni bir kullanıcı hesabı oluşturur.
 //Kullanıcı oluşturma: Kullanıcı adı ve şifre, User nesnesine set edilir. Şifre, passwordEncoder kullanılarak güvenli bir şekilde şifrelenir.
@@ -61,6 +60,7 @@ public class UserService {
         String token = jwtUtil.generateToken(user.getUsername());
         return new LoginResponse(token, user.getId());
     }
+
 
     //Kullanıcı bulma: Bu yöntem, kullanıcı adı ile veritabanında eşleşen bir kullanıcıyı bulur ve döndürür.
 //Hata: Eğer kullanıcı bulunamazsa, bir hata (RuntimeException) fırlatılır.
