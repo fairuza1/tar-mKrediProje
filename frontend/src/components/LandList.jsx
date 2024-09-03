@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import {Container, Typography, Box, Grid, Card, CardContent, CardMedia, Button, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
-import {useNavigate} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Container, Typography, Box, Grid, Card, CardContent, CardMedia, Button, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, MenuItem, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
 
@@ -12,10 +13,16 @@ const LandList = () => {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [landToDelete, setLandToDelete] = useState(null);
+
+    // Filtreleme durumları
+    const [filterCity, setFilterCity] = useState('');
+    const [filterDistrict, setFilterDistrict] = useState('');
+    const [filterName, setFilterName] = useState('');
+
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/lands', {withCredentials: true})
+        axios.get('http://localhost:8080/lands', { withCredentials: true })
             .then(response => {
                 setLands(response.data);
             })
@@ -30,7 +37,7 @@ const LandList = () => {
     if (!isAuthenticated) {
         return (
             <Container maxWidth="md">
-                <Box sx={{mt: 3}}>
+                <Box sx={{ mt: 3 }}>
                     <Typography variant="h6" color="error">
                         Oturum açmadan görüntüleyemezsiniz.
                     </Typography>
@@ -72,17 +79,69 @@ const LandList = () => {
         setOpenSnackbar(false);
     };
 
+    // Filtrelenmiş arazi listesi
+    const filteredLands = lands.filter(land => {
+        const matchesCity = filterCity ? land.city.toLowerCase().includes(filterCity.toLowerCase()) : true;
+        const matchesDistrict = filterDistrict ? land.district.toLowerCase().includes(filterDistrict.toLowerCase()) : true;
+        const matchesName = filterName ? land.name === filterName : true;
+        return matchesCity && matchesDistrict && matchesName;
+    });
+
     return (
-        <Container maxWidth="lg" sx={{marginBottom: "60px"}}>
+        <Container maxWidth="lg" sx={{ marginBottom: "60px" }}>
             <Box>
-                <BreadcrumbComponent pageName="Arazilerim"/>
+                <BreadcrumbComponent pageName="Arazilerim" />
             </Box>
-            <Box sx={{mt: 3}}>
+
+            {/* Filtreleme bölümü */}
+            <Accordion sx={{ mt: 3, mb: 3 }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                    <Typography>Filtreleme Seçenekleri</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="İl"
+                                value={filterCity}
+                                onChange={(e) => setFilterCity(e.target.value)}
+                                fullWidth
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="İlçe"
+                                value={filterDistrict}
+                                onChange={(e) => setFilterDistrict(e.target.value)}
+                                fullWidth
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Arazi Adı"
+                                value={filterName}
+                                onChange={(e) => setFilterName(e.target.value)}
+                                select
+                                fullWidth
+                            >
+                                <MenuItem value="">Hepsi</MenuItem>
+                                {lands.map((land) => (
+                                    <MenuItem key={land.id} value={land.name}>
+                                        {land.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                    </Grid>
+                </AccordionDetails>
+            </Accordion>
+
+            <Box sx={{ mt: 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
                     Araziler Listesi
                 </Typography>
                 <Grid container spacing={3}>
-                    {lands.map((land) => (
+                    {filteredLands.map((land) => (
                         <Grid item xs={12} sm={6} md={4} key={land.id}>
                             <Card
                                 sx={{
@@ -102,7 +161,7 @@ const LandList = () => {
                                     height="140"
                                     image={land.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
                                     alt={land.name}
-                                    sx={{borderRadius: "8px"}}
+                                    sx={{ borderRadius: "8px" }}
                                 />
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div">
@@ -124,7 +183,7 @@ const LandList = () => {
                                         Arazi Tipi: {land.landType || 'N/A'}
                                     </Typography>
                                 </CardContent>
-                                <Box sx={{display: 'flex', justifyContent: 'center', gap: 2, mb: 2}}>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={() => handleDetail(land.id)}>
                                         Güncelleme
                                     </Button>

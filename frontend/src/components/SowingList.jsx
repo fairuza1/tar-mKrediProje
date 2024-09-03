@@ -20,7 +20,7 @@ const SowingList = () => {
     const [filterPlant, setFilterPlant] = useState('');
     const [filterDate, setFilterDate] = useState('');
     const [filterHarvested, setFilterHarvested] = useState(''); // Hasat durumu filtresi
-    const [filterAreaRange, setFilterAreaRange] = useState([0, 1000000]); // Ekili alan filtresi
+    const [filterAreaRange, setFilterAreaRange] = useState([0, 10000]); // Ekili alan filtresi
 
     const navigate = useNavigate();
 
