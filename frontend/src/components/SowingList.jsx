@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Grid, Card, CardContent, CardMedia, Button, Alert, Snackbar } from '@mui/material';
+import { Container, Typography, Box, Grid, Card, CardContent, CardMedia, Button, Alert, Snackbar, TextField, MenuItem, Accordion, AccordionSummary, AccordionDetails, Slider } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
@@ -13,6 +14,14 @@ const SowingList = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+    // Filtreleme durumları
+    const [filterLand, setFilterLand] = useState('');
+    const [filterPlant, setFilterPlant] = useState('');
+    const [filterDate, setFilterDate] = useState('');
+    const [filterHarvested, setFilterHarvested] = useState(''); // Hasat durumu filtresi
+    const [filterAreaRange, setFilterAreaRange] = useState([0, 1000000]); // Ekili alan filtresi
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -119,22 +128,113 @@ const SowingList = () => {
         setSnackbarOpen(false);
     };
 
+    const handleAreaChange = (event, newValue) => {
+        setFilterAreaRange(newValue);
+    };
+
+    // Filtrelenmiş ekim listesi
+    const filteredSowings = sowings.filter(sowing => {
+        const land = getLand(sowing.landId);
+        const matchesLand = filterLand ? (land && land.name === filterLand) : true;
+        const matchesPlant = filterPlant ? sowing.plantName.toLowerCase().includes(filterPlant.toLowerCase()) : true;
+        const matchesDate = filterDate ? new Date(sowing.sowingDate).toLocaleDateString('en-CA') === filterDate : true;
+        const matchesHarvested = filterHarvested === 'harvested' ? harvestedSowings.includes(sowing.id) :
+            filterHarvested === 'notHarvested' ? !harvestedSowings.includes(sowing.id) : true;
+        const matchesArea = sowing.amount >= filterAreaRange[0] && sowing.amount <= filterAreaRange[1];
+        return matchesLand && matchesPlant && matchesDate && matchesHarvested && matchesArea;
+    });
+
     return (
         <Container maxWidth="lg">
             <Box>
                 <BreadcrumbComponent pageName="Ekimlerim" />
             </Box>
+
+            {/* Filtreleme bölümü */}
+            <Accordion sx={{ mt: 3, mb: 3 }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                    <Typography>Filtreleme Seçenekleri</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Arazi Seç"
+                                value={filterLand}
+                                onChange={(e) => setFilterLand(e.target.value)}
+                                select
+                                fullWidth
+                            >
+                                <MenuItem value="">Hepsi</MenuItem>
+                                {lands.map((land) => (
+                                    <MenuItem key={land.id} value={land.name}>
+                                        {land.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Bitki Adı"
+                                value={filterPlant}
+                                onChange={(e) => setFilterPlant(e.target.value)}
+                                fullWidth
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Ekim Tarihi"
+                                type="date"
+                                InputLabelProps={{ shrink: true }}
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
+                                fullWidth
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Hasat Durumu"
+                                value={filterHarvested}
+                                onChange={(e) => setFilterHarvested(e.target.value)}
+                                select
+                                fullWidth
+                            >
+                                <MenuItem value="">Hepsi</MenuItem>
+                                <MenuItem value="harvested">Hasat Edildi</MenuItem>
+                                <MenuItem value="notHarvested">Hasat Edilmedi</MenuItem>
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <Typography variant="body1" gutterBottom>
+                                Ekili Alan Aralığı (m²)
+                            </Typography>
+                            <Slider
+                                value={filterAreaRange}
+                                onChange={handleAreaChange}
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={10000}
+                                marks={[
+                                    { value: 0, label: '0 m²' },
+                                    { value: 10000, label: '10000 m²' },
+                                ]}
+                                sx={{ marginBottom: 2 }}
+                            />
+                        </Grid>
+                    </Grid>
+                </AccordionDetails>
+            </Accordion>
+
             <Box sx={{ mt: 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
                     Ekimlerim Listesi
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
                 <Grid container spacing={3}>
-                    {sowings.map((sowing) => {
+                    {filteredSowings.map((sowing) => {
                         const land = getLand(sowing.landId);
                         const remainingSize = getRemainingSize(sowing.landId);
                         const isHarvested = harvestedSowings.includes(sowing.id);
-
                         return (
                             <Grid item xs={12} sm={6} md={4} key={sowing.id}>
                                 <Card
@@ -155,7 +255,7 @@ const SowingList = () => {
                                         height="140"
                                         image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
                                         alt={land?.name || 'Unknown Land'}
-                                        sx={{borderRadius:"8px"}}
+                                        sx={{ borderRadius: "8px" }}
                                     />
                                     <CardContent>
                                         <Typography gutterBottom variant="h5" component="div">
@@ -193,7 +293,6 @@ const SowingList = () => {
                                         >
                                             {isHarvested ? 'Hasat Edildi' : 'Hasat Et'}
                                         </Button>
-
                                     </Box>
                                 </Card>
                             </Grid>
@@ -201,6 +300,8 @@ const SowingList = () => {
                     })}
                 </Grid>
             </Box>
+
+            {/* Snackbar ile bildirim */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={3000}
@@ -215,3 +316,4 @@ const SowingList = () => {
 };
 
 export default SowingList;
+
