@@ -124,7 +124,7 @@ function Signup() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            E-Koop Bilgi Sistemi - Kayıt Ol
+                              Kayıt Ol
                         </Typography>
                         {/* Spinner */}
                         {loading && (
@@ -137,7 +137,7 @@ function Signup() {
                                 required
                                 fullWidth
                                 id="user"
-                                label="Kullanıcı Adı"
+                                label="Kullanıcı Adı gir"
                                 name="user"
                                 autoComplete="user"
                                 autoFocus
@@ -175,7 +175,6 @@ function Signup() {
                             <TextField
                                 variant="outlined"
                                 margin="normal"
-                                required
                                 fullWidth
                                 id="phoneNumber"
                                 label="Telefon Numarası"
