@@ -13,6 +13,7 @@ const LandList = () => {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [landToDelete, setLandToDelete] = useState(null);
+    const [accordionOpen, setAccordionOpen] = useState(false); // Accordion durumunu takip eder
 
     // Filtreleme durumları
     const [filterCity, setFilterCity] = useState('');
@@ -79,6 +80,11 @@ const LandList = () => {
         setOpenSnackbar(false);
     };
 
+    // Accordion açık/kapalı durumu değiştiğinde stil değiştir
+    const handleAccordionChange = (event, isExpanded) => {
+        setAccordionOpen(isExpanded);
+    };
+
     // Filtrelenmiş arazi listesi
     const filteredLands = lands.filter(land => {
         const matchesCity = filterCity ? land.city.toLowerCase().includes(filterCity.toLowerCase()) : true;
@@ -94,7 +100,22 @@ const LandList = () => {
             </Box>
 
             {/* Filtreleme bölümü */}
-            <Accordion sx={{ mt: 3, mb: 3 }}>
+            <Accordion
+                expanded={accordionOpen}
+                onChange={handleAccordionChange}
+                sx={{
+                    mt: 3,
+                    mb: 3,
+                    boxShadow: accordionOpen ? 'none' : '8px 8px 16px rgba(0, 0, 0, 0.2)',
+                    background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+                    borderRadius: '12px',
+                    '&:hover': {
+                        boxShadow: accordionOpen ? 'none' : '12px 12px 24px rgba(0, 0, 0, 0.3)',
+                        transform: accordionOpen ? 'none' : 'translateY(-4px)',
+                    },
+                    padding: accordionOpen ? '0' : '16px',
+                }}
+            >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
                     <Typography>Filtreleme Seçenekleri</Typography>
                 </AccordionSummary>
@@ -184,7 +205,7 @@ const LandList = () => {
                                     </Typography>
                                 </CardContent>
                                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
-                                    <Button variant="contained" color="primary" onClick={() => handleDetail(land.id)}>
+                                    <Button variant="contained" color="success" onClick={() => handleDetail(land.id)}>
                                         Güncelleme
                                     </Button>
                                     <Button variant="contained" color="error" onClick={() => handleOpenDeleteDialog(land.id)}>

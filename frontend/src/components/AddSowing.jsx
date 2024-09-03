@@ -238,14 +238,14 @@ function AddSowing() {
                             }}
                         />
 
-                        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                        <Button type="submit" variant="contained" color="success" fullWidth sx={{ mt: 2 }}>
                             Ekim Ekle
                         </Button>
 
                     </Box>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h6" gutterBottom>
+                <Grid item xs={12} md={6 }>
+                    <Typography variant="h4" gutterBottom marginTop={4}>
                         Önerilen Bitkiler
                     </Typography>
                     {recommendations.length > 0 ? (

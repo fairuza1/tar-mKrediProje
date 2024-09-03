@@ -214,7 +214,7 @@ function AddLand() {
                 {/* Image Uploader Component */}
                 <ImageUploader onImageUpload={setImageUrl}/>
 
-                <Button type="submit" variant="contained" color="primary" fullWidth sx={{mt: 2}}>
+                <Button type="submit" variant="contained" color="success" fullWidth sx={{mt: 2}}>
                     Arazi Ekle
                 </Button>
             </Box>

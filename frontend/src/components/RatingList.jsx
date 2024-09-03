@@ -31,6 +31,7 @@ const RatingList = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [accordionOpen, setAccordionOpen] = useState(false); // Accordion durumunu takip eder
 
     // Filtreleme durumları
     const [filterLand, setFilterLand] = useState('');
@@ -118,6 +119,11 @@ const RatingList = () => {
         setFilterRating(newValue);
     };
 
+    // Accordion açık/kapalı durumu değiştiğinde stil değiştir
+    const handleAccordionChange = (event, isExpanded) => {
+        setAccordionOpen(isExpanded);
+    };
+
     return (
         <Container maxWidth="lg">
             <Typography variant="h4" component="h1" gutterBottom>
@@ -125,7 +131,22 @@ const RatingList = () => {
             </Typography>
 
             {/* Filtreleme bölümü */}
-            <Accordion sx={{ mt: 3, mb: 3 }}>
+            <Accordion
+                sx={{
+                    mt: 3,
+                    mb: 3,
+                    boxShadow: accordionOpen ? 'none' : '8px 8px 16px rgba(0, 0, 0, 0.2)',
+                    background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+                    borderRadius: '12px',
+                    '&:hover': {
+                        boxShadow: accordionOpen ? 'none' : '12px 12px 24px rgba(0, 0, 0, 0.3)',
+                        transform: accordionOpen ? 'none' : 'translateY(-4px)',
+                    },
+                    padding: accordionOpen ? '0' : '16px',
+                }}
+                expanded={accordionOpen} // Accordion'un açık/kapalı durumunu takip eder
+                onChange={handleAccordionChange} // Accordion durum değişikliğini ele alır
+            >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
                     <Typography>Filtreleme Seçenekleri</Typography>
                 </AccordionSummary>
@@ -197,14 +218,14 @@ const RatingList = () => {
                             <Card
                                 sx={{
                                     maxWidth: 345,
-                                    boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
+                                    boxShadow: accordionOpen ? 'none' : '8px 8px 16px rgba(0, 0, 0, 0.2)',
                                     background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
                                     borderRadius: '12px',
                                     '&:hover': {
-                                        boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)',
-                                        transform: 'translateY(-4px)',
+                                        boxShadow: accordionOpen ? 'none' : '12px 12px 24px rgba(0, 0, 0, 0.3)',
+                                        transform: accordionOpen ? 'none' : 'translateY(-4px)',
                                     },
-                                    padding: '16px',
+                                    padding: accordionOpen ? '0' : '16px',
                                 }}
                             >
                                 <CardMedia

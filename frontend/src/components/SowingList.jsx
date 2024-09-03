@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Grid, Card, CardContent, CardMedia, Button, Alert, Snackbar, TextField, MenuItem, Accordion, AccordionSummary, AccordionDetails, Slider } from '@mui/material';
+import {
+    Container,
+    Typography,
+    Box,
+    Grid,
+    Card,
+    CardContent,
+    CardMedia,
+    Button,
+    Alert,
+    Snackbar,
+    TextField,
+    MenuItem,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Slider
+} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -14,13 +31,14 @@ const SowingList = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [accordionOpen, setAccordionOpen] = useState(false); // Accordion durumunu takip eder
 
     // Filtreleme durumları
     const [filterLand, setFilterLand] = useState('');
     const [filterPlant, setFilterPlant] = useState('');
     const [filterDate, setFilterDate] = useState('');
-    const [filterHarvested, setFilterHarvested] = useState(''); // Hasat durumu filtresi
-    const [filterAreaRange, setFilterAreaRange] = useState([0, 10000]); // Ekili alan filtresi
+    const [filterHarvested, setFilterHarvested] = useState('');
+    const [filterAreaRange, setFilterAreaRange] = useState([0, 10000]);
 
     const navigate = useNavigate();
 
@@ -132,6 +150,11 @@ const SowingList = () => {
         setFilterAreaRange(newValue);
     };
 
+    // Accordion açık/kapalı durumu değiştiğinde stil değiştir
+    const handleAccordionChange = (event, isExpanded) => {
+        setAccordionOpen(isExpanded);
+    };
+
     // Seçilen araziye göre bitkileri filtrele
     const filteredPlants = filterLand
         ? Array.from(
@@ -169,7 +192,22 @@ const SowingList = () => {
             </Box>
 
             {/* Filtreleme bölümü */}
-            <Accordion sx={{ mt: 3, mb: 3 }}>
+            <Accordion
+                expanded={accordionOpen}
+                onChange={handleAccordionChange}
+                sx={{
+                    mt: 3,
+                    mb: 3,
+                    boxShadow: accordionOpen ? 'none' : '8px 8px 16px rgba(0, 0, 0, 0.2)',
+                    background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+                    borderRadius: '12px',
+                    '&:hover': {
+                        boxShadow: accordionOpen ? 'none' : '12px 12px 24px rgba(0, 0, 0, 0.3)',
+                        transform: accordionOpen ? 'none' : 'translateY(-4px)',
+                    },
+                    padding: accordionOpen ? '0' : '16px',
+                }}
+            >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
                     <Typography>Filtreleme Seçenekleri</Typography>
                 </AccordionSummary>
@@ -240,11 +278,6 @@ const SowingList = () => {
                                 valueLabelDisplay="auto"
                                 min={0}
                                 max={10000}
-                                marks={[
-                                    { value: 0, label: '0 m²' },
-                                    { value: 10000, label: '10000 m²' },
-                                ]}
-                                sx={{ marginBottom: 2 }}
                             />
                         </Grid>
                     </Grid>
@@ -308,7 +341,7 @@ const SowingList = () => {
                                     </CardContent>
                                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                                         <Button variant="contained" color="primary" onClick={() => handleDetail(sowing.id)}>
-                                            Detay
+                                            Güncelleme
                                         </Button>
                                         <Button
                                             variant="contained"

@@ -273,7 +273,7 @@ const LandDetails = () => {
                 <Box sx={{ marginTop: 3 }}>
                     {isEditing ? (
                         <>
-                            <Button variant="contained" color="primary" onClick={handleSave}>
+                            <Button variant="contained" color="success" onClick={handleSave}>
                                 Kaydet
                             </Button>
                             <Button variant="contained" color="secondary" onClick={handleEditToggle} sx={{ marginLeft: 2 }}>
@@ -282,7 +282,7 @@ const LandDetails = () => {
                         </>
                     ) : (
                         <>
-                            <Button variant="contained" color="primary" onClick={handleEditToggle}>
+                            <Button variant="contained" color="success" onClick={handleEditToggle}>
                                 Düzenle
                             </Button>
                             <Button variant="contained" color="error" onClick={handleOpenDeleteDialog} sx={{ marginLeft: 2 }}>
