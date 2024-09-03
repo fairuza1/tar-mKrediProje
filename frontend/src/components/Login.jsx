@@ -130,7 +130,7 @@ function Login({ setIsLoggedIn }) {
                                 required
                                 fullWidth
                                 id="user"
-                                label="Kullanıcı Adınızı Giriniz"
+                                label="Kullanıcı Adınızı/Mail giriniz"
                                 name="user"
                                 autoComplete="user"
                                 autoFocus

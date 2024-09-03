@@ -28,9 +28,12 @@ public class UserService {
 //Yanıt: Bu token ve kullanıcı kimliği (userId), LoginResponse objesi olarak döndürülür.
 //Hata: Eğer kullanıcı adı bulunamazsa veya şifre yanlışsa, bir hata (RuntimeException) fırlatılır.
     public LoginResponse login(LoginRequest request) {
+        // Kullanıcıyı username ya da email ile bulmaya çalışıyoruz
         User user = userRepository.findByUsername(request.getUser())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseGet(() -> userRepository.findByEmail(request.getUser())
+                        .orElseThrow(() -> new RuntimeException("User not found")));
 
+        // Şifre kontrolü
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             String token = jwtUtil.generateToken(user.getUsername());
             return new LoginResponse(token, user.getId());
@@ -38,18 +41,27 @@ public class UserService {
             throw new RuntimeException("Invalid credentials");
         }
     }
+
     //Kayıt işlemi: Bu yöntem, yeni bir kullanıcı hesabı oluşturur.
 //Kullanıcı oluşturma: Kullanıcı adı ve şifre, User nesnesine set edilir. Şifre, passwordEncoder kullanılarak güvenli bir şekilde şifrelenir.
 //Kullanıcıyı kaydetme: userRepository.save() metodu ile kullanıcı veritabanına kaydedilir.
 //JWT oluşturma: Kullanıcı adı ile bir JWT tokenı oluşturulur ve bu token, kullanıcı kimliği ile birlikte döndürülür.
     public LoginResponse signup(LoginRequest request) {
+        // Eğer email zaten varsa, hata fırlatın
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already in use");
+        }
+
         User user = new User();
         user.setUsername(request.getUser());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(request.getEmail()); // Email'i kaydedin
         userRepository.save(user);
+
         String token = jwtUtil.generateToken(user.getUsername());
         return new LoginResponse(token, user.getId());
     }
+
     //Kullanıcı bulma: Bu yöntem, kullanıcı adı ile veritabanında eşleşen bir kullanıcıyı bulur ve döndürür.
 //Hata: Eğer kullanıcı bulunamazsa, bir hata (RuntimeException) fırlatılır.
     public User findByUsername(String username) {
