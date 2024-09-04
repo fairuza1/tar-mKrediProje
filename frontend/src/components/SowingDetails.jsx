@@ -23,10 +23,9 @@ const SowingDetails = () => {
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
 
-        // Düzenleme moduna geçildiğinde mevcut kategori ve bitkiyi set et
         if (!isEditing && sowing) {
-            setSelectedCategory(sowing.categoryId);  // Kategori ID'sini set ediyoruz
-            fetchPlants(sowing.categoryId);  // Kategoriye göre bitkileri getir
+            setSelectedCategory(sowing.categoryId);
+            fetchPlants(sowing.categoryId);
         }
     };
 
@@ -72,7 +71,6 @@ const SowingDetails = () => {
     };
 
     const handleSave = async () => {
-        const land = lands.find(land => land.id === sowing.landId);
         const newAmount = parseFloat(sowing.amount);
 
         if (newAmount > remainingSize) {
@@ -82,18 +80,19 @@ const SowingDetails = () => {
             return;
         }
 
-        try {
-            await fetch(`http://localhost:8080/sowings/update/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(sowing),
-            });
+        // Tarih doğrulaması
+        if (!validateDate(sowing.sowingDate)) {
+            setSnackbarMessage('Girilen tarih geçerli değil. Lütfen geçerli bir tarih girin.');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+            return;
+        }
 
-            const updatedDataResponse = await fetch(`http://localhost:8080/sowings/detail/${id}`);
-            const updatedData = await updatedDataResponse.json();
-            setSowing(updatedData);
+        try {
+            await axios.put(`http://localhost:8080/sowings/update/${id}`, sowing, { withCredentials: true });
+
+            const updatedData = await axios.get(`http://localhost:8080/sowings/detail/${id}`, { withCredentials: true });
+            setSowing(updatedData.data);
             setIsEditing(false);
             setSnackbarMessage('Ekim güncellendi!');
             setSnackbarSeverity('success');
@@ -108,12 +107,20 @@ const SowingDetails = () => {
         }
     };
 
+    const validateDate = (date) => {
+        const selectedDate = new Date(date);
+        const minDate = new Date(getMinDate());
+        const maxDate = new Date(getMaxDate());
+
+        return selectedDate >= minDate && selectedDate <= maxDate;
+    };
+
     const handleCancel = () => {
         setIsEditing(false);
     };
 
     const handleNavigateToDetails = () => {
-        window.location.href = 'http://localhost:5173/sowing-list';
+        navigate('/sowing-list');
     };
 
     const handleOpenDeleteDialog = () => {
@@ -143,14 +150,12 @@ const SowingDetails = () => {
     useEffect(() => {
         const fetchSowingDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/sowings/detail/${id}`);
-                const data = await response.json();
-                console.log("Fetched Sowing Data:", data);
-                setSowing(data);
-                setSelectedCategory(data.categoryId);  // Kategori ID'si set ediliyor
+                const response = await axios.get(`http://localhost:8080/sowings/detail/${id}`, { withCredentials: true });
+                setSowing(response.data);
+                setSelectedCategory(response.data.categoryId);
                 await fetchLands();
                 await fetchSowings();
-                fetchCategoriesAndPlants(data.categoryId);
+                fetchCategoriesAndPlants(response.data.categoryId);
                 calculateRemainingSize();
             } catch (error) {
                 console.error('Ekim detayları alınırken hata oluştu:', error);
@@ -158,7 +163,6 @@ const SowingDetails = () => {
         };
 
         fetchSowingDetails();
-
     }, [id, lands.length, sowings.length]);
 
     const fetchCategoriesAndPlants = async (categoryId) => {
@@ -167,34 +171,15 @@ const SowingDetails = () => {
             setCategories(categoriesResponse.data);
 
             if (categoryId) {
-                const plantsResponse = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${categoryId}`, { withCredentials: true });
-                setPlants(plantsResponse.data);
+                fetchPlants(categoryId);
             }
         } catch (error) {
             console.error('Kategoriler ve bitkiler alınırken hata oluştu:', error);
         }
     };
 
-    const handleCategoryChange = (event) => {
-        const newCategory = event.target.value;
-        setSelectedCategory(newCategory);
-        setSowing(prevState => ({
-            ...prevState,
-            categoryId: newCategory,  // Kategori ID set ediliyor
-            plantId: ''
-        }));
-
-        // Sadece newCategory tanımlıysa fetchPlants çağrılır
-        if (newCategory) {
-            fetchPlants(newCategory);
-        }
-    };
-
     const fetchPlants = async (categoryId) => {
-        if (!categoryId) {
-            console.error('Kategori ID tanımlı değil.');
-            return; // Eğer categoryId tanımlı değilse fonksiyondan çık
-        }
+        if (!categoryId) return;
 
         try {
             const response = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${categoryId}`, { withCredentials: true });
@@ -204,6 +189,16 @@ const SowingDetails = () => {
         }
     };
 
+    const handleCategoryChange = (event) => {
+        const newCategory = event.target.value;
+        setSelectedCategory(newCategory);
+        setSowing(prevState => ({
+            ...prevState,
+            categoryId: newCategory,
+            plantId: ''
+        }));
+        fetchPlants(newCategory);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -219,6 +214,22 @@ const SowingDetails = () => {
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
+    };
+
+    // Minimum tarihi arazi tipine göre belirleme
+    const getMinDate = () => {
+        const selectedLand = lands.find(land => land.id === sowing.landId);
+        if (selectedLand && (selectedLand.landType === 'Bahçe' || selectedLand.landType === 'Zeytinlik')) {
+            return '1900-01-01'; // Bahçe ve Zeytinlik için 1900 yılına kadar izin ver
+        }
+        const currentDate = new Date();
+        const lastYearDate = new Date();
+        lastYearDate.setFullYear(currentDate.getFullYear() - 1);
+        return lastYearDate.toISOString().split('T')[0];
+    };
+
+    const getMaxDate = () => {
+        return new Date().toISOString().split('T')[0];
     };
 
     if (!sowing) {
@@ -292,6 +303,12 @@ const SowingDetails = () => {
                                 onChange={handleChange}
                                 margin="normal"
                                 InputLabelProps={{ shrink: true }}
+                                InputProps={{
+                                    inputProps: {
+                                        min: getMinDate(),
+                                        max: getMaxDate(),
+                                    },
+                                }}
                             />
 
                             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
@@ -302,9 +319,9 @@ const SowingDetails = () => {
                         <>
                             <Typography variant="h6">Arazi Adı: {sowing.landName}</Typography>
                             <Typography variant="h6">Ekim Adı: {sowing.plantName}</Typography>
-                            <Typography variant="h6">Kategori: {sowing.categoryName || 'Kategori Bilinmiyor'}</Typography> {/* Kategori adı */}
+                            <Typography variant="h6">Kategori: {sowing.categoryName || 'Kategori Bilinmiyor'}</Typography>
                             <Typography variant="h6">Tarih: {sowing.sowingDate.split('T')[0]}</Typography>
-                            <Typography variant="h6">Ekilen Alan: {sowing.amount}</Typography>
+                            <Typography variant="h6">Ekilen Alan: {sowing.amount} m²</Typography>
                             <Typography variant="h6">Düzenlenebilir Max Alan: {remainingSize < 0 ? 0 : remainingSize} m²</Typography>
                         </>
                     )}
