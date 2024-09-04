@@ -18,8 +18,8 @@ function AddSowing() {
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [recommendations, setRecommendations] = useState([]);
-    const [sortBy, setSortBy] = useState('plantName'); // Başlangıç sıralama ölçütü: bitki
-    const [sortOrder, setSortOrder] = useState('asc'); // Artan (A-Z) sıralama
+    const [sortBy, setSortBy] = useState('plantName');
+    const [sortOrder, setSortOrder] = useState('asc');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -78,7 +78,6 @@ function AddSowing() {
                         const response = await axios.get(`http://localhost:8080/api/ratings/recommendations?city=${city}&district=${district}`, { withCredentials: true });
                         setRecommendations(Object.entries(response.data));
 
-                        // Metrekare başına düşen ürün miktarını al
                         const yieldResponse = await axios.get(`http://localhost:8080/api/ratings/yield-per-square-meter-by-plant?city=${city}&district=${district}`, { withCredentials: true });
                         setYieldPerSquareMeterByPlant(yieldResponse.data);
 
@@ -92,13 +91,11 @@ function AddSowing() {
         }
     }, [landId, lands]);
 
-    // Arazi boyutunu getiren fonksiyon
     const getLandSize = (landId) => {
         const land = lands.find(land => land.id === parseInt(landId));
         return land ? land.landSize : 0;
     };
 
-    // Araziye ekilen toplam miktarı getiren fonksiyon
     const getLandSownAmount = async (landId) => {
         try {
             const response = await axios.get(`http://localhost:8080/sowings/land/${landId}`, { withCredentials: true });
@@ -109,7 +106,24 @@ function AddSowing() {
         }
     };
 
-    // Sıralama fonksiyonu
+    // Minimum tarihi arazi tipine göre belirleme
+    const getMinDate = () => {
+        const selectedLand = lands.find(land => land.id === parseInt(landId));
+        if (selectedLand && (selectedLand.landType === 'Bahçe' || selectedLand.landType === 'Zeytinlik')) {
+            return '1900-01-01'; // Bahçe ve Zeytinlik için 1900 yılına kadar izin ver
+        }
+        // Diğer arazi tipleri için bugünden 1 yıl öncesine kadar izin ver
+        const currentDate = new Date();
+        const lastYearDate = new Date();
+        lastYearDate.setFullYear(currentDate.getFullYear() - 1);
+        return lastYearDate.toISOString().split('T')[0];
+    };
+
+    // Maksimum tarih bugünkü tarih olarak belirlenir
+    const getMaxDate = () => {
+        return new Date().toISOString().split('T')[0]; // Şu anki tarihe kadar izin ver
+    };
+
     const sortRecommendations = (recommendations) => {
         return recommendations.sort((a, b) => {
             if (sortBy === 'plantName') {
@@ -260,6 +274,12 @@ function AddSowing() {
                             onChange={(e) => setSowingDate(e.target.value)}
                             InputLabelProps={{
                                 shrink: true,
+                            }}
+                            InputProps={{
+                                inputProps: {
+                                    min: getMinDate(),
+                                    max: getMaxDate(),
+                                },
                             }}
                         />
 
