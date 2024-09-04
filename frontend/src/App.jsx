@@ -51,7 +51,7 @@ function App() {
         <Router>
             <NavbarWrapper isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
             <Routes>
-                <Route path="/" element={<Navigate to={isLoggedIn ? "/home" : "/login"} />} />
+                <Route path="/" element={<Navigate to={isLoggedIn ? "/login" : "/login"} />} />
                 <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
                 <Route path="/add-land" element={isLoggedIn ? <AddLand /> : <Navigate to="/login" />} />
                 <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />

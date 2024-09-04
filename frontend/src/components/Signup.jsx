@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Avatar, Button, CssBaseline, TextField, Link, Grid, Box, Typography, Paper, CircularProgress } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import backgroundImage from 'C:/Users/ercan kara/IdeaProjects/TarimKrediProjem/frontend/public/images/farm-background.jpg'; // Arka plan resminin yolu
-import logoImage from 'C:/Users/ercan kara/IdeaProjects/TarimKrediProjem/frontend/public/images/leftphoto.jpg'; // Sol tablo resminin yolu
+import backgroundImage from 'C:/Users/ercan kara/IdeaProjects/TarimKrediProjem/frontend/public/images/farm-background.jpg';
+import logoImage from 'C:/Users/ercan kara/IdeaProjects/TarimKrediProjem/frontend/public/images/leftphoto.jpg';
 
 const theme = createTheme();
 
@@ -16,8 +16,9 @@ function Signup() {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
-    const [loading, setLoading] = useState(false); // Spinner için loading durumu
-    const [isPasswordValid, setIsPasswordValid] = useState(false); // Şifrenin geçerliliği için durum
+    const [loading, setLoading] = useState(false);
+    const [isPasswordValid, setIsPasswordValid] = useState(false);
+    const [isEmailValid, setIsEmailValid] = useState(true); // E-mail doğrulaması için
     const navigate = useNavigate();
 
     const validateForm = () => {
@@ -33,6 +34,10 @@ function Signup() {
             setError('Lütfen e-posta adresinizi giriniz.');
             return false;
         }
+        if (!isEmailValid) {
+            setError('Lütfen geçerli bir e-posta adresi giriniz.');
+            return false;
+        }
         if (!isPasswordValid) {
             setError('Lütfen geçerli bir şifre giriniz.');
             return false;
@@ -44,25 +49,25 @@ function Signup() {
         e.preventDefault();
 
         if (!validateForm()) {
-            return; // Form geçerli değilse işlem yapılmaz
+            return;
         }
 
-        setLoading(true); // Kayıt işlemi başladığında loading'i true yap
+        setLoading(true);
         try {
             const response = await axios.post('http://localhost:8080/auth/signup', { user, password, email, phoneNumber });
-            if (response.status === 200) { // Eğer durum kodu 200 ise başarılı kabul edelim
+            if (response.status === 200) {
                 setMessage('Kayıt başarılı. Giriş sayfasına yönlendiriliyorsunuz...');
-                setError(''); // Hata mesajını temizle
+                setError('');
                 setTimeout(() => {
-                    setLoading(false); // Yönlendirme öncesinde loading'i false yap
+                    setLoading(false);
                     navigate('/login');
                 }, 2000);
             } else if (response.data && response.data.message === 'User already exists') {
                 setError('Bu kullanıcı adı zaten mevcut.');
-                setLoading(false); // Hata olduğunda loading'i false yap
+                setLoading(false);
             } else {
                 setError('Bir hata oluştu. Lütfen tekrar deneyin.');
-                setLoading(false); // Hata olduğunda loading'i false yap
+                setLoading(false);
             }
         } catch (error) {
             if (error.response) {
@@ -70,7 +75,7 @@ function Signup() {
             } else {
                 setError('Bir hata oluştu');
             }
-            setLoading(false); // Hata olduğunda loading'i false yap
+            setLoading(false);
         }
     };
 
@@ -81,10 +86,24 @@ function Signup() {
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
         if (!regex.test(passwordValue)) {
             setError("Şifre en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.");
-            setIsPasswordValid(false); // Geçerli değilse, buton devre dışı kalır
+            setIsPasswordValid(false);
         } else {
-            setError(''); // Hata mesajını temizle
-            setIsPasswordValid(true); // Geçerliyse, buton aktif hale gelir
+            setError('');
+            setIsPasswordValid(true);
+        }
+    };
+
+    const handleEmailChange = (e) => {
+        const emailValue = e.target.value;
+        setEmail(emailValue);
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basit e-posta doğrulama regex'i
+        if (!emailRegex.test(emailValue)) {
+            setError('Geçersiz e-posta adresi.');
+            setIsEmailValid(false);
+        } else {
+            setError('');
+            setIsEmailValid(true);
         }
     };
 
@@ -117,7 +136,6 @@ function Signup() {
                         overflow: 'hidden',
                     }}
                 >
-                    {/* Sol Tablo: Resim */}
                     <Grid
                         item
                         xs={12}
@@ -147,7 +165,6 @@ function Signup() {
                             }}
                         />
                     </Grid>
-                    {/* Sağ Tablo: Kayıt Formu */}
                     <Grid
                         item
                         xs={12}
@@ -167,7 +184,6 @@ function Signup() {
                         <Typography component="h1" variant="h5">
                             Kayıt Ol
                         </Typography>
-                        {/* Spinner */}
                         {loading && (
                             <CircularProgress size={24} sx={{ mt: 2, mb: 2 }} />
                         )}
@@ -184,7 +200,7 @@ function Signup() {
                                 autoFocus
                                 value={user}
                                 onChange={(e) => setUser(e.target.value)}
-                                disabled={loading} // Kayıt yaparken alanları devre dışı bırak
+                                disabled={loading}
                             />
                             <TextField
                                 variant="outlined"
@@ -197,8 +213,8 @@ function Signup() {
                                 id="password"
                                 autoComplete="current-password"
                                 value={password}
-                                onChange={handlePasswordChange} // Burada handlePasswordChange fonksiyonunu kullanacağız
-                                disabled={loading} // Kayıt yaparken alanları devre dışı bırak
+                                onChange={handlePasswordChange}
+                                disabled={loading}
                             />
                             <TextField
                                 variant="outlined"
@@ -208,10 +224,11 @@ function Signup() {
                                 id="email"
                                 label="Email"
                                 name="email"
+                                type="email" // E-mail formatını zorunlu hale getirir
                                 autoComplete="email"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                disabled={loading} // Kayıt yaparken alanları devre dışı bırak
+                                onChange={handleEmailChange}
+                                disabled={loading}
                             />
                             <TextField
                                 variant="outlined"
@@ -223,7 +240,7 @@ function Signup() {
                                 autoComplete="phoneNumber"
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
-                                disabled={loading} // Kayıt yaparken alanları devre dışı bırak
+                                disabled={loading}
                             />
                             {error && (
                                 <Typography variant="body2" color="error" align="center">
@@ -240,7 +257,7 @@ function Signup() {
                                 fullWidth
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2, bgcolor: '#6c757d' }}
-                                disabled={loading} // Yükleme devam ediyorsa buton devre dışı
+                                disabled={loading}
                             >
                                 Kayıt Ol
                             </Button>
