@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Container, Typography, Box, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert, Table, TableBody, TableCell, TableHead, TableRow, Grid, Avatar } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert, Table, TableBody, TableCell, TableHead, TableRow, Grid, Avatar, TableSortLabel } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbComponent from "./BreadCrumb";
@@ -15,11 +15,12 @@ function AddSowing() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [yieldPerSquareMeterByPlant, setYieldPerSquareMeterByPlant] = useState({});
-    const navigate = useNavigate();
-
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [recommendations, setRecommendations] = useState([]);
+    const [sortBy, setSortBy] = useState('plantName'); // Başlangıç sıralama ölçütü: bitki
+    const [sortOrder, setSortOrder] = useState('asc'); // Artan (A-Z) sıralama
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -91,11 +92,13 @@ function AddSowing() {
         }
     }, [landId, lands]);
 
+    // Arazi boyutunu getiren fonksiyon
     const getLandSize = (landId) => {
-        const land = lands.find(land => land.id === landId);
+        const land = lands.find(land => land.id === parseInt(landId));
         return land ? land.landSize : 0;
     };
 
+    // Araziye ekilen toplam miktarı getiren fonksiyon
     const getLandSownAmount = async (landId) => {
         try {
             const response = await axios.get(`http://localhost:8080/sowings/land/${landId}`, { withCredentials: true });
@@ -106,11 +109,33 @@ function AddSowing() {
         }
     };
 
+    // Sıralama fonksiyonu
+    const sortRecommendations = (recommendations) => {
+        return recommendations.sort((a, b) => {
+            if (sortBy === 'plantName') {
+                return sortOrder === 'asc'
+                    ? a[0].localeCompare(b[0])
+                    : b[0].localeCompare(a[0]);
+            } else if (sortBy === 'score') {
+                return sortOrder === 'asc'
+                    ? a[1] - b[1]
+                    : b[1] - a[1];
+            }
+            return 0;
+        });
+    };
+
+    const handleSort = (column) => {
+        const isAsc = sortBy === column && sortOrder === 'asc';
+        setSortOrder(isAsc ? 'desc' : 'asc');
+        setSortBy(column);
+    };
+
     const handleAddSowing = async (e) => {
         e.preventDefault();
 
         if (!plantId || !landId || !amount || !sowingDate) {
-            setSnackbarMessage('Please fill in all the fields.');
+            setSnackbarMessage('Lütfen tüm alanları doldurun.');
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
             return;
@@ -138,7 +163,7 @@ function AddSowing() {
         try {
             const response = await axios.post('http://localhost:8080/sowings', newSowing, { withCredentials: true });
             if (response.status === 200) {
-                setSnackbarMessage('Sowing saved successfully!');
+                setSnackbarMessage('Ekim başarıyla kaydedildi!');
                 setSnackbarSeverity('success');
                 setOpenSnackbar(true);
 
@@ -148,7 +173,7 @@ function AddSowing() {
                 setLandId('');
                 setAmount('');
             } else {
-                setSnackbarMessage('Failed to save the Sowing.');
+                setSnackbarMessage('Ekim kaydedilemedi.');
                 setSnackbarSeverity('error');
                 setOpenSnackbar(true);
             }
@@ -244,7 +269,7 @@ function AddSowing() {
 
                     </Box>
                 </Grid>
-                <Grid item xs={12} md={6 }>
+                <Grid item xs={12} md={6}>
                     <Typography variant="h4" gutterBottom marginTop={4}>
                         Önerilen Bitkiler
                     </Typography>
@@ -252,13 +277,29 @@ function AddSowing() {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell align="center">Bitki</TableCell>
-                                    <TableCell align="right">Puan</TableCell>
+                                    <TableCell align="center">
+                                        <TableSortLabel
+                                            active={sortBy === 'plantName'}
+                                            direction={sortBy === 'plantName' ? sortOrder : 'asc'}
+                                            onClick={() => handleSort('plantName')}
+                                        >
+                                            Bitki
+                                        </TableSortLabel>
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        <TableSortLabel
+                                            active={sortBy === 'score'}
+                                            direction={sortBy === 'score' ? sortOrder : 'asc'}
+                                            onClick={() => handleSort('score')}
+                                        >
+                                            Puan
+                                        </TableSortLabel>
+                                    </TableCell>
                                     <TableCell align="right">Metrekare Başına Ürün (kg/m²)</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {recommendations.map(([plantName, score], index) => (
+                                {sortRecommendations(recommendations).map(([plantName, score], index) => (
                                     <TableRow key={index}>
                                         <TableCell>
                                             <Box display="flex" alignItems="center">

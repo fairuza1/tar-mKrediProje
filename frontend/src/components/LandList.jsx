@@ -198,7 +198,7 @@ const LandList = () => {
                                         İlçe: {land.district}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Köy: {land.village || 'N/A'}
+                                        Köy: {land.village || 'Köy yok'}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         Arazi Tipi: {land.landType || 'N/A'}
