@@ -32,6 +32,7 @@ const Harvest = ({ onSowingUpdate }) => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [accordionOpen, setAccordionOpen] = useState(false);
 
     // Filtreleme durumları
     const [filterLand, setFilterLand] = useState('');
@@ -106,6 +107,10 @@ const Harvest = ({ onSowingUpdate }) => {
         setFilterAreaRange(newValue);
     };
 
+    const handleAccordionChange = (event, isExpanded) => {
+        setAccordionOpen(isExpanded);
+    };
+
     return (
         <Container maxWidth="lg">
             <Box sx={{ mt: 3 }}>
@@ -113,7 +118,22 @@ const Harvest = ({ onSowingUpdate }) => {
             </Box>
 
             {/* Filtreleme bölümü */}
-            <Accordion sx={{ mt: 3, mb: 3 }}>
+            <Accordion
+                expanded={accordionOpen}
+                onChange={handleAccordionChange}
+                sx={{
+                    mt: 3,
+                    mb: 3,
+                    boxShadow: accordionOpen ? 'none' : '8px 8px 16px rgba(0, 0, 0, 0.2)', // Gölgelendirme efekti
+                    background: 'linear-gradient(145deg, #ffffff, #f0f0f0)', // Gradient arka plan
+                    borderRadius: '12px', // Köşeleri yuvarlat
+                    '&:hover': {
+                        boxShadow: accordionOpen ? 'none' : '12px 12px 24px rgba(0, 0, 0, 0.3)', // Hover efekti
+                        transform: accordionOpen ? 'none' : 'translateY(-4px)', // Hover animasyonu
+                    },
+                    padding: accordionOpen ? '0' : '16px',
+                }}
+            >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
                     <Typography>Filtreleme Seçenekleri</Typography>
                 </AccordionSummary>
@@ -176,12 +196,12 @@ const Harvest = ({ onSowingUpdate }) => {
                                     <Card
                                         sx={{
                                             maxWidth: 345,
-                                            boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
-                                            background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+                                            boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)', // Gölgelendirme efekti
+                                            background: 'linear-gradient(145deg, #ffffff, #f0f0f0)', // Gradient arka plan
                                             borderRadius: '12px',
                                             '&:hover': {
-                                                boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)',
-                                                transform: 'translateY(-4px)',
+                                                boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)', // Hover'da derin gölge
+                                                transform: 'translateY(-4px)', // Hover animasyonu
                                             },
                                             padding: '16px',
                                         }}
@@ -191,7 +211,7 @@ const Harvest = ({ onSowingUpdate }) => {
                                             height="140"
                                             image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
                                             alt={land?.name || 'Unknown Land'}
-                                            sx={{borderRadius:"8px"}}
+                                            sx={{ borderRadius: "8px" }}
                                         />
                                         <CardContent>
                                             <Typography gutterBottom variant="h5" component="div">
