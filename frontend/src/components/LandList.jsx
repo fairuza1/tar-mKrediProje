@@ -4,6 +4,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
+import ScrollToTop from "./ScrollToTop.jsx";
 
 const LandList = () => {
     const [lands, setLands] = useState([]);
@@ -250,6 +251,7 @@ const LandList = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <ScrollToTop />
         </Container>
     );
 };

@@ -21,6 +21,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
+import ScrollToTop from './ScrollToTop'; // ScrollToTop bileşeni buraya import edilecek
+
 
 const SowingList = () => {
     const [sowings, setSowings] = useState([]);
@@ -387,7 +389,9 @@ const SowingList = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            <ScrollToTop />
         </Container>
+
     );
 };
 

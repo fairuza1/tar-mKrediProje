@@ -18,6 +18,7 @@ import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
 import ImageUploader from './ImageUploader'; // Import the ImageUploader component
+import ScrollToTop from './ScrollToTop'; // ScrollToTop bileşeni buraya import edilecek
 
 function AddLand() {
     const [landName, setLandName] = useState('');
@@ -228,8 +229,10 @@ function AddLand() {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+
         </Container>
     );
+    <ScrollToTop />
 }
 
 export default AddLand;

@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
+import ScrollToTop from './ScrollToTop'; // ScrollToTop bileşeni buraya import edilecek
 
 const RatingList = () => {
     const [ratings, setRatings] = useState([]);
@@ -271,6 +272,7 @@ const RatingList = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            <ScrollToTop />
         </Container>
     );
 };

@@ -21,6 +21,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
+import ScrollToTop from './ScrollToTop'; // ScrollToTop bileşeni buraya import edilecek
 
 const Harvest = ({ onSowingUpdate }) => {
     const [harvests, setHarvests] = useState([]);
@@ -255,6 +256,7 @@ const Harvest = ({ onSowingUpdate }) => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            <ScrollToTop/>
         </Container>
     );
 };

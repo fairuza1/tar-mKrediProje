@@ -3,6 +3,7 @@ import { TextField, Button, Container, Typography, Box, MenuItem, FormControl, I
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbComponent from "./BreadCrumb";
+import ScrollToTop from "./ScrollToTop.jsx";
 
 function AddSowing() {
     const [plantId, setPlantId] = useState('');
@@ -356,6 +357,7 @@ function AddSowing() {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            <ScrollToTop />
         </Container>
     );
 }
