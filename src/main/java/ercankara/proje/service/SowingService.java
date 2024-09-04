@@ -115,12 +115,19 @@ public class SowingService {
         dto.setId(sowing.getId());
         dto.setPlantId(sowing.getPlant().getId());
         dto.setPlantName(sowing.getPlant().getName());
+
+        // Kategori bilgisi ekleniyor
+        dto.setCategoryId(sowing.getPlant().getCategory().getId());
+        dto.setCategoryName(sowing.getPlant().getCategory().getCategoryName());
+
         dto.setLandId(sowing.getLand().getId());
         dto.setLandName(sowing.getLand().getName());
         dto.setSowingDate(sowing.getSowingDate());
         dto.setAmount(sowing.getAmount());
+
         return dto;
     }
+
     public void deleteSowing(Long id) {
         Sowing sowing = sowingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sowing not found"));

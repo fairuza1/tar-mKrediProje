@@ -1,7 +1,6 @@
 package ercankara.proje.dto;
 
 import lombok.Data;
-
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -19,9 +18,13 @@ public class SowingDTO {
 
     private String landName;
 
+    // Kategori bilgisi ekleniyor
+    private Long categoryId;      // Yeni kategori ID alanı
+    private String categoryName;  // Yeni kategori adı alanı
+
     @NotNull(message = "Sowing date cannot be null")
     private LocalDate sowingDate;
 
-    @NotNull(message = "Amount cannot be null")  // Add this line
-    private Integer amount; // amount alanını ekleyin
+    @NotNull(message = "Amount cannot be null")
+    private Integer amount;
 }

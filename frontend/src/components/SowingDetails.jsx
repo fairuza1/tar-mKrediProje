@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Paper, Button, TextField, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
 import axios from 'axios';
 
 const SowingDetails = () => {
@@ -18,11 +17,17 @@ const SowingDetails = () => {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [remainingSize, setRemainingSize] = useState(0);
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // Silme işlemi için onay diyaloğu
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const navigate = useNavigate();
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
+
+        // Düzenleme moduna geçildiğinde mevcut kategori ve bitkiyi set et
+        if (!isEditing && sowing) {
+            setSelectedCategory(sowing.categoryId);  // Kategori ID'sini set ediyoruz
+            fetchPlants(sowing.categoryId);  // Kategoriye göre bitkileri getir
+        }
     };
 
     const fetchLands = async () => {
@@ -104,11 +109,11 @@ const SowingDetails = () => {
     };
 
     const handleCancel = () => {
-        setIsEditing(false); // İptal işlemi düzenleme modunu kapatacak
+        setIsEditing(false);
     };
 
     const handleNavigateToDetails = () => {
-        window.location.href = 'http://localhost:5173/sowing-list'; // Ok işaretine tıklanınca yönlendirme
+        window.location.href = 'http://localhost:5173/sowing-list';
     };
 
     const handleOpenDeleteDialog = () => {
@@ -142,10 +147,10 @@ const SowingDetails = () => {
                 const data = await response.json();
                 console.log("Fetched Sowing Data:", data);
                 setSowing(data);
-                setSelectedCategory(data.category);
+                setSelectedCategory(data.categoryId);  // Kategori ID'si set ediliyor
                 await fetchLands();
                 await fetchSowings();
-                fetchCategoriesAndPlants(data.category);
+                fetchCategoriesAndPlants(data.categoryId);
                 calculateRemainingSize();
             } catch (error) {
                 console.error('Ekim detayları alınırken hata oluştu:', error);
@@ -175,13 +180,22 @@ const SowingDetails = () => {
         setSelectedCategory(newCategory);
         setSowing(prevState => ({
             ...prevState,
-            category: newCategory,
+            categoryId: newCategory,  // Kategori ID set ediliyor
             plantId: ''
         }));
-        fetchPlants(newCategory);
+
+        // Sadece newCategory tanımlıysa fetchPlants çağrılır
+        if (newCategory) {
+            fetchPlants(newCategory);
+        }
     };
 
     const fetchPlants = async (categoryId) => {
+        if (!categoryId) {
+            console.error('Kategori ID tanımlı değil.');
+            return; // Eğer categoryId tanımlı değilse fonksiyondan çık
+        }
+
         try {
             const response = await axios.get(`http://localhost:8080/plants/by-category?categoryId=${categoryId}`, { withCredentials: true });
             setPlants(response.data);
@@ -189,6 +203,7 @@ const SowingDetails = () => {
             console.error('Bitkiler alınırken hata oluştu:', error);
         }
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -287,6 +302,7 @@ const SowingDetails = () => {
                         <>
                             <Typography variant="h6">Arazi Adı: {sowing.landName}</Typography>
                             <Typography variant="h6">Ekim Adı: {sowing.plantName}</Typography>
+                            <Typography variant="h6">Kategori: {sowing.categoryName || 'Kategori Bilinmiyor'}</Typography> {/* Kategori adı */}
                             <Typography variant="h6">Tarih: {sowing.sowingDate.split('T')[0]}</Typography>
                             <Typography variant="h6">Ekilen Alan: {sowing.amount}</Typography>
                             <Typography variant="h6">Düzenlenebilir Max Alan: {remainingSize < 0 ? 0 : remainingSize} m²</Typography>
@@ -296,7 +312,7 @@ const SowingDetails = () => {
                 <Box sx={{ marginTop: 3 }}>
                     {isEditing ? (
                         <>
-                            <Button variant="contained" color="primary" onClick={handleSave}>
+                            <Button variant="contained" color="success" onClick={handleSave}>
                                 Kaydet
                             </Button>
                             <Button variant="contained" color="secondary" onClick={handleCancel} sx={{ marginLeft: 2 }}>
@@ -305,7 +321,7 @@ const SowingDetails = () => {
                         </>
                     ) : (
                         <>
-                            <Button variant="contained" color="primary" onClick={handleEditToggle}>
+                            <Button variant="contained" color="success" onClick={handleEditToggle}>
                                 Düzenle
                             </Button>
                             <Button variant="contained" color="error" onClick={handleOpenDeleteDialog} sx={{ marginLeft: 2 }}>

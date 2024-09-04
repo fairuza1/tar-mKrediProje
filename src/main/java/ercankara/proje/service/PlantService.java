@@ -1,7 +1,9 @@
 package ercankara.proje.service;
 
 import ercankara.proje.dto.PlantDTO;
+import ercankara.proje.entity.Category;
 import ercankara.proje.entity.Plant;
+import ercankara.proje.repository.CategoryRepository;
 import ercankara.proje.repository.PlantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,17 @@ public class PlantService {
     @Autowired
     private PlantRepository plantRepository;
 
-    public Plant savePlant(Plant plant) {
+    @Autowired
+    private CategoryRepository categoryRepository; // Kategori repository'sini ekliyoruz
+
+    public Plant savePlant(PlantDTO plantDto) {
+        // Bitki oluşturulurken kategoriye de erişelim
+        Category category = categoryRepository.findById(plantDto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found with ID: " + plantDto.getCategoryId()));
+
+        Plant plant = new Plant();
+        plant.setName(plantDto.getName());
+        plant.setCategory(category); // Bitkiye kategori set edelim
         return plantRepository.save(plant);
     }
 
@@ -40,6 +52,8 @@ public class PlantService {
         PlantDTO plantDto = new PlantDTO();
         plantDto.setId(plant.getId());
         plantDto.setName(plant.getName());
+        plantDto.setCategoryId(plant.getCategory().getId()); // Kategori ID
+        plantDto.setCategoryName(plant.getCategory().getCategoryName()); // Kategori adı
         return plantDto;
     }
 }

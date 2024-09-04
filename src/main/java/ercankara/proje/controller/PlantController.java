@@ -20,9 +20,7 @@ public class PlantController {
 
     @PostMapping
     public Plant createPlant(@RequestBody PlantDTO plantDto) {
-        Plant plant = new Plant();
-        plant.setName(plantDto.getName());
-        return plantService.savePlant(plant);
+        return plantService.savePlant(plantDto);  // Kategori ile birlikte bitkiyi kaydediyoruz
     }
 
     @GetMapping
