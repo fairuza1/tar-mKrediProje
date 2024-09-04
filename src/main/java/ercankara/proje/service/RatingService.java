@@ -40,10 +40,32 @@ public class RatingService {
         rating.setHarvestCondition(ratingDTO.getHarvestCondition());
         rating.setProductQuality(ratingDTO.getProductQuality());
         rating.setProductQuantity(ratingDTO.getProductQuantity());
-        rating.setOverallRating(ratingDTO.getOverallRating());
+
+        // Ürün ilk defa mı değerlendiriliyor, kontrol edelim
+        boolean isFirstEvaluation = isFirstEvaluation(ratingDTO.getHarvestId());
+
+        if (isFirstEvaluation) {
+            // İlk değerlendirme için özel puanlama
+            if (ratingDTO.getHarvestCondition() >= 4.5) {
+                rating.setOverallRating(4); // Çok iyi
+            } else if (ratingDTO.getHarvestCondition() >= 3.5) {
+                rating.setOverallRating(3); // İyi
+            } else if (ratingDTO.getHarvestCondition() >= 2.5) {
+                rating.setOverallRating(2.5); // Ne iyi ne kötü
+            } else if (ratingDTO.getHarvestCondition() >= 1.5) {
+                rating.setOverallRating(2); // Kötü
+            } else {
+                rating.setOverallRating(1); // Çok kötü
+            }
+        } else {
+            // Daha önce değerlendirilmişse, 1-5 arasında tam puanlama yap
+            double average = (ratingDTO.getHarvestCondition() + ratingDTO.getProductQuality()) / 2.0;
+            rating.setOverallRating(average);
+        }
 
         return ratingRepository.save(rating);
     }
+
 
     public List<RatingDTO> getAllRatings() {
         return ratingRepository.findAll().stream()
@@ -139,5 +161,10 @@ public class RatingService {
         }
 
         return yieldPerSquareMeterByPlant;
+    }
+    public boolean isFirstEvaluation(Long harvestId) {
+        // Hasat ID'sine göre daha önce değerlendirme yapılmış mı kontrol et
+        List<Rating> ratings = ratingRepository.findByHarvestId(harvestId);
+        return ratings.isEmpty(); // Eğer boşsa, bu hasat için ilk değerlendirme yapılıyor demektir
     }
 }

@@ -29,10 +29,10 @@ import axios from "axios";
 const StyledIcon = styled('div')(({ selected }) => ({
     cursor: 'pointer',
     transition: 'transform 0.2s ease, z-index 0.2s ease',
-    transform: selected ? 'scale(2)' : 'scale(1)', // Ölçekleme oranı daha küçük yapıldı
+    transform: selected ? 'scale(2)' : 'scale(1)',
     '&:hover': {
-        transform: 'scale(3)', // Hover durumunda aynı ölçekleme oranı kullanıldı
-        zIndex: 10, // Hover durumunda z-index düşük bir değer olarak ayarlandı
+        transform: 'scale(3)',
+        zIndex: 10,
     },
     display: 'flex',
     justifyContent: 'center',
@@ -40,12 +40,12 @@ const StyledIcon = styled('div')(({ selected }) => ({
     height: '100%',
     width: '100%',
     position: 'relative',
-    zIndex: selected ? 1 : 111, // Z-index değeri düşük bir seviyede tutuldu
+    zIndex: selected ? 1 : 111,
 }));
 
 const TableCellCustom = styled(TableCell)(({ theme }) => ({
     padding: '1px',
-    border: '1px solid #ddd', // Border geri eklendi
+    border: '1px solid #ddd',
 }));
 
 const Rating = () => {
@@ -69,6 +69,17 @@ const Rating = () => {
         }
     }, [harvestCondition, productQuality]);
 
+    // Ürünün ilk defa değerlendirilip değerlendirilmediğini kontrol eden API çağrısı
+    const checkIfFirstEvaluation = async (harvestId) => {
+        try {
+            const response = await axios.get(`http://localhost:8080/api/ratings/isFirstEvaluation/${harvestId}`);
+            return response.data.isFirstEvaluation;
+        } catch (error) {
+            console.error('Hata oluştu:', error);
+            return false;
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -86,12 +97,35 @@ const Rating = () => {
             return;
         }
 
+        // Ürünün ilk defa mı değerlendirildiğini kontrol et
+        const isFirstEvaluation = await checkIfFirstEvaluation(harvestId);
+
+        let overallRating;
+
+        if (isFirstEvaluation) {
+            // İlk değerlendirme için özel puanlama sistemi
+            if (harvestCondition === 5) {
+                overallRating = 4;  // Çok iyi
+            } else if (harvestCondition === 4) {
+                overallRating = 3;  // İyi
+            } else if (harvestCondition === 3) {
+                overallRating = 2.5;  // Ne iyi ne kötü
+            } else if (harvestCondition === 2) {
+                overallRating = 2;  // Kötü
+            } else {
+                overallRating = 1;  // Çok kötü
+            }
+        } else {
+            // Daha önce değerlendirilen ürünler için 1-5 puanlama sistemi
+            overallRating = (harvestCondition + productQuality) / 2;
+        }
+
         const newEvaluation = {
             harvestId,
             harvestCondition,
             productQuality,
             productQuantity: parseFloat(productQuantity),
-            overallRating: averageRating
+            overallRating
         };
 
         try {
@@ -224,7 +258,6 @@ const Rating = () => {
                     </Table>
                 </TableContainer>
 
-                {/* Ürün Miktarı Alanı */}
                 <Box sx={{ mt: 4 }}>
                     <Typography variant="h5" component="h3" gutterBottom>
                         Ürün Miktarı

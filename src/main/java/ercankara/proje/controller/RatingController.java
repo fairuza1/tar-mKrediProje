@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,4 +65,12 @@ public class RatingController {
         Map<String, Double> yieldPerSquareMeterByPlant = ratingService.calculateYieldPerSquareMeterByPlant(city, district);
         return new ResponseEntity<>(yieldPerSquareMeterByPlant, HttpStatus.OK);
     }
+    @GetMapping("/isFirstEvaluation/{harvestId}")
+    public ResponseEntity<Map<String, Boolean>> isFirstEvaluation(@PathVariable Long harvestId) {
+        boolean isFirstEvaluation = ratingService.isFirstEvaluation(harvestId);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isFirstEvaluation", isFirstEvaluation);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
