@@ -22,7 +22,7 @@ import {
     AccordionDetails
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
 import ScrollToTop from "./ScrollToTop.jsx";
@@ -43,6 +43,7 @@ const LandList = () => {
     const [filterName, setFilterName] = useState('');
 
     const navigate = useNavigate();
+    const location = useLocation(); // Yönlendirme ile gelen mesaj ve durumu yakalayacağız.
 
     useEffect(() => {
         axios.get('http://localhost:8080/lands', { withCredentials: true })
@@ -57,6 +58,15 @@ const LandList = () => {
             });
     }, []);
 
+    // Eğer location state ile mesaj ve durum geldiyse, Snackbar'ı aç
+    useEffect(() => {
+        if (location.state && location.state.message) {
+            setSnackbarMessage(location.state.message);
+            setSnackbarSeverity(location.state.severity);
+            setOpenSnackbar(true);
+        }
+    }, [location.state]);
+
     if (!isAuthenticated) {
         return (
             <Container maxWidth="md">
@@ -70,7 +80,7 @@ const LandList = () => {
     }
 
     const handleDetail = (id) => {
-        navigate(`/lands/detail/${id}`, { state: { editMode: true } }); // Yönlendirme yaparken editMode bilgisi gönderiyoruz
+        navigate(`/lands/detail/${id}`, { state: { editMode: true } });
     };
 
     const handleDelete = async () => {
@@ -118,7 +128,7 @@ const LandList = () => {
         boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
         background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
         borderRadius: '12px',
-        transition: 'transform 1.2s ease-in-out, box-shadow 0.4s ease-in-out',
+        transition: 'transform 1.2s ease-in-out',
         '&:hover': {
             boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)',
             transform: 'rotateY(360deg) scale(1.3)',
@@ -126,7 +136,6 @@ const LandList = () => {
             zIndex: 1000,
         },
     });
-
     return (
         <Container maxWidth="lg" sx={{ marginBottom: "60px" }}>
             <Box>
@@ -244,7 +253,7 @@ const LandList = () => {
                 open={openSnackbar}
                 autoHideDuration={3000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             >
                 <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}

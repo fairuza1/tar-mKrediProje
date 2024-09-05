@@ -12,7 +12,6 @@ import {
     Select,
     Snackbar,
     Alert,
-    Card, CardMedia, CardContent
 } from '@mui/material';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import ilIlceData from '../Data/il-ilce.json';
@@ -21,14 +20,14 @@ import koylerData from '../Data/koyler.json';
 const LandDetails = () => {
     const { id } = useParams();
     const location = useLocation();
-    const { editMode } = location.state || {}; // editMode parametresini location'dan al
+    const { editMode } = location.state || {};
     const [land, setLand] = useState(null);
-    const [isEditing, setIsEditing] = useState(editMode || false); // editMode varsa düzenleme modunda başlar
+    const [isEditing, setIsEditing] = useState(editMode || false);
     const [ilceler, setIlceler] = useState([]);
     const [koyler, setKoyler] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Tek bir snackbar kullanılıyor
     const [selectedFile, setSelectedFile] = useState(null);
     const navigate = useNavigate();
 
@@ -61,10 +60,6 @@ const LandDetails = () => {
         setKoyler(koyList);
     };
 
-    const handleEditToggle = () => {
-        setIsEditing(!isEditing);
-    };
-
     const handleSave = () => {
         const formData = new FormData();
         formData.append('land', new Blob([JSON.stringify(land)], { type: "application/json" }));
@@ -86,42 +81,23 @@ const LandDetails = () => {
             .then(data => {
                 setLand(data);
                 setIsEditing(false);
-                setSnackbarMessage('Arazi bilgileri başarıyla güncellendi!');
-                setSnackbarSeverity('success');
-                setOpenSnackbar(true);
-                // Kaydetme işlemi tamamlandığında land liste sayfasına yönlendirme
-                navigate('/land-list');
+                // Başarı durumunda land-list sayfasına yönlendirme ve başarı mesajı taşıma
+                navigate('/land-list', {
+                    state: {
+                        message: 'Arazi bilgileri başarıyla güncellendi!',
+                        severity: 'success'
+                    }
+                });
             })
             .catch(error => {
                 console.error('Error updating land details:', error);
-                setSnackbarMessage('Arazi güncellenemedi.');
-                setSnackbarSeverity('error');
-                setOpenSnackbar(true);
-            });
-    };
-
-    const handleDelete = () => {
-        fetch(`http://localhost:8080/lands/delete/${id}`, {
-            method: 'DELETE',
-        })
-            .then(response => {
-                if (response.ok) {
-                    setSnackbarMessage('Arazi başarıyla silindi!');
-                    setSnackbarSeverity('success');
-                    setOpenSnackbar(true);
-                    // Silme işlemi tamamlandığında land liste sayfasına yönlendirme
-                    navigate('/land-list');
-                } else {
-                    setSnackbarMessage('Arazi silinemedi.');
-                    setSnackbarSeverity('error');
-                    setOpenSnackbar(true);
-                }
-            })
-            .catch(error => {
-                console.error('Error deleting land:', error);
-                setSnackbarMessage('Arazi silinemedi.');
-                setSnackbarSeverity('error');
-                setOpenSnackbar(true);
+                // Hata durumunda land-list sayfasına yönlendirme ve hata mesajı taşıma
+                navigate('/land-list', {
+                    state: {
+                        message: 'Arazi güncellenemedi. Lütfen tekrar deneyin.',
+                        severity: 'error'
+                    }
+                });
             });
     };
 
@@ -163,7 +139,7 @@ const LandDetails = () => {
         <Container maxWidth="md">
             <Box sx={{ mt: 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
-                    {isEditing ? 'Arazi Bilgilerini Düzenle' : `${land.name} Detayları`}
+                    {isEditing ? 'Arazi Bilgilerini Düzenle' : ''}
                 </Typography>
                 <Paper elevation={3} sx={{ p: 2 }}>
                     {isEditing ? (
@@ -230,51 +206,14 @@ const LandDetails = () => {
                                 onChange={handleImageUpload}
                             />
                         </>
-                    ) : (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                            <Card sx={{ maxWidth: 345, borderRadius: 2, boxShadow: 3 }}>
-                                <CardMedia
-                                    component="img"
-                                    height="200"
-                                    image={land.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
-                                    alt={land.name}
-                                    sx={{ borderRadius: 2 }}
-                                />
-                                <CardContent>
-                                    <Typography variant="h6" color="textSecondary">
-                                        {land.name}
-                                    </Typography>
-                                    <Typography variant="body2" color="textSecondary">
-                                        {land.city}, {land.district}, {land.village || 'N/A'}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                            <Box>
-                                <Typography variant="h6">Boyut: {land.landSize} m²</Typography>
-                                <Typography variant="h6">Şehir: {land.city}</Typography>
-                                <Typography variant="h6">İlçe: {land.district}</Typography>
-                                <Typography variant="h6">Köy: {land.village || 'N/A'}</Typography>
-                            </Box>
-                        </Box>
-                    )}
+                    ) : null}
                 </Paper>
-                <Box sx={{ marginTop: 3 }}>
+                <Box sx={{ marginTop: 3, display: 'flex', justifyContent: 'flex-end' }}>
                     {isEditing ? (
-                        <>
-                            <Button variant="contained" color="success" onClick={handleSave}>
-                                Kaydet
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <Button variant="contained" color="success" onClick={handleEditToggle}>
-                                Düzenle
-                            </Button>
-                            <Button variant="contained" color="error" onClick={handleDelete} sx={{ marginLeft: 2 }}>
-                                Sil
-                            </Button>
-                        </>
-                    )}
+                        <Button variant="contained" color="success" onClick={handleSave}>
+                            Kaydet
+                        </Button>
+                    ) : null}
                 </Box>
             </Box>
 
@@ -282,7 +221,7 @@ const LandDetails = () => {
                 open={openSnackbar}
                 autoHideDuration={3000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} // Sol altta bildirim
             >
                 <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}
