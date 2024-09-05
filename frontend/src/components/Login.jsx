@@ -10,7 +10,7 @@ import logoImage from 'C:/Users/ercan kara/IdeaProjects/TarimKrediProjem/fronten
 const theme = createTheme();
 
 function Login({ setIsLoggedIn }) {
-    const [user, setUser] = useState('');
+    const [username, setUsername] = useState(''); // 'user' yerine 'username'
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ function Login({ setIsLoggedIn }) {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        if (!user) {
+        if (!username) {
             setError('Kullanıcı adı veya e-posta boş bırakılamaz.');
             return;
         }
@@ -31,10 +31,13 @@ function Login({ setIsLoggedIn }) {
 
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:8080/auth/login', { user, password }, { withCredentials: true });
+            const response = await axios.post('http://localhost:8080/auth/login', { username, password }, { withCredentials: true });
             if (response.status === 200) {
                 const data = response.data;
-                localStorage.setItem('userId', data.userId);
+                // Hem userId'yi hem de username'i localStorage'a kaydediyoruz
+                localStorage.setItem('userId', data.userId); // userId'yi sakla
+                localStorage.setItem('username', data.username); // username'i sakla
+
                 setIsLoggedIn(true);
                 setTimeout(() => {
                     setLoading(false);
@@ -51,9 +54,9 @@ function Login({ setIsLoggedIn }) {
         }
     };
 
-    // Kullanıcı input alanına her bir karakter girdiğinde hata mesajını temizle
-    const handleUserChange = (e) => {
-        setUser(e.target.value);
+
+    const handleUsernameChange = (e) => {
+        setUsername(e.target.value);
         setError(''); // Hata mesajını temizle
     };
 
@@ -148,13 +151,13 @@ function Login({ setIsLoggedIn }) {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="user"
+                                id="username"
                                 label="Kullanıcı Adınızı veya E-postanızı Giriniz"
-                                name="user"
-                                autoComplete="user"
+                                name="username"
+                                autoComplete="username"
                                 autoFocus
-                                value={user}
-                                onChange={handleUserChange} // Her değişiklikte hata mesajını temizle
+                                value={username}
+                                onChange={handleUsernameChange} // Her değişiklikte hata mesajını temizle
                                 disabled={loading}
                             />
                             <TextField

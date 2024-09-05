@@ -10,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,21 +26,21 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginResponse response = userService.login(request);
         String token = response.getToken();
-        String refreshToken = userService.generateRefreshToken(request.getUser());
+        String refreshToken = userService.generateRefreshToken(request.getUsername()); // 'getUser' yerine 'getUsername'
 
         // HTTP-Only cookie oluşturuyoruz
         ResponseCookie authCookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
-                .secure(false) // eğer https kullanıyorsanız, bunu true yapın
+                .secure(false)
                 .path("/")
-                .maxAge(60 * 60 *24) // access token süresi (15 dakika)
+                .maxAge(60 * 60 * 24)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(false) // eğer https kullanıyorsanız, bunu true yapın
+                .secure(false)
                 .path("/")
-                .maxAge(30 * 24 * 60 * 60) // refresh token süresi (30 gün)
+                .maxAge(30 * 24 * 60 * 60)
                 .build();
 
         return ResponseEntity.ok()
@@ -55,7 +54,6 @@ public class AuthController {
         LoginResponse response = userService.signup(request);
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
@@ -85,9 +83,9 @@ public class AuthController {
         if (newToken != null) {
             ResponseCookie authCookie = ResponseCookie.from("jwt", newToken)
                     .httpOnly(true)
-                    .secure(false) // eğer https kullanıyorsanız, bunu true yapın
+                    .secure(false)
                     .path("/")
-                    .maxAge(60 * 60 * 24) // access token süresi (1 gün)
+                    .maxAge(60 * 60 * 24)
                     .build();
 
             return ResponseEntity.ok()
@@ -97,5 +95,4 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid refresh token");
         }
     }
-
 }

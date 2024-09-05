@@ -41,6 +41,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/categories").permitAll()
                         .requestMatchers("/harvests/**").permitAll()
                         .requestMatchers("/api/ratings/**").permitAll()
+                        .requestMatchers("/users/**").permitAll()
+
 
 
 

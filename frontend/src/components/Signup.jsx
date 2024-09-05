@@ -10,7 +10,7 @@ import logoImage from 'C:/Users/ercan kara/IdeaProjects/TarimKrediProjem/fronten
 const theme = createTheme();
 
 function Signup() {
-    const [user, setUser] = useState('');
+    const [username, setUsername] = useState(''); // 'user' yerine 'username'
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -22,7 +22,7 @@ function Signup() {
     const navigate = useNavigate();
 
     const validateForm = () => {
-        if (!user) {
+        if (!username) {
             setError('Lütfen kullanıcı adını giriniz.');
             return false;
         }
@@ -54,7 +54,7 @@ function Signup() {
 
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:8080/auth/signup', { user, password, email, phoneNumber });
+            const response = await axios.post('http://localhost:8080/auth/signup', { username, password, email, phoneNumber });
             if (response.status === 200) {
                 setMessage('Kayıt başarılı. Giriş sayfasına yönlendiriliyorsunuz...');
                 setError('');
@@ -193,13 +193,13 @@ function Signup() {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="user"
+                                id="username"
                                 label="Kullanıcı Adı gir"
-                                name="user"
-                                autoComplete="user"
+                                name="username"
+                                autoComplete="username"
                                 autoFocus
-                                value={user}
-                                onChange={(e) => setUser(e.target.value)}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 disabled={loading}
                             />
                             <TextField
@@ -224,7 +224,7 @@ function Signup() {
                                 id="email"
                                 label="Email"
                                 name="email"
-                                type="email" // E-mail formatını zorunlu hale getirir
+                                type="email"
                                 autoComplete="email"
                                 value={email}
                                 onChange={handleEmailChange}
