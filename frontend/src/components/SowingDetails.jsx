@@ -326,15 +326,13 @@ const SowingDetails = () => {
                         </>
                     )}
                 </Paper>
-                <Box sx={{ marginTop: 3 }}>
+                <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'flex-end' }}>
                     {isEditing ? (
                         <>
                             <Button variant="contained" color="success" onClick={handleSave}>
                                 Kaydet
                             </Button>
-                            <Button variant="contained" color="secondary" onClick={handleCancel} sx={{ marginLeft: 2 }}>
-                                İptal
-                            </Button>
+
                         </>
                     ) : (
                         <>
@@ -347,6 +345,7 @@ const SowingDetails = () => {
                         </>
                     )}
                 </Box>
+
             </Box>
 
             <Snackbar
