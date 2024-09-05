@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
 import ScrollToTop from "./ScrollToTop.jsx";
+import { styled } from '@mui/system';
 
 const LandList = () => {
     const [lands, setLands] = useState([]);
@@ -94,6 +95,21 @@ const LandList = () => {
         return matchesCity && matchesDistrict && matchesName;
     });
 
+    // StyledCard tanımı
+    const StyledCard = styled(Card)({
+        maxWidth: 345,
+        boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
+        background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+        borderRadius: '12px',
+        transition: 'transform 1.2s ease-in-out, box-shadow 0.4s ease-in-out',
+        '&:hover': {
+            boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)',
+            transform: 'rotateY(360deg) scale(1.3)', // Dönme ve büyüme efekti
+            position: 'relative',
+            zIndex: 1000,
+        },
+    });
+
     return (
         <Container maxWidth="lg" sx={{ marginBottom: "60px" }}>
             <Box>
@@ -109,7 +125,7 @@ const LandList = () => {
                     mb: 3,
                     boxShadow: accordionOpen ? 'none' : '8px 8px 16px rgba(0, 0, 0, 0.2)',
                     background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
-                    borderRadius: '12px',
+                    borderRadius: '26px',
                     '&:hover': {
                         boxShadow: accordionOpen ? 'none' : '12px 12px 24px rgba(0, 0, 0, 0.3)',
                         transform: accordionOpen ? 'none' : 'translateY(-4px)',
@@ -158,26 +174,14 @@ const LandList = () => {
                 </AccordionDetails>
             </Accordion>
 
-            <Box sx={{ mt: 3 }}>
-                <Typography variant="h4" component="h2" gutterBottom>
+            <Box sx={{ mt: 4 }}>
+                <Typography variant="h4" component="h2" gutterBottom marginLeft={2}>
                     Araziler Listesi
                 </Typography>
                 <Grid container spacing={3}>
                     {filteredLands.map((land) => (
                         <Grid item xs={12} sm={6} md={4} key={land.id}>
-                            <Card
-                                sx={{
-                                    maxWidth: 345,
-                                    boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
-                                    background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
-                                    borderRadius: '12px',
-                                    '&:hover': {
-                                        boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)',
-                                        transform: 'translateY(-4px)',
-                                    },
-                                    padding: '16px',
-                                }}
-                            >
+                            <StyledCard>
                                 <CardMedia
                                     component="img"
                                     height="140"
@@ -213,7 +217,7 @@ const LandList = () => {
                                         Sil
                                     </Button>
                                 </Box>
-                            </Card>
+                            </StyledCard>
                         </Grid>
                     ))}
                 </Grid>
