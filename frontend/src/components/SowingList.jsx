@@ -21,22 +21,20 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BreadcrumbComponent from "./BreadCrumb.jsx";
-import ScrollToTop from './ScrollToTop'; // ScrollToTop bileşeni buraya import edilecek
-
+import ScrollToTop from './ScrollToTop';
 
 const SowingList = () => {
     const [sowings, setSowings] = useState([]);
     const [lands, setLands] = useState([]);
-    const [categories, setCategories] = useState([]);  // Store the categories here
+    const [categories, setCategories] = useState([]);
     const [isAuthenticated, setIsAuthenticated] = useState(true);
     const [harvestedSowings, setHarvestedSowings] = useState(JSON.parse(localStorage.getItem('harvestedSowings')) || []);
     const [error, setError] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-    const [accordionOpen, setAccordionOpen] = useState(false); // Accordion durumunu takip eder
+    const [accordionOpen, setAccordionOpen] = useState(false);
 
-    // Filtreleme durumları
     const [filterLand, setFilterLand] = useState('');
     const [filterPlant, setFilterPlant] = useState('');
     const [filterDate, setFilterDate] = useState('');
@@ -51,7 +49,7 @@ const SowingList = () => {
                 const sowingResponse = await axios.get('http://localhost:8080/sowings', { withCredentials: true });
                 setSowings(sowingResponse.data);
             } catch (error) {
-                console.error('Error fetching sowings:', error);
+                console.error('Ekim verileri alınırken bir hata oluştu:', error);
                 if (error.response && error.response.status === 401) {
                     setIsAuthenticated(false);
                 } else {
@@ -66,19 +64,17 @@ const SowingList = () => {
                 const landResponse = await axios.get('http://localhost:8080/lands', { withCredentials: true });
                 setLands(landResponse.data);
             } catch (error) {
-                console.error('Error fetching lands:', error);
-                setError('Arazi verileri alınırken bir hata oluştu.');
+                console.error('Arazi verileri alınırken bir hata oluştu:', error);
                 setSnackbarSeverity('error');
                 setSnackbarMessage('Arazi verileri alınırken bir hata oluştu.');
                 setSnackbarOpen(true);
             }
 
-            // Fetch categories data
             try {
                 const categoryResponse = await axios.get('http://localhost:8080/categories', { withCredentials: true });
                 setCategories(categoryResponse.data);
             } catch (error) {
-                console.error('Error fetching categories:', error);
+                console.error('Kategoriler alınırken bir hata oluştu:', error);
             }
         };
 
@@ -97,12 +93,10 @@ const SowingList = () => {
         );
     }
 
-    // Retrieve land by its ID
     const getLand = (landId) => {
         return lands.find(land => land.id === landId);
     };
 
-    // Retrieve category name by its ID
     const getCategoryName = (categoryId) => {
         const category = categories.find(cat => cat.id === categoryId);
         return category ? category.categoryName : 'Bilinmiyor';
@@ -120,8 +114,10 @@ const SowingList = () => {
         return landSize - totalSownAmount;
     };
 
+    // Güncelle butonuna basıldığında sowing detail sayfasına yönlendirme
     const handleDetail = (id) => {
-        navigate(`/sowings/detail/${id}`);
+        // sowing detail sayfasına yönlendirme
+        navigate(`/sowings/detail/${id}`, { state: { isEditing: true } });
     };
 
     const handleHarvest = async (sowingId) => {
@@ -153,7 +149,6 @@ const SowingList = () => {
 
         } catch (error) {
             console.error('Hasat kaydetme hatası:', error);
-            setError('Hasat kaydedilirken bir hata oluştu.');
             setSnackbarSeverity('error');
             setSnackbarMessage('Hasat kaydedilirken bir hata oluştu.');
             setSnackbarOpen(true);
@@ -206,7 +201,6 @@ const SowingList = () => {
                 <BreadcrumbComponent pageName="Ekimlerim" />
             </Box>
 
-            {/* Filtreleme bölümü */}
             <Accordion
                 expanded={accordionOpen}
                 onChange={handleAccordionChange}
@@ -309,7 +303,7 @@ const SowingList = () => {
                         const land = getLand(sowing.landId);
                         const remainingSize = getRemainingSize(sowing.landId);
                         const isHarvested = harvestedSowings.includes(sowing.id);
-                        const categoryName = getCategoryName(sowing.categoryId); // Fetch category name here
+                        const categoryName = getCategoryName(sowing.categoryId);
                         return (
                             <Grid item xs={12} sm={6} md={4} key={sowing.id}>
                                 <Card
@@ -340,7 +334,7 @@ const SowingList = () => {
                                             Arazi Tipi: {land ? land.landType : 'Bilinmiyor'}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Kategori: {categoryName} {/* Show category name here */}
+                                            Kategori: {categoryName}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
                                             Bitki: {sowing.plantName}
@@ -379,7 +373,6 @@ const SowingList = () => {
                 </Grid>
             </Box>
 
-            {/* Snackbar ile bildirim */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={3000}
@@ -391,7 +384,6 @@ const SowingList = () => {
             </Snackbar>
             <ScrollToTop />
         </Container>
-
     );
 };
 

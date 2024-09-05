@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Typography, Box, Paper, Button, TextField, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
 
 const SowingDetails = () => {
     const { id } = useParams();
+    const location = useLocation(); // state'den isEditing'i almak için kullanıyoruz
     const [sowing, setSowing] = useState(null);
     const [categories, setCategories] = useState([]);
     const [plants, setPlants] = useState([]);
     const [lands, setLands] = useState([]);
     const [sowings, setSowings] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(location.state?.isEditing || false); // Yönlendirme ile gelen isEditing durumunu kontrol ediyoruz
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -19,15 +20,30 @@ const SowingDetails = () => {
     const [remainingSize, setRemainingSize] = useState(0);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const navigate = useNavigate();
+    const formRef = useRef(null);  // Formu referans almak için useRef kullanıyoruz
 
-    const handleEditToggle = () => {
-        setIsEditing(!isEditing);
+    useEffect(() => {
+        const fetchSowingDetails = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/sowings/detail/${id}`, { withCredentials: true });
+                setSowing(response.data);
+                setSelectedCategory(response.data.categoryId);
+                await fetchLands();
+                await fetchSowings();
+                fetchCategoriesAndPlants(response.data.categoryId);
+                calculateRemainingSize();
+            } catch (error) {
+                console.error('Ekim detayları alınırken hata oluştu:', error);
+            }
+        };
 
-        if (!isEditing && sowing) {
-            setSelectedCategory(sowing.categoryId);
-            fetchPlants(sowing.categoryId);
+        fetchSowingDetails();
+
+        // Sayfa yüklendiğinde formun olduğu kısma kaydırma
+        if (formRef.current) {
+            formRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-    };
+    }, [id, lands.length, sowings.length]);
 
     const fetchLands = async () => {
         try {
@@ -91,14 +107,15 @@ const SowingDetails = () => {
         try {
             await axios.put(`http://localhost:8080/sowings/update/${id}`, sowing, { withCredentials: true });
 
-            const updatedData = await axios.get(`http://localhost:8080/sowings/detail/${id}`, { withCredentials: true });
-            setSowing(updatedData.data);
-            setIsEditing(false);
             setSnackbarMessage('Ekim güncellendi!');
             setSnackbarSeverity('success');
             setOpenSnackbar(true);
 
-            calculateRemainingSize();
+            // Kaydetme başarılı olunca sowing list sayfasına yönlendir
+            setTimeout(() => {
+                navigate('/sowing-list');  // Sowing list sayfasına yönlendirme
+            }, 2000);  // 2 saniye bekleyip yönlendiriyoruz.
+
         } catch (error) {
             console.error('Ekim güncellenirken hata oluştu:', error);
             setSnackbarMessage('Ekim güncellenemedi.');
@@ -106,6 +123,7 @@ const SowingDetails = () => {
             setOpenSnackbar(true);
         }
     };
+
 
     const validateDate = (date) => {
         const selectedDate = new Date(date);
@@ -146,24 +164,6 @@ const SowingDetails = () => {
             setOpenSnackbar(true);
         }
     };
-
-    useEffect(() => {
-        const fetchSowingDetails = async () => {
-            try {
-                const response = await axios.get(`http://localhost:8080/sowings/detail/${id}`, { withCredentials: true });
-                setSowing(response.data);
-                setSelectedCategory(response.data.categoryId);
-                await fetchLands();
-                await fetchSowings();
-                fetchCategoriesAndPlants(response.data.categoryId);
-                calculateRemainingSize();
-            } catch (error) {
-                console.error('Ekim detayları alınırken hata oluştu:', error);
-            }
-        };
-
-        fetchSowingDetails();
-    }, [id, lands.length, sowings.length]);
 
     const fetchCategoriesAndPlants = async (categoryId) => {
         try {
@@ -242,7 +242,7 @@ const SowingDetails = () => {
                 <Typography variant="h4" component="h2" gutterBottom>
                     {isEditing ? 'Ekim Bilgilerini Düzenle' : `${sowing.plantName} Detayları`}
                 </Typography>
-                <Paper elevation={3} sx={{ p: 2, position: 'relative' }}>
+                <Paper elevation={3} sx={{ p: 2, position: 'relative' }} ref={formRef}>
                     <IconButton
                         onClick={handleNavigateToDetails}
                         sx={{ position: 'absolute', top: 8, right: 8 }}
