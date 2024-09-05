@@ -12,29 +12,23 @@ import {
     Select,
     Snackbar,
     Alert,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     Card, CardMedia, CardContent
 } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import ilIlceData from '../Data/il-ilce.json';
 import koylerData from '../Data/koyler.json';
-import sowingList from "./SowingList.jsx";
-import sowingDetails from "./SowingDetails.jsx";
 
 const LandDetails = () => {
     const { id } = useParams();
+    const location = useLocation();
+    const { editMode } = location.state || {}; // editMode parametresini location'dan al
     const [land, setLand] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(editMode || false); // editMode varsa düzenleme modunda başlar
     const [ilceler, setIlceler] = useState([]);
     const [koyler, setKoyler] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const navigate = useNavigate();
 
@@ -81,7 +75,7 @@ const LandDetails = () => {
         fetch(`http://localhost:8080/lands/update/${id}`, {
             method: 'PUT',
             body: formData,
-            credentials: 'include', // Gerekirse çerezlerle birlikte isteği gönderir
+            credentials: 'include',
         })
             .then(response => {
                 if (!response.ok) {
@@ -95,6 +89,8 @@ const LandDetails = () => {
                 setSnackbarMessage('Arazi bilgileri başarıyla güncellendi!');
                 setSnackbarSeverity('success');
                 setOpenSnackbar(true);
+                // Kaydetme işlemi tamamlandığında land liste sayfasına yönlendirme
+                navigate('/land-list');
             })
             .catch(error => {
                 console.error('Error updating land details:', error);
@@ -113,8 +109,8 @@ const LandDetails = () => {
                     setSnackbarMessage('Arazi başarıyla silindi!');
                     setSnackbarSeverity('success');
                     setOpenSnackbar(true);
-                    setOpenDeleteDialog(false);
-                    navigate('/lands');
+                    // Silme işlemi tamamlandığında land liste sayfasına yönlendirme
+                    navigate('/land-list');
                 } else {
                     setSnackbarMessage('Arazi silinemedi.');
                     setSnackbarSeverity('error');
@@ -131,14 +127,6 @@ const LandDetails = () => {
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
-    };
-
-    const handleOpenDeleteDialog = () => {
-        setOpenDeleteDialog(true);
-    };
-
-    const handleCloseDeleteDialog = () => {
-        setOpenDeleteDialog(false);
     };
 
     const handleChange = (e) => {
@@ -193,7 +181,7 @@ const LandDetails = () => {
                                 label="Boyut (m²)"
                                 name="landSize"
                                 value={land.landSize}
-                                type="number" // Number input type
+                                type="number"
                                 onChange={handleChange}
                                 margin="normal"
                             />
@@ -276,16 +264,13 @@ const LandDetails = () => {
                             <Button variant="contained" color="success" onClick={handleSave}>
                                 Kaydet
                             </Button>
-                            <Button variant="contained" color="secondary" onClick={handleEditToggle} sx={{ marginLeft: 2 }}>
-                                İptal
-                            </Button>
                         </>
                     ) : (
                         <>
                             <Button variant="contained" color="success" onClick={handleEditToggle}>
                                 Düzenle
                             </Button>
-                            <Button variant="contained" color="error" onClick={handleOpenDeleteDialog} sx={{ marginLeft: 2 }}>
+                            <Button variant="contained" color="error" onClick={handleDelete} sx={{ marginLeft: 2 }}>
                                 Sil
                             </Button>
                         </>
@@ -303,28 +288,6 @@ const LandDetails = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
-
-            <Dialog
-                open={openDeleteDialog}
-                onClose={handleCloseDeleteDialog}
-                aria-labelledby="delete-dialog-title"
-                aria-describedby="delete-dialog-description"
-            >
-                <DialogTitle id="delete-dialog-title">Silmek istediğinizden emin misiniz?</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="delete-dialog-description">
-                        Bu işlem geri alınamaz. Silmek istediğinizden emin misiniz?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDeleteDialog} color="primary">
-                        İptal
-                    </Button>
-                    <Button onClick={handleDelete} color="error" autoFocus>
-                        Sil
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Container>
     );
 };

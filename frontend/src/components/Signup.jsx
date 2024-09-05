@@ -128,7 +128,7 @@ function Signup() {
                     sx={{
                         display: 'flex',
                         flexDirection: 'row',
-                        width: '80%',
+                        width: '100%',
                         maxWidth: '950px',
                         borderRadius: '12px',
                         borderTopLeftRadius: '100px',

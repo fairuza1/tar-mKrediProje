@@ -13,7 +13,7 @@ import {
     Alert,
     InputAdornment
 } from '@mui/material';
-import LocationOnIcon from '@mui/icons-material/LocationOn'; // İkonlar için MUI Icons kullanıyoruz
+import LocationOnIcon from '@mui/icons-material/LocationOn'; // İkonlar için MUI Icons kullandım
 import ilIlceData from '../Data/il-ilce.json';
 import koylerData from '../Data/koyler.json';
 import axios from 'axios';
@@ -131,6 +131,7 @@ function AddLand() {
         setOpenSnackbar(false);
     };
 
+
     return (
         <Container maxWidth="sm" sx={{  minHeight: '100vh', padding: 3 }}>
             <Box sx={{ backgroundColor: 'white', padding: 3, borderRadius: 4, boxShadow: 7 }}>
@@ -246,7 +247,7 @@ function AddLand() {
                             transition: 'background-color 0.3s ease',
                         }}
                     >
-                        Arazi Ekle
+                        kaydet
                     </Button>
                 </Box>
 

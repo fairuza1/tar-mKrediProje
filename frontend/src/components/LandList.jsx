@@ -1,5 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Grid, Card, CardContent, CardMedia, Button, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, MenuItem, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import {
+    Container,
+    Typography,
+    Box,
+    Grid,
+    Card,
+    CardContent,
+    CardMedia,
+    Button,
+    Snackbar,
+    Alert,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    TextField,
+    MenuItem,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails
+} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -15,9 +36,8 @@ const LandList = () => {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [landToDelete, setLandToDelete] = useState(null);
-    const [accordionOpen, setAccordionOpen] = useState(false); // Accordion durumunu takip eder
+    const [accordionOpen, setAccordionOpen] = useState(false);
 
-    // Filtreleme durumları
     const [filterCity, setFilterCity] = useState('');
     const [filterDistrict, setFilterDistrict] = useState('');
     const [filterName, setFilterName] = useState('');
@@ -50,7 +70,7 @@ const LandList = () => {
     }
 
     const handleDetail = (id) => {
-        navigate(`/lands/detail/${id}`);
+        navigate(`/lands/detail/${id}`, { state: { editMode: true } }); // Yönlendirme yaparken editMode bilgisi gönderiyoruz
     };
 
     const handleDelete = async () => {
@@ -82,12 +102,10 @@ const LandList = () => {
         setOpenSnackbar(false);
     };
 
-    // Accordion açık/kapalı durumu değiştiğinde stil değiştir
     const handleAccordionChange = (event, isExpanded) => {
         setAccordionOpen(isExpanded);
     };
 
-    // Filtrelenmiş arazi listesi
     const filteredLands = lands.filter(land => {
         const matchesCity = filterCity ? land.city.toLowerCase().includes(filterCity.toLowerCase()) : true;
         const matchesDistrict = filterDistrict ? land.district.toLowerCase().includes(filterDistrict.toLowerCase()) : true;
@@ -95,7 +113,6 @@ const LandList = () => {
         return matchesCity && matchesDistrict && matchesName;
     });
 
-    // StyledCard tanımı
     const StyledCard = styled(Card)({
         maxWidth: 345,
         boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
@@ -104,7 +121,7 @@ const LandList = () => {
         transition: 'transform 1.2s ease-in-out, box-shadow 0.4s ease-in-out',
         '&:hover': {
             boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)',
-            transform: 'rotateY(360deg) scale(1.3)', // Dönme ve büyüme efekti
+            transform: 'rotateY(360deg) scale(1.3)',
             position: 'relative',
             zIndex: 1000,
         },
@@ -116,7 +133,6 @@ const LandList = () => {
                 <BreadcrumbComponent pageName="Arazilerim" />
             </Box>
 
-            {/* Filtreleme bölümü */}
             <Accordion
                 expanded={accordionOpen}
                 onChange={handleAccordionChange}
@@ -194,19 +210,20 @@ const LandList = () => {
                                         {land.name}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Boyut: {land.landSize} hektar
+                                        Boyut: <span style={{ marginLeft: '23px' }}>{land.landSize} hektar</span>
+                                    </Typography>
+
+                                    <Typography variant="body2" color="text.secondary">
+                                        Şehir: <span style={{ marginLeft: '25px' }}> {land.city}</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Şehir: {land.city}
+                                        İlçe: <span style={{ marginLeft: '38px' }}> {land.district}</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        İlçe: {land.district}
+                                        Köy:   <span style={{ marginLeft: '35px' }}>{land.village || 'Köy yok'}</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Köy: {land.village || 'Köy yok'}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Arazi Tipi: {land.landType || 'N/A'}
+                                        Arazi Tipi: <span style={{ marginLeft: '0px' }}>{land.landType || 'N/A'}</span>
                                     </Typography>
                                 </CardContent>
                                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>

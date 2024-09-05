@@ -208,6 +208,7 @@ function AddSowing() {
 
     return (
         <Container maxWidth="lg">
+
             <Box>
                 <BreadcrumbComponent pageName="Ekim Yap ve Önerilen Bitkiler" />
             </Box>
@@ -358,6 +359,7 @@ function AddSowing() {
                 </Alert>
             </Snackbar>
             <ScrollToTop />
+
         </Container>
     );
 }
