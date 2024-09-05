@@ -107,22 +107,19 @@ function AddSowing() {
         }
     };
 
-    // Minimum tarihi arazi tipine göre belirleme
     const getMinDate = () => {
         const selectedLand = lands.find(land => land.id === parseInt(landId));
         if (selectedLand && (selectedLand.landType === 'Bahçe' || selectedLand.landType === 'Zeytinlik')) {
-            return '1900-01-01'; // Bahçe ve Zeytinlik için 1900 yılına kadar izin ver
+            return '1900-01-01';
         }
-        // Diğer arazi tipleri için bugünden 1 yıl öncesine kadar izin ver
         const currentDate = new Date();
         const lastYearDate = new Date();
         lastYearDate.setFullYear(currentDate.getFullYear() - 1);
         return lastYearDate.toISOString().split('T')[0];
     };
 
-    // Maksimum tarih bugünkü tarih olarak belirlenir
     const getMaxDate = () => {
-        return new Date().toISOString().split('T')[0]; // Şu anki tarihe kadar izin ver
+        return new Date().toISOString().split('T')[0];
     };
 
     const sortRecommendations = (recommendations) => {
@@ -146,7 +143,7 @@ function AddSowing() {
         setSortBy(column);
     };
 
-    const handleAddSowing = async (e) => {
+    const handleAddSowing = async (e, redirect = true) => {
         e.preventDefault();
 
         if (!plantId || !landId || !amount || !sowingDate) {
@@ -182,11 +179,14 @@ function AddSowing() {
                 setSnackbarSeverity('success');
                 setOpenSnackbar(true);
 
-                setTimeout(() => navigate('/sowing-list'), 3000);
-                setPlantId('');
-                setSowingDate('');
-                setLandId('');
-                setAmount('');
+                if (redirect) {
+                    setTimeout(() => navigate('/sowing-list'), 1000);
+                } else {
+                    setPlantId('');
+                    setSowingDate('');
+                    setLandId('');
+                    setAmount('');
+                }
             } else {
                 setSnackbarMessage('Ekim kaydedilemedi.');
                 setSnackbarSeverity('error');
@@ -214,7 +214,7 @@ function AddSowing() {
             </Box>
             <Grid container spacing={4}>
                 <Grid item xs={12} md={6}>
-                    <Box component="form" onSubmit={handleAddSowing} sx={{ mt: 3 }}>
+                    <Box component="form" sx={{ mt: 3 }}>
                         <Typography variant="h4" component="h2" gutterBottom>
                             Ekim Yap
                         </Typography>
@@ -285,9 +285,14 @@ function AddSowing() {
                             }}
                         />
 
-                        <Button type="submit" variant="contained" color="success" fullWidth sx={{ mt: 2 }}>
-                            Ekim Ekle
-                        </Button>
+                        <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
+                            <Button variant="contained" color="success" onClick={(e) => handleAddSowing(e, true)}>
+                                Kaydet
+                            </Button>
+                            <Button variant="contained" color="primary" onClick={(e) => handleAddSowing(e, false)}>
+                                Kaydetmeye Devam Et
+                            </Button>
+                        </Box>
 
                     </Box>
                 </Grid>
