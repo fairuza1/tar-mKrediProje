@@ -285,7 +285,7 @@ function AddSowing() {
                             }}
                         />
 
-                        <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
+                        <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'flex-end', gap: 3 }}>
                             <Button variant="contained" color="success" onClick={(e) => handleAddSowing(e, true)}>
                                 Kaydet
                             </Button>
@@ -293,6 +293,7 @@ function AddSowing() {
                                 Kaydetmeye Devam Et
                             </Button>
                         </Box>
+
 
                     </Box>
                 </Grid>
