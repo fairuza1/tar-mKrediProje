@@ -9,6 +9,7 @@ import ercankara.proje.dto.LandDTO;
 import ercankara.proje.entity.Land;
 import ercankara.proje.entity.User;
 import ercankara.proje.repository.LandRepository;
+import ercankara.proje.repository.SowingRepository;
 import ercankara.proje.repository.UserRepository;
 
 import java.io.File;
@@ -28,6 +29,9 @@ public class LandService {
 
     @Autowired
     private LandRepository landRepository;
+
+    @Autowired
+    private SowingRepository sowingRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -58,6 +62,7 @@ public class LandService {
         Land existingLand = landRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Land not found"));
 
+        int oldLandSize = existingLand.getLandSize();
         existingLand.setName(landDto.getName());
         existingLand.setLandSize(landDto.getLandSize());
         existingLand.setCity(landDto.getCity());
@@ -69,6 +74,13 @@ public class LandService {
             User user = userRepository.findById(landDto.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             existingLand.setUser(user);
+        }
+
+        // Arazi boyutu değiştiğinde remainingArea'yi yeniden hesapla
+        if (landDto.getLandSize() != oldLandSize) {
+            int totalSowedArea = sowingRepository.findTotalSowedAreaByLandId(id);
+            int newRemainingArea = landDto.getLandSize() - totalSowedArea;
+            existingLand.setRemainingArea(newRemainingArea < 0 ? 0 : newRemainingArea);
         }
 
         if (file != null && !file.isEmpty()) {

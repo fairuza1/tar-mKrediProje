@@ -14,5 +14,8 @@ public interface SowingRepository extends JpaRepository<Sowing, Long> {
     List<Sowing> findByUserId(@Param("userId") Long userId);
 
     List<Sowing> findByLandUserId(Long userId);
+    // Ekilen toplam alanı bulmak için bir query
+    @Query("SELECT SUM(s.amount) FROM Sowing s WHERE s.land.id = :landId")
+    Integer findTotalSowedAreaByLandId(@Param("landId") Long landId);
 
 }

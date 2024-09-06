@@ -27,7 +27,7 @@ const LandDetails = () => {
     const [koyler, setKoyler] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Tek bir snackbar kullanılıyor
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [selectedFile, setSelectedFile] = useState(null);
     const navigate = useNavigate();
 
@@ -81,7 +81,6 @@ const LandDetails = () => {
             .then(data => {
                 setLand(data);
                 setIsEditing(false);
-                // Başarı durumunda land-list sayfasına yönlendirme ve başarı mesajı taşıma
                 navigate('/land-list', {
                     state: {
                         message: 'Arazi bilgileri başarıyla güncellendi!',
@@ -91,7 +90,6 @@ const LandDetails = () => {
             })
             .catch(error => {
                 console.error('Error updating land details:', error);
-                // Hata durumunda land-list sayfasına yönlendirme ve hata mesajı taşıma
                 navigate('/land-list', {
                     state: {
                         message: 'Arazi güncellenemedi. Lütfen tekrar deneyin.',
@@ -99,10 +97,6 @@ const LandDetails = () => {
                     }
                 });
             });
-    };
-
-    const handleCloseSnackbar = () => {
-        setOpenSnackbar(false);
     };
 
     const handleChange = (e) => {
@@ -161,6 +155,9 @@ const LandDetails = () => {
                                 onChange={handleChange}
                                 margin="normal"
                             />
+                            <Typography variant="body1">
+                                Kalan Alan: {land.remainingArea} m²
+                            </Typography>
 
                             <FormControl fullWidth margin="normal" variant="outlined">
                                 <InputLabel>İl</InputLabel>
@@ -168,7 +165,7 @@ const LandDetails = () => {
                                     name="city"
                                     value={land.city}
                                     onChange={handleChange}
-                                    label="İl"// bunun sayesinde çizginin arasında kalacak
+                                    label="İl"
                                 >
                                     {uniqueCities.map(il => (
                                         <MenuItem key={il} value={il}>{il}</MenuItem>
@@ -223,10 +220,10 @@ const LandDetails = () => {
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={3000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} // Sol altta bildirim
+                onClose={() => setOpenSnackbar(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             >
-                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

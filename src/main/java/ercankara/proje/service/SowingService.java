@@ -86,22 +86,41 @@ public class SowingService {
         Sowing existingSowing = sowingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sowing not found"));
 
+        // Mevcut arazideki remainingArea'yi eski ekim miktarını geri ekleyerek güncelle
+        Land land = existingSowing.getLand();
+        int currentRemainingArea = land.getRemainingArea();
+        land.setRemainingArea(currentRemainingArea + existingSowing.getAmount()); // Eski ekim miktarını geri ekliyoruz
+
+        // Yeni ekim miktarını kontrol ediyoruz
+        if (sowingDTO.getAmount() <= 0) {
+            throw new RuntimeException("Ekim miktarı sıfır veya negatif olamaz.");
+        }
+        if (sowingDTO.getAmount() > land.getRemainingArea()) {
+            throw new RuntimeException("Yeni ekim miktarı mevcut arazi alanını aşıyor. Mevcut: " + land.getRemainingArea());
+        }
+
+        // Yeni ekim miktarını kalan alandan çıkarıyoruz
+        land.setRemainingArea(land.getRemainingArea() - sowingDTO.getAmount());
+
+        // Güncellemeleri Sowing nesnesine uygula
         existingSowing.setSowingDate(sowingDTO.getSowingDate());
         existingSowing.setAmount(sowingDTO.getAmount());
 
-        if (sowingDTO.getLandId() != null) {
-            Land land = landRepository.findById(sowingDTO.getLandId())
+        // Eğer arazi veya bitki değişiyorsa, gerekli güncellemeleri yap
+        if (sowingDTO.getLandId() != null && !sowingDTO.getLandId().equals(existingSowing.getLand().getId())) {
+            Land newLand = landRepository.findById(sowingDTO.getLandId())
                     .orElseThrow(() -> new RuntimeException("Land not found"));
-            existingSowing.setLand(land);
+            existingSowing.setLand(newLand);
         }
 
-        if (sowingDTO.getPlantId() != null) {
+        if (sowingDTO.getPlantId() != null && !sowingDTO.getPlantId().equals(existingSowing.getPlant().getId())) {
             Plant plant = plantRepository.findById(sowingDTO.getPlantId())
                     .orElseThrow(() -> new RuntimeException("Plant not found"));
             existingSowing.setPlant(plant);
         }
 
-        return sowingRepository.save(existingSowing);
+        landRepository.save(land);  // Arazideki kalan alanı güncelle
+        return sowingRepository.save(existingSowing);  // Ekim güncellemesini kaydediyoruz
     }
 
     public int getAvailableLand(Long landId) {
@@ -141,5 +160,4 @@ public class SowingService {
         // Ekim kaydını sil
         sowingRepository.delete(sowing);
     }
-
 }
