@@ -219,16 +219,19 @@ const Harvest = ({ onSowingUpdate }) => {
                                                 {land ? land.name : 'Bilinmiyor'}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Arazi Tipi: {land ? land.landType : 'Bilinmiyor'}
+                                                Arazi Tipi:<span
+                                                style={{marginLeft: '20px'}}> {land ? land.landType : 'Bilinmiyor'}</span>
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Bitki: {sowing ? sowing.plantName : 'Bilinmiyor'}
+                                                Bitki: <span style={{marginLeft: '54px'}}>{sowing ? sowing.plantName : 'Bilinmiyor'}</span>
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Ekilen Alan: {sowing ? sowing.amount : 'Bilinmiyor'} m²
+                                                Ekilen Alan:<span
+                                                style={{marginLeft: '8px'}}> {sowing ? sowing.amount : 'Bilinmiyor'} m²</span>
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Hasat Tarihi: {new Date(harvest.harvestDate).toLocaleDateString()}
+                                                Hasat Tarihi:<span
+                                                style={{marginLeft: '2px'}}> {new Date(harvest.harvestDate).toLocaleDateString()}</span>
                                             </Typography>
                                         </CardContent>
                                         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>

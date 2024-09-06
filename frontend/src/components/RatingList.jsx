@@ -243,22 +243,22 @@ const RatingList = () => {
 
                                 <CardContent>
                                     <Typography variant="body2" color="text.secondary">
-                                        Bitki Adı: {plantName}
+                                        Bitki Adı: <span style={{marginLeft: '51px'}}>{plantName}</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Ekilen Alan: {sowing ? sowing.amount : 'Bilinmiyor'} m²
+                                        Ekilen Alan: <span style={{marginLeft: '30px'}}>{sowing ? sowing.amount : 'Bilinmiyor'} m²</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Hasat Koşulları: {rating.harvestCondition}
+                                        Hasat Koşulları:<span style={{marginLeft: '6px'}}> {rating.harvestCondition}</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Ürün Kalitesi: {rating.productQuality}
+                                        Ürün Kalitesi:<span style={{marginLeft: '19px'}}> {rating.productQuality}</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Ürün Miktarı: {rating.productQuantity} kg
+                                        Ürün Miktarı:<span style={{marginLeft: '22px'}}> {rating.productQuantity} kg</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Genel Değerlendirme: {rating.overallRating}
+                                       Değerlendirme: <span style={{marginLeft: '7px'}}>{rating.overallRating}</span>
                                     </Typography>
                                 </CardContent>
                             </Card>

@@ -259,6 +259,7 @@ const SowingDetails = () => {
                                 <Select
                                     value={selectedCategory}
                                     onChange={handleCategoryChange}
+                                    label="Kategori"
                                 >
                                     {categories.map((category) => (
                                         <MenuItem key={category.id} value={category.id}>
@@ -275,6 +276,7 @@ const SowingDetails = () => {
                                     onChange={handleChange}
                                     name="plantId"
                                     disabled={!selectedCategory}
+                                    label="Bitki"
                                 >
                                     {plants.map((plant) => (
                                         <MenuItem key={plant.id} value={plant.id}>

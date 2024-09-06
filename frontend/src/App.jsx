@@ -16,7 +16,6 @@ import Harvest from './components/Harvest.jsx';
 import Rating from './components/Rating.jsx';
 import RatingList from './components/RatingList.jsx';
 import './App.css';
-import myImage from './assets/background.jpg';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -66,7 +65,7 @@ function AppContent({ isLoggedIn, setIsLoggedIn }) {
             <NavbarWrapper isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
             <div className="main-content">
                 <Routes>
-                    <Route path="/" element={<Navigate to={isLoggedIn ? "/home" : "/login"} />} />
+                    <Route path="/" element={<Navigate to={isLoggedIn ? "/login" : "/login"} />} />
                     <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
                     <Route path="/add-land" element={isLoggedIn ? <AddLand /> : <Navigate to="/login" />} />
                     <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />

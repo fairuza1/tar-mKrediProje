@@ -162,12 +162,13 @@ const LandDetails = () => {
                                 margin="normal"
                             />
 
-                            <FormControl fullWidth margin="normal">
+                            <FormControl fullWidth margin="normal" variant="outlined">
                                 <InputLabel>İl</InputLabel>
                                 <Select
                                     name="city"
                                     value={land.city}
                                     onChange={handleChange}
+                                    label="İl"// bunun sayesinde çizginin arasında kalacak
                                 >
                                     {uniqueCities.map(il => (
                                         <MenuItem key={il} value={il}>{il}</MenuItem>
@@ -180,6 +181,7 @@ const LandDetails = () => {
                                     name="district"
                                     value={land.district}
                                     onChange={handleChange}
+                                    label="İlçe"
                                 >
                                     {ilceler.map((ilce, index) => (
                                         <MenuItem key={index} value={ilce}>{ilce}</MenuItem>
@@ -192,6 +194,7 @@ const LandDetails = () => {
                                     name="village"
                                     value={land.village || ''}
                                     onChange={handleChange}
+                                    label="Köy/Mahalle"
                                 >
                                     {koyler.map((koy, index) => (
                                         <MenuItem key={index} value={koy}>{koy}</MenuItem>

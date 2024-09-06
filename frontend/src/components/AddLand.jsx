@@ -103,8 +103,17 @@ function AddLand() {
                 setSnackbarMessage('Arazi başarıyla kaydedildi!');
                 setSnackbarSeverity('success');
                 setOpenSnackbar(true);
-                setTimeout(() => navigate('/land-list'), 3000);
-                resetForm();
+
+                // Yönlendirmeyi geciktiriyoruz ki kullanıcı formun başarıyla gönderildiğini görebilsin
+                setTimeout(() => {
+                    navigate('/land-list', {
+                        state: {
+                            message: 'Arazi başarıyla eklendi!',
+                            severity: 'success'
+                        }
+                    });
+                }, 1000); // 3 saniye bekle
+
             } else {
                 setSnackbarMessage('Arazi kaydedilemedi.');
                 setSnackbarSeverity('error');
@@ -116,6 +125,7 @@ function AddLand() {
             setOpenSnackbar(true);
         }
     };
+
 
     const resetForm = () => {
         setLandName('');

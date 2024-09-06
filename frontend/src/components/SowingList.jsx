@@ -331,25 +331,25 @@ const SowingList = () => {
                                             {land ? land.name : 'Bilinmiyor'}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Arazi Tipi: {land ? land.landType : 'Bilinmiyor'}
+                                             Arazi Tipi: <span style={{marginLeft: '11  px'}}>{land ? land.landType : 'Bilinmiyor'} </span>
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Kategori: {categoryName}
+                                            Kategori:<span style={{marginLeft: '17px'}}> {categoryName} </span>
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Bitki: {sowing.plantName}
+                                            Bitki: <span style={{marginLeft: '44px'}}>{sowing.plantName}</span>
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Arazi Alanı: {land ? land.landSize : 'Bilinmiyor'} m²
+                                            Arazi Alanı:<span style={{marginLeft: '7px'}}>{land ? land.landSize : 'Bilinmiyor'} m²</span>
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Ekilen Alan: {sowing.amount} m²
+                                            Ekilen Alan:<span style={{marginLeft: '4px'}}>{sowing.amount} m²</span>
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Boş Alan: {remainingSize < 0 ? 0 : remainingSize} m²
+                                            Boş Alan:<span style={{marginLeft: '20px'}}>{remainingSize < 0 ? 0 : remainingSize} m²</span>
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Ekim Tarihi: {new Date(sowing.sowingDate).toLocaleDateString()}
+                                            Ekim Tarihi:<span style={{marginLeft: '6px'}}>{new Date(sowing.sowingDate).toLocaleDateString()}</span>
                                         </Typography>
                                     </CardContent>
                                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
