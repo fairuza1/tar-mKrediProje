@@ -3,11 +3,10 @@ body {
     font-family: 'Arial', sans-serif;
 }
 .app-container {
-    /*min-height: 100vh;*/
+    min-height: 150vh;
     background-image: url('./assets/background.jpg');
-    background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
+    background-repeat: repeat;
 }
 .MuiAccordion-root::before {
     display: none;
