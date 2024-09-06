@@ -219,20 +219,20 @@ const LandList = () => {
                                         {land.name}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Boyut: <span style={{ marginLeft: '23px' }}>{land.landSize} hektar</span>
+                                        Boyut <span style={{ marginLeft: '23px' }}>:{land.landSize} hektar</span>
                                     </Typography>
 
                                     <Typography variant="body2" color="text.secondary">
-                                        Şehir: <span style={{ marginLeft: '25px' }}> {land.city}</span>
+                                        Şehir <span style={{ marginLeft: '25px' }}> :{land.city}</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        İlçe: <span style={{ marginLeft: '38px' }}> {land.district}</span>
+                                        İlçe <span style={{ marginLeft: '38px' }}> :{land.district}</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Köy:   <span style={{ marginLeft: '35px' }}>{land.village || 'Köy yok'}</span>
+                                        Köy   <span style={{ marginLeft: '35px' }}>:{land.village || 'Köy yok'}</span>
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Arazi Tipi: <span style={{ marginLeft: '0px' }}>{land.landType || 'N/A'}</span>
+                                        Arazi Tipi <span style={{ marginLeft: '0px' }}>:{land.landType || 'N/A'}</span>
                                     </Typography>
                                 </CardContent>
                                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
