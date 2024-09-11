@@ -36,8 +36,8 @@ public class LandService {
     @Autowired
     private UserRepository userRepository;
 
-    public Land saveLand(LandDTO landDto, MultipartFile imageFile) {
-        User user = userRepository.findById(landDto.getUserId())
+        public Land saveLand(LandDTO landDto, MultipartFile imageFile) {
+            User user = userRepository.findById(landDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Land land = new Land();
