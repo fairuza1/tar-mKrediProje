@@ -29,7 +29,7 @@ public class UserService {
 
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             String token = jwtUtil.generateToken(user.getUsername());
-            return new LoginResponse(token, user.getId(), user.getUsername()); // username'i yanıtla birlikte gönder
+            return new LoginResponse(token, user.getId(), user.getUsername());
         } else {
             throw new RuntimeException("Invalid credentials");
         }

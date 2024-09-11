@@ -1,18 +1,7 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
-import {
-    Avatar,
-    Button,
-    CssBaseline,
-    TextField,
-    Link,
-    Grid,
-    Box,
-    Typography,
-    Paper,
-    CircularProgress
-} from '@mui/material';
+import {Avatar, Button, CssBaseline, TextField, Link, Grid, Box, Typography, Paper, CircularProgress} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import backgroundImage
@@ -157,16 +146,11 @@ function Login({setIsLoggedIn}) {
                         <Typography component="h1" variant="h5">
                             Giriş </Typography>
                         {loading && (
-                            <CircularProgress size={24} sx={{mt: 2, mb: 2}}/>
+                            <CircularProgress size={59} sx={{mt: 2, mb: 2}} color={"success"}/>
                         )}
                         <Box component="form" noValidate onSubmit={handleLogin} sx={{mt: 1}}>
                             <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="username"
-                                label="Kullanıcı Adınızı veya E-postanızı Giriniz"
+                                variant="outlined" margin="normal" required fullWidth id="username" label="Kullanıcı Adınızı veya E-postanızı Giriniz"
                                 name="username"
                                 autoComplete="username"
                                 autoFocus
@@ -175,13 +159,7 @@ function Login({setIsLoggedIn}) {
                                 disabled={loading}
                             />
                             <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="password"
-                                label="Şifrenizi Giriniz"
-                                type="password"
+                                variant="outlined" margin="normal" required fullWidth name="password" label="Şifrenizi Giriniz" type="password"
                                 id="password"
                                 autoComplete="current-password"
                                 value={password}
@@ -213,14 +191,6 @@ function Login({setIsLoggedIn}) {
                                 disabled={loading}
                             >
                                 Giriş Yap
-                            </Button>
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                sx={{mt: 1, mb: 2, bgcolor: '#dc3545'}}
-                                disabled={loading}
-                            >
-                                E-Devlet ile Giriş Yap
                             </Button>
                             <Grid container justifyContent="flex-end">
                                 <Grid item>

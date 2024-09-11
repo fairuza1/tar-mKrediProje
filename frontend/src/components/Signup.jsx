@@ -71,9 +71,9 @@ function Signup() {
             }
         } catch (error) {
             if (error.response) {
-                setError(error.response.data.message || 'Bir hata oluştu');
+                setError(error.response.data.message || 'kullanıcı adı veya mail zaten mevcut');
             } else {
-                setError('Bir hata oluştu');
+                setError(' kullanıcı adı veya mail zaten mevcut.');
             }
             setLoading(false);
         }
@@ -217,9 +217,9 @@ function Signup() {
                                 disabled={loading}
                             />
                             <TextField
-                                variant="outlined"
+                                // variant="outlined"
                                 margin="normal"
-                                required
+                                required //yıldız işareti verir
                                 fullWidth
                                 id="email"
                                 label="Email"
@@ -230,20 +230,9 @@ function Signup() {
                                 onChange={handleEmailChange}
                                 disabled={loading}
                             />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                fullWidth
-                                id="phoneNumber"
-                                label="Telefon Numarası"
-                                name="phoneNumber"
-                                autoComplete="phoneNumber"
-                                value={phoneNumber}
-                                onChange={(e) => setPhoneNumber(e.target.value)}
-                                disabled={loading}
-                            />
+
                             {error && (
-                                <Typography variant="body2" color="error" align="center">
+                                <Typography variant="body2" color="error" align="center" >
                                     {error}
                                 </Typography>
                             )}

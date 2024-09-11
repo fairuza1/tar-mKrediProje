@@ -11,7 +11,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom'; // useLocation import et
 import axios from 'axios';
 import Logo from '../assets/logo.png'; // Logo dosyasının yolu
 
@@ -29,6 +29,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [username, setUsername] = useState(''); // Kullanıcı adını tutmak için state
     const navigate = useNavigate();
+    const location = useLocation(); // Mevcut sayfayı almak için useLocation hook'u kullanılıyor
 
     // localStorage'den username'i çek
     useEffect(() => {
@@ -152,7 +153,17 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                             <Button
                                 key={page.link}
                                 onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: 'white', display: 'block', fontFamily: 'Poppins, sans-serif' }}
+                                sx={{
+                                    my: 2,
+                                    backgroundColor: location.pathname === `/${page.link}` ? 'white' : 'transparent', // Arkaplan rengi beyaz
+                                    color: location.pathname === `/${page.link}` ? 'green' : 'white', // Yazı rengi yeşil
+                                    display: 'block',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    '&:hover': { // Hover olduğunda arkaplan rengi beyaz, yazı rengi yeşil
+                                        backgroundColor: 'white',
+                                        color: 'green'
+                                    }
+                                }}
                                 component={Link}
                                 to={`/${page.link}`}
                             >
@@ -161,10 +172,11 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                         ))}
                     </Box>
 
+
                     <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', ml: 'auto' }}> {/* ml: 'auto' ile sağa kaydır */}
                         {username && (
-                            <Typography sx={{ color: 'white', marginRight: '10px', fontWeight: 'bold' }}> {/* fontWeight: 'bold' ile kalın */}
-                                Merhaba, {username}
+                            <Typography sx={{ fontSize:30, color: 'black', marginRight: '10px', fontWeight: 'bold' ,backgroundColor:"b" }}> {/* fontWeight: 'bold' ile kalın */}
+                                Merhaba , {username}
                             </Typography>
                         )}
                         <Tooltip title="Ayarlar">

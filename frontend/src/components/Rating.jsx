@@ -284,7 +284,7 @@ const Rating = () => {
             </Box>
 
             <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%', fontSize: '1.2rem' }}>
+                <Alert onClose={handleSnackbarClose}  anchorOrigin={{ vertical: 'top', horizontal: 'center' }} severity={snackbarSeverity} sx={{ width: '100%', fontSize: '1.2rem' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

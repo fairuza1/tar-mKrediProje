@@ -22,14 +22,14 @@ public class Sowing {
 
     @ManyToOne
     @JoinColumn(name = "land_id", nullable = false)
-    @JsonBackReference  // Bu alan serileştirilirken görmezden gelinir
+    @JsonBackReference
     private Land land;
 
     @Column(nullable = false)
     private LocalDate sowingDate;
 
     @Column(nullable = false)
-    private int amount; // amount alanını ekleyin
+    private int amount;
 
     @OneToMany(mappedBy = "sowing", cascade = CascadeType.REMOVE)
     private List<Harvest> harvests;
