@@ -14,21 +14,15 @@ public class Land {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
     @Column(nullable = false, length = 50)
     String name;
-
     @Column(nullable = false)
     int landSize;
-
     @Column(nullable = false)
     String city;
-
     @Column(nullable = false)
     String district;
-
     private String landType;
-
     String village;
 
     @Column(nullable = false)

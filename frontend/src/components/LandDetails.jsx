@@ -16,6 +16,7 @@ import {
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import ilIlceData from '../Data/il-ilce.json';
 import koylerData from '../Data/koyler.json';
+import ScrollToTop from "./ScrollToTop.jsx";
 
 const LandDetails = () => {
     const { id } = useParams();
@@ -135,7 +136,9 @@ const LandDetails = () => {
                 <Typography variant="h4" component="h2" gutterBottom>
                     {isEditing ? 'Arazi Bilgilerini Düzenle' : ''}
                 </Typography>
+
                 <Paper elevation={3} sx={{ p: 2 }}>
+
                     {isEditing ? (
                         <>
                             <TextField
@@ -155,9 +158,6 @@ const LandDetails = () => {
                                 onChange={handleChange}
                                 margin="normal"
                             />
-                            <Typography variant="body1">
-                                Kalan Alan: {land.remainingArea} m²
-                            </Typography>
 
                             <FormControl fullWidth margin="normal" variant="outlined">
                                 <InputLabel>İl</InputLabel>
@@ -227,6 +227,8 @@ const LandDetails = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            <ScrollToTop />
+
         </Container>
     );
 };

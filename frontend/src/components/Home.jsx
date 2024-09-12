@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import BreadcrumbComponent from "./BreadCrumb";
 import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
-
+import ScrollToTop from './ScrollToTop'; // ScrollToTop bileşeni
 import card1 from '../assets/card1.jpg';
 import card2 from '../assets/card2.jpg';
 import card3 from '../assets/card3.jpg';
@@ -47,19 +47,21 @@ function Home() {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 justifyContent: 'space-between',
-                                boxShadow: 3,
-                                borderRadius: 2,
+                                boxShadow: 20,
+                                borderRadius: 4,
                                 fontFamily: 'Poppins, sans-serif',
+
+
                             }}
                         >
                             <CardMedia
                                 component="img"
-                                height="200"
+                                height="220"
                                 image={card.image}
                                 alt={card.title}
                             />
                             <CardContent sx={{ flexGrow: 1 }}>
-                                <Typography gutterBottom variant="h5" component="div" sx={{ fontFamily: 'Poppins, sans-serif' }}>
+                                <Typography gutterBottom variant="h3" component="div" sx={{ fontFamily: 'Poppins, sans-serif' }}>
                                     {card.title}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary" paragraph sx={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -72,11 +74,13 @@ function Home() {
                                             fullWidth
                                             size="large"
                                             sx={{
-                                                backgroundColor: 'green',
+                                                backgroundColor: '#00c400',
                                                 color: 'white',
                                                 fontFamily: 'Poppins, sans-serif',
                                                 '&:hover': {
                                                     backgroundColor: 'darkgreen',
+
+
                                                 },
                                             }}
                                         >
@@ -89,6 +93,7 @@ function Home() {
                     </Grid>
                 ))}
             </Grid>
+            <ScrollToTop />
         </Container>
     );
 }
