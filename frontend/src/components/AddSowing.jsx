@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Container, Typography, Box, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert, Table, TableBody, TableCell, TableHead, TableRow, Grid, Avatar, TableSortLabel } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, MenuItem, FormControl, InputLabel, Select, Snackbar, Alert, Table, TableBody, TableCell, TableHead, TableRow, Grid, Avatar, TableSortLabel, TablePagination } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbComponent from "./BreadCrumb";
@@ -21,6 +21,8 @@ function AddSowing() {
     const [recommendations, setRecommendations] = useState([]);
     const [sortBy, setSortBy] = useState('plantName');
     const [sortOrder, setSortOrder] = useState('asc');
+    const [page, setPage] = useState(0); // Sayfalama için state
+    const [rowsPerPage, setRowsPerPage] = useState(5); // Sayfa başına gösterilecek öğe sayısı
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -137,10 +139,23 @@ function AddSowing() {
         });
     };
 
+    const paginatedRecommendations = sortRecommendations(recommendations).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage); // Sayfalama
+
     const handleSort = (column) => {
         const isAsc = sortBy === column && sortOrder === 'asc';
         setSortOrder(isAsc ? 'desc' : 'asc');
         setSortBy(column);
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+        window.scrollTo(0, 0); // Sayfa değişince en üste kaydır
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+        window.scrollTo(0, 0); // Satır sayısı değişince de en üste kaydır
     };
 
     const handleAddSowing = async (e, redirect = true) => {
@@ -302,51 +317,63 @@ function AddSowing() {
                         Önerilen Bitkiler
                     </Typography>
                     {recommendations.length > 0 ? (
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell align="center">
-                                        <TableSortLabel
-                                            active={sortBy === 'plantName'}
-                                            direction={sortBy === 'plantName' ? sortOrder : 'asc'}
-                                            onClick={() => handleSort('plantName')}
-                                        >
-                                            Bitki
-                                        </TableSortLabel>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <TableSortLabel
-                                            active={sortBy === 'score'}
-                                            direction={sortBy === 'score' ? sortOrder : 'asc'}
-                                            onClick={() => handleSort('score')}
-                                        >
-                                            Puan
-                                        </TableSortLabel>
-                                    </TableCell>
-                                    <TableCell align="right">Metrekare Başına Ürün (kg/m²)</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {sortRecommendations(recommendations).map(([plantName, score], index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>
-                                            <Box display="flex" alignItems="center">
-                                                <Avatar
-                                                    src={`/images/Plant/${plantName.toLowerCase()}.jpg`}
-                                                    alt={plantName}
-                                                    sx={{ mr: 2 }}
-                                                />
-                                                {plantName}
-                                            </Box>
+                        <>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="center">
+                                            <TableSortLabel
+                                                active={sortBy === 'plantName'}
+                                                direction={sortBy === 'plantName' ? sortOrder : 'asc'}
+                                                onClick={() => handleSort('plantName')}
+                                            >
+                                                Bitki
+                                            </TableSortLabel>
                                         </TableCell>
-                                        <TableCell align="right">{(score * 20).toFixed(2)}%</TableCell>
                                         <TableCell align="right">
-                                            {yieldPerSquareMeterByPlant[plantName] ? yieldPerSquareMeterByPlant[plantName].toFixed(2) : 'N/A'} kg/m²
+                                            <TableSortLabel
+                                                active={sortBy === 'score'}
+                                                direction={sortBy === 'score' ? sortOrder : 'asc'}
+                                                onClick={() => handleSort('score')}
+                                            >
+                                                Puan
+                                            </TableSortLabel>
                                         </TableCell>
+                                        <TableCell align="right">Metrekare Başına Ürün (kg/m²)</TableCell>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHead>
+                                <TableBody>
+                                    {paginatedRecommendations.map(([plantName, score], index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <Box display="flex" alignItems="center">
+                                                    <Avatar
+                                                        src={`/images/Plant/${plantName.toLowerCase()}.jpg`}
+                                                        alt={plantName}
+                                                        sx={{ mr: 2 }}
+                                                    />
+                                                    {plantName}
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell align="right">{(score * 20).toFixed(2)}%</TableCell>
+                                            <TableCell align="right">
+                                                {yieldPerSquareMeterByPlant[plantName] ? yieldPerSquareMeterByPlant[plantName].toFixed(2) : 'N/A'} kg/m²
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            <TablePagination
+                                component="div"
+                                count={recommendations.length}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                rowsPerPage={rowsPerPage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                labelRowsPerPage="Sayfa başına satır"
+                                rowsPerPageOptions={[5, 7,10]} // Sayfa başına gösterilecek bitki
+                            />
+                        </>
                     ) : (
                         <Typography variant="body1">
                             Seçilen arazi için öneri bulunmamaktadır.

@@ -26,9 +26,11 @@ function App() {
             try {
                 const response = await fetch('/auth/validate-token', {
                     method: 'GET',
-                    credentials: 'include',
+                    credentials: 'include', // JWT'yi içeren cookie'yi gönderir
                 });
-                if (response.ok) {
+                const result = await response.json();
+
+                if (response.ok && result.isValid) {
                     setIsLoggedIn(true);
                 } else {
                     setIsLoggedIn(false);
@@ -55,9 +57,8 @@ function App() {
 }
 
 function AppContent({ isLoggedIn, setIsLoggedIn }) {
-    const location = useLocation(); // Router'ın içinde olduğumuz için bu hook burada çalışacak
+    const location = useLocation();
 
-    // Arka plan resmini sadece login ve signup dışında göstermeyi kontrol ediyoruz
     const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
     return (
@@ -65,7 +66,7 @@ function AppContent({ isLoggedIn, setIsLoggedIn }) {
             <NavbarWrapper isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
             <div className="main-content">
                 <Routes>
-                    <Route path="/" element={<Navigate to={isLoggedIn ? "/login" : "/login"} />} />
+                    <Route path="/" element={<Navigate to={isLoggedIn ? "/home" : "/login"} />} />
                     <Route path="/home" element={isLoggedIn ? <Home /> : <Navigate to="/login" />} />
                     <Route path="/add-land" element={isLoggedIn ? <AddLand /> : <Navigate to="/login" />} />
                     <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
@@ -78,7 +79,6 @@ function AppContent({ isLoggedIn, setIsLoggedIn }) {
                     <Route path="/harvest" element={isLoggedIn ? <Harvest /> : <Navigate to="/login" />} />
                     <Route path="/rating/:harvestId" element={isLoggedIn ? <Rating /> : <Navigate to="/login" />} />
                     <Route path="/rating-list" element={isLoggedIn ? <RatingList /> : <Navigate to="/login" />} />
-
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
                 </Routes>
