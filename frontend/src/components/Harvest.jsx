@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // useRef import edildi
 import {
     Container,
     Typography,
@@ -16,7 +16,8 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Slider
+    Slider,
+    Pagination
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
@@ -39,7 +40,15 @@ const Harvest = ({ onSowingUpdate }) => {
     const [filterLand, setFilterLand] = useState('');
     const [filterAreaRange, setFilterAreaRange] = useState([0, 10000]);
 
+    // Sayfalama durumları
+    const [page, setPage] = useState(1);
+    const [rowsPerPage] = useState(6);
+    const [totalPages, setTotalPages] = useState(0);
+
     const userId = parseInt(localStorage.getItem('userId')); // Kullanıcı ID'sini al
+
+    // Sayfanın başına kaydırma işlemi için kullanılacak ref
+    const topRef = useRef(null); // Ref tanımlandı
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -64,6 +73,7 @@ const Harvest = ({ onSowingUpdate }) => {
         fetchAllData();
     }, []);
 
+    // Getland ve getsowing fonksiyonları
     const getLand = (landId) => lands.find(land => land.id === landId);
     const getSowing = (sowingId) => sowings.find(sowing => sowing.id === sowingId);
 
@@ -75,6 +85,12 @@ const Harvest = ({ onSowingUpdate }) => {
         const matchesArea = sowing ? sowing.amount >= filterAreaRange[0] && sowing.amount <= filterAreaRange[1] : true;
         return land && land.userId === userId && matchesLand && matchesArea; // Sadece kullanıcıya ait ve filtreye uyan verileri döndür
     });
+
+    // Sayfalama işlemi
+    const paginatedHarvests = filteredHarvests.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+    useEffect(() => {
+        setTotalPages(Math.ceil(filteredHarvests.length / rowsPerPage));
+    }, [filteredHarvests, rowsPerPage]);
 
     const handleDelete = async (harvestId, sowingId) => {
         try {
@@ -112,8 +128,18 @@ const Harvest = ({ onSowingUpdate }) => {
         setAccordionOpen(isExpanded);
     };
 
+    // Sayfa değiştiğinde scroll'u sayfanın başına kaydırma
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        if (topRef.current) {
+            topRef.current.scrollIntoView({ behavior: 'smooth' }); // Sayfanın başına smooth bir şekilde kaydırma
+        }
+    };
+
     return (
         <Container maxWidth="lg">
+            {/* Sayfanın en üstüne yerleştirilecek ref */}
+            <div ref={topRef}></div> {/* Ref burada kullanıldı */}
             <Box sx={{ mt: 3 }}>
                 <BreadcrumbComponent pageName="Hasatlar" />
             </Box>
@@ -124,15 +150,7 @@ const Harvest = ({ onSowingUpdate }) => {
                 onChange={handleAccordionChange}
                 sx={{
                     mt: 3,
-                    mb: 3,
-                    boxShadow: accordionOpen ? 'none' : '8px 8px 16px rgba(0, 0, 0, 0.2)', // Gölgelendirme efekti
-                    background: 'linear-gradient(145deg, #ffffff, #f0f0f0)', // Gradient arka plan
-                    borderRadius: '12px', // Köşeleri yuvarlat
-                    '&:hover': {
-                        boxShadow: accordionOpen ? 'none' : '12px 12px 24px rgba(0, 0, 0, 0.3)', // Hover efekti
-                        transform: accordionOpen ? 'none' : 'translateY(-4px)', // Hover animasyonu
-                    },
-                    padding: accordionOpen ? '0' : '16px',
+                    mb: 3
                 }}
             >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
@@ -187,65 +205,64 @@ const Harvest = ({ onSowingUpdate }) => {
                         <CircularProgress />
                     </Box>
                 ) : (
-                    <Grid container spacing={3}>
-                        {filteredHarvests.map((harvest) => {
-                            const sowing = getSowing(harvest.sowingId);
-                            const land = sowing ? getLand(sowing.landId) : null;
+                    <>
+                        <Grid container spacing={3}>
+                            {paginatedHarvests.map((harvest) => {
+                                const sowing = getSowing(harvest.sowingId);
+                                const land = sowing ? getLand(sowing.landId) : null;
 
-                            return (
-                                <Grid item xs={12} sm={6} md={4} key={harvest.id}>
-                                    <Card
-                                        sx={{
-                                            maxWidth: 345,
-                                            boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)', // Gölgelendirme efekti
-                                            background: 'linear-gradient(145deg, #ffffff, #f0f0f0)', // Gradient arka plan
-                                            borderRadius: '12px',
-                                            '&:hover': {
-                                                boxShadow: '12px 12px 24px rgba(0, 0, 0, 0.3)', // Hover'da derin gölge
-                                                transform: 'translateY(-4px)', // Hover animasyonu
-                                            },
-                                            padding: '16px',
-                                        }}
-                                    >
-                                        <CardMedia
-                                            component="img"
-                                            height="140"
-                                            image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
-                                            alt={land?.name || 'Unknown Land'}
-                                            sx={{ borderRadius: "8px" }}
-                                        />
-                                        <CardContent>
-                                            <Typography gutterBottom variant="h5" component="div">
-                                                {land ? land.name : 'Bilinmiyor'}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Arazi Tipi<span style={{marginLeft: '20px'}}> :{land ? land.landType : 'Bilinmiyor'}</span>
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Bitki <span style={{marginLeft: '54px'}}>:{sowing ? sowing.plantName : 'Bilinmiyor'}</span>
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Ekilen Alan<span style={{marginLeft: '8px'}}>   : {sowing ? sowing.amount : 'Bilinmiyor'} m²</span>
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Hasat Tarihi<span
-                                                style={{marginLeft: '2px'}}> :{new Date(harvest.harvestDate).toLocaleDateString()}</span>
-                                            </Typography>
-                                        </CardContent>
-                                        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                                            <Button
-                                                variant="contained"
-                                                color="error"
-                                                onClick={() => handleDelete(harvest.id, sowing.id)}
-                                            >
-                                                Sil
-                                            </Button>
-                                        </Box>
-                                    </Card>
-                                </Grid>
-                            );
-                        })}
-                    </Grid>
+                                return (
+                                    <Grid item xs={12} sm={6} md={4} key={harvest.id}>
+                                        <Card>
+                                            <CardMedia
+                                                component="img"
+                                                height="250"
+                                                image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
+                                                alt={land?.name || 'Unknown Land'}
+                                                sx={{ borderRadius: "8px" }}
+                                            />
+                                            <CardContent>
+                                                <Typography gutterBottom variant="h5" component="div">
+                                                    {land ? land.name : 'Bilinmiyor'}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Arazi Tipi<span style={{marginLeft: '20px'}}> :{land ? land.landType : 'Bilinmiyor'}</span>
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Bitki <span style={{marginLeft: '54px'}}>:{sowing ? sowing.plantName : 'Bilinmiyor'}</span>
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Ekilen Alan<span style={{marginLeft: '8px'}}>   : {sowing ? sowing.amount : 'Bilinmiyor'} m²</span>
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Hasat Tarihi<span
+                                                    style={{marginLeft: '2px'}}> :{new Date(harvest.harvestDate).toLocaleDateString()}</span>
+                                                </Typography>
+                                            </CardContent>
+                                            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                                                <Button
+                                                    variant="contained"
+                                                    color="error"
+                                                    onClick={() => handleDelete(harvest.id, sowing.id)}
+                                                >
+                                                    Sil
+                                                </Button>
+                                            </Box>
+                                        </Card>
+                                    </Grid>
+                                );
+                            })}
+                        </Grid>
+                        {/* Sayfalama bileşeni */}
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                            <Pagination
+                                count={totalPages}
+                                page={page}
+                                onChange={handlePageChange} // Sayfa değiştiğinde scroll işlemi yapacak
+                                color="primary"
+                            />
+                        </Box>
+                    </>
                 )}
             </Box>
             <Snackbar
@@ -257,7 +274,7 @@ const Harvest = ({ onSowingUpdate }) => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
-            <ScrollToTop/>
+            <ScrollToTop /> {/* ScrollToTop bileşenini sayfanın en sonuna yerleştirdik */}
         </Container>
     );
 };

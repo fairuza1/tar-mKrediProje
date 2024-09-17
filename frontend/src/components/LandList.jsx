@@ -19,7 +19,8 @@ import {
     MenuItem,
     Accordion,
     AccordionSummary,
-    AccordionDetails
+    AccordionDetails,
+    TablePagination
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -37,10 +38,11 @@ const LandList = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [landToDelete, setLandToDelete] = useState(null);
     const [accordionOpen, setAccordionOpen] = useState(false);
-
     const [filterCity, setFilterCity] = useState('');
     const [filterDistrict, setFilterDistrict] = useState('');
     const [filterName, setFilterName] = useState('');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
 
     const navigate = useNavigate();
     const location = useLocation(); // Yönlendirme ile gelen mesaj ve durumu yakalayacağız.
@@ -123,7 +125,18 @@ const LandList = () => {
         return matchesCity && matchesDistrict && matchesName;
     });
 
-    const StyledCard = styled(Card)({
+    const paginatedLands = filteredLands.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const StyledCard = styled(Card)(({
         maxWidth: 345,
         boxShadow: '8px 8px 16px rgba(0, 0, 0, 0.2)',
         background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
@@ -135,7 +148,8 @@ const LandList = () => {
             position: 'relative',
             zIndex: 1000,
         },
-    });
+    }));
+
     return (
         <Container maxWidth="lg" sx={{ marginBottom: "60px" }}>
             <Box>
@@ -204,7 +218,7 @@ const LandList = () => {
                     Araziler Listesi
                 </Typography>
                 <Grid container spacing={3}>
-                    {filteredLands.map((land) => (
+                    {paginatedLands.map((land) => (
                         <Grid item xs={12} sm={6} md={4} key={land.id}>
                             <StyledCard>
                                 <CardMedia
@@ -247,6 +261,17 @@ const LandList = () => {
                         </Grid>
                     ))}
                 </Grid>
+                <TablePagination
+                    sx={{marginTop:'30px',paddingTop:'20px'}}
+                    component="div"
+                    count={filteredLands.length}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    labelRowsPerPage="Sayfa başına satır"
+                    rowsPerPageOptions={[5, 10, 15]}
+                />
             </Box>
 
             <Snackbar

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     Container,
     Typography,
@@ -16,11 +16,11 @@ import {
     Slider,
     Accordion,
     AccordionSummary,
-    AccordionDetails
+    AccordionDetails,
+    Pagination
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
-import ScrollToTop from './ScrollToTop'; // ScrollToTop bileşeni buraya import edilecek
 
 const RatingList = () => {
     const [ratings, setRatings] = useState([]);
@@ -32,14 +32,20 @@ const RatingList = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-    const [accordionOpen, setAccordionOpen] = useState(false); // Accordion durumunu takip eder
+    const [accordionOpen, setAccordionOpen] = useState(false);
 
     // Filtreleme durumları
     const [filterLand, setFilterLand] = useState('');
     const [filterPlant, setFilterPlant] = useState('');
     const [filterRating, setFilterRating] = useState([0, 5]);
 
+    // Sayfalama durumları
+    const [page, setPage] = useState(1);
+    const [rowsPerPage] = useState(6);
+    const [totalPages, setTotalPages] = useState(0);
+
     const userId = parseInt(localStorage.getItem('userId')); // Kullanıcı ID'sini al
+    const topRef = useRef(null); // Ref tanımlandı
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -72,11 +78,11 @@ const RatingList = () => {
 
     // Kullanıcının ekmiş olduğu bitkileri filtreleyin ve tekrarlananları kaldırın
     const userSownPlants = Array.from(
-        new Set( // Set yapısı kullanılarak tekrar eden bitki adları kaldırılır
+        new Set(
             sowings
                 .filter(sowing => lands.find(land => land.id === sowing.landId)?.userId === userId)
                 .map(sowing => plants.find(plant => plant.id === sowing.plantId)?.name)
-                .filter(Boolean) // Undefined olanları filtrele
+                .filter(Boolean)
         )
     ).map(plantName => plants.find(plant => plant.name === plantName));
 
@@ -108,6 +114,12 @@ const RatingList = () => {
         return land && land.userId === userId && matchesLand && matchesPlant && matchesRating;
     });
 
+    // Sayfalama işlemi
+    const paginatedRatings = filteredRatings.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+    useEffect(() => {
+        setTotalPages(Math.ceil(filteredRatings.length / rowsPerPage));
+    }, [filteredRatings, rowsPerPage]);
+
     const getSowing = (sowingId) => sowings.find(sowing => sowing.id === sowingId);
     const getLand = (landId) => lands.find(land => land.id === landId);
     const getPlantName = (plantId) => plants.find(plant => plant.id === plantId)?.name || 'Bilinmiyor';
@@ -120,13 +132,22 @@ const RatingList = () => {
         setFilterRating(newValue);
     };
 
-    // Accordion açık/kapalı durumu değiştiğinde stil değiştir
     const handleAccordionChange = (event, isExpanded) => {
         setAccordionOpen(isExpanded);
     };
 
+    // Sayfa değiştiğinde scroll'u sayfanın başına kaydırma
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        if (topRef.current) {
+            topRef.current.scrollIntoView({ behavior: 'smooth' }); // Sayfanın başına smooth bir şekilde kaydırma
+        }
+    };
+
     return (
         <Container maxWidth="lg">
+            <div ref={topRef}></div> {/* Ref burada kullanıldı */}
+
             <Typography variant="h4" component="h1" gutterBottom>
                 Değerlendirme Listesi
             </Typography>
@@ -145,8 +166,8 @@ const RatingList = () => {
                     },
                     padding: accordionOpen ? '0' : '16px',
                 }}
-                expanded={accordionOpen} // Accordion'un açık/kapalı durumunu takip eder
-                onChange={handleAccordionChange} // Accordion durum değişikliğini ele alır
+                expanded={accordionOpen}
+                onChange={handleAccordionChange}
             >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
                     <Typography>Filtreleme Seçenekleri</Typography>
@@ -207,72 +228,87 @@ const RatingList = () => {
                 </AccordionDetails>
             </Accordion>
 
-            <Grid container spacing={3}>
-                {filteredRatings.map((rating) => {
-                    const harvest = harvests.find(h => h.id === rating.harvestId);
-                    const sowing = harvest ? getSowing(harvest.sowingId) : null;
-                    const land = sowing ? getLand(sowing.landId) : null;
-                    const plantName = sowing ? getPlantName(sowing.plantId) : 'Bilinmiyor';
+            {/* Listeleme bölümü */}
+            {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <Grid container spacing={2}>
+                    {paginatedRatings.map((rating) => {
+                        const harvest = harvests.find(h => h.id === rating.harvestId);
+                        const sowing = harvest ? getSowing(harvest.sowingId) : null;
+                        const land = sowing ? getLand(sowing.landId) : null;
+                        const plantName = sowing ? getPlantName(sowing.plantId) : 'Bilinmiyor';
 
-                    return (
-                        <Grid item xs={12} sm={6} md={4} key={rating.harvestId}>
-                            <Card
-                                sx={{
-                                    maxWidth: 345,
-                                    boxShadow: accordionOpen ? 'none' : '8px 8px 16px rgba(0, 0, 0, 0.2)',
-                                    background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
-                                    borderRadius: '12px',
-                                    '&:hover': {
-                                        boxShadow: accordionOpen ? 'none' : '12px 12px 24px rgba(0, 0, 0, 0.3)',
-                                        transform: accordionOpen ? 'none' : 'translateY(-4px)',
-                                    },
-                                    padding: accordionOpen ? '0' : '16px',
-                                }}
-                            >
-                                <CardMedia
-                                    component="img"
-                                    height="140"
-                                    image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
-                                    alt={land?.name || 'Unknown Land'}
-                                    sx={{ borderRadius: "8px" }}
-                                />
-                                <CardHeader
-                                    title={`Arazi Adı: ${land ? land.name : 'Bilinmiyor'}`}
-                                    subheader={`Arazi Türü: ${land ? land.landType : 'Bilinmiyor'}`}
-                                />
+                        return (
+                            <Grid item xs={12} sm={6} md={4} key={rating.harvestId}>
+                                <Card
+                                    sx={{
+                                        maxWidth: 345,
+                                        boxShadow: accordionOpen ? 'none' : '8px 8px 16px rgba(0, 0, 0, 0.2)',
+                                        background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+                                        borderRadius: '12px',
+                                        '&:hover': {
+                                            boxShadow: accordionOpen ? 'none' : '12px 12px 24px rgba(0, 0, 0, 0.3)',
+                                            transform: accordionOpen ? 'none' : 'translateY(-4px)',
+                                        },
+                                        padding: accordionOpen ? '0' : '16px',
+                                    }}
+                                >
+                                    <CardMedia
+                                        component="img"
+                                        height="140"
+                                        image={land?.imageUrl || "../../src/assets/DefaultImage/DefaultImage.jpg"}
+                                        alt={land?.name || 'Unknown Land'}
+                                        sx={{ borderRadius: "8px" }}
+                                    />
+                                    <CardHeader
+                                        title={`Arazi Adı: ${land ? land.name : 'Bilinmiyor'}`}
+                                        subheader={`Arazi Türü: ${land ? land.landType : 'Bilinmiyor'}`}
+                                    />
+                                    <CardContent>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Bitki Adı <span style={{ marginLeft: '51px' }}>:{plantName}</span>
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Ekilen Alan <span style={{ marginLeft: '30px' }}>:{sowing ? sowing.amount : 'Bilinmiyor'} m²</span>
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Hasat Koşulları<span style={{ marginLeft: '6px' }}>:{rating.harvestCondition}</span>
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Ürün Kalitesi<span style={{ marginLeft: '19px' }}>:{rating.productQuality}</span>
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Ürün Miktarı<span style={{ marginLeft: '22px' }}>:{rating.productQuantity} kg</span>
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Değerlendirme<span style={{ marginLeft: '5px' }}>:{rating.overallRating}</span>
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        );
+                    })}
+                </Grid>
+            )}
 
-                                <CardContent>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Bitki Adı <span style={{marginLeft: '51px'}}>:{plantName}</span>
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Ekilen Alan <span style={{marginLeft: '30px'}}>:{sowing ? sowing.amount : 'Bilinmiyor'} m²</span>
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Hasat Koşulları<span style={{marginLeft: '6px'}}>:{rating.harvestCondition}</span>
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Ürün Kalitesi<span style={{marginLeft: '19px'}}>:{rating.productQuality}</span>
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Ürün Miktarı<span style={{marginLeft: '22px'}}>:{rating.productQuantity} kg</span>
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                       Değerlendirme<span style={{marginLeft: '5px'}}>:{rating.overallRating}</span>
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    );
-                })}
-            </Grid>
+            {/* Sayfalama bileşeni */}
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={handlePageChange}
+                    color="primary"
+                />
+            </Box>
 
-            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}  anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
                 <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
-            <ScrollToTop />
         </Container>
     );
 };

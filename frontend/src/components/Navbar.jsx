@@ -175,7 +175,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
 
                     <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', ml: 'auto' }}> {/* ml: 'auto' ile sağa kaydır */}
                         {username && (
-                            <Typography sx={{ fontSize:30, color: 'black', marginRight: '10px', fontWeight: 'bold' ,backgroundColor:"b" }}> {/* fontWeight: 'bold' ile kalın */}
+                            <Typography sx={{ fontSize:30, color: 'white', marginRight: '10px', fontWeight: 'bold' ,backgroundColor:"b" }}> {/* fontWeight: 'bold' ile kalın */}
                                 Merhaba , {username}
                             </Typography>
                         )}

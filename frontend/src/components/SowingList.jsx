@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
     Container,
     Typography,
@@ -15,7 +15,8 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Slider
+    Slider,
+    Pagination
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
@@ -41,7 +42,11 @@ const SowingList = () => {
     const [filterHarvested, setFilterHarvested] = useState('');
     const [filterAreaRange, setFilterAreaRange] = useState([0, 10000]);
 
+    const [page, setPage] = useState(1);
+    const [itemsPerPage] = useState(6); // Kart başına gösterilecek öğe sayısı
+
     const navigate = useNavigate();
+    const topRef = useRef(null); // Ref tanımlandı
 
     useEffect(() => {
         const fetchData = async () => {
@@ -195,9 +200,23 @@ const SowingList = () => {
         return matchesLand && matchesPlant && matchesDate && matchesHarvested && matchesArea;
     });
 
+    // Sayfalamaya uygun verileri al
+    const paginatedSowings = filteredSowings.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+    const totalPages = Math.ceil(filteredSowings.length / itemsPerPage);
+
+    // Sayfa değiştiğinde scroll'u sayfanın başına kaydırma
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        if (topRef.current) {
+            topRef.current.scrollIntoView({ behavior: 'smooth' }); // Sayfanın başına smooth bir şekilde kaydırma
+        }
+    };
+
     return (
         <Container maxWidth="lg">
-            <Box>
+            <div ref={topRef}></div> {/* Ref burada kullanıldı */}
+
+            <Box sx={{ mt: 3 }}>
                 <BreadcrumbComponent pageName="Ekimlerim" />
             </Box>
 
@@ -299,7 +318,7 @@ const SowingList = () => {
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
                 <Grid container spacing={3}>
-                    {filteredSowings.map((sowing) => {
+                    {paginatedSowings.map((sowing) => {
                         const land = getLand(sowing.landId);
                         const remainingSize = getRemainingSize(sowing.landId);
                         const isHarvested = harvestedSowings.includes(sowing.id);
@@ -331,7 +350,7 @@ const SowingList = () => {
                                             {land ? land.name : 'Bilinmiyor'}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                             Arazi Tipi  <span style={{marginLeft: '15px'}}> :{land ? land.landType : 'Bilinmiyor'} </span>
+                                            Arazi Tipi  <span style={{marginLeft: '15px'}}> :{land ? land.landType : 'Bilinmiyor'} </span>
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
                                             Kategori<span style={{marginLeft: '19px'}}> :{categoryName} </span>
@@ -371,6 +390,15 @@ const SowingList = () => {
                         );
                     })}
                 </Grid>
+                {/* Pagination */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={handlePageChange} // Sayfa değiştiğinde scroll işlemi yapacak
+                        color="primary"
+                    />
+                </Box>
             </Box>
 
             <Snackbar
@@ -389,3 +417,4 @@ const SowingList = () => {
 };
 
 export default SowingList;
+
