@@ -133,10 +133,6 @@ const SowingDetails = () => {
         return selectedDate >= minDate && selectedDate <= maxDate;
     };
 
-    const handleCancel = () => {
-        setIsEditing(false);
-    };
-
     const handleNavigateToDetails = () => {
         navigate('/sowing-list');
     };

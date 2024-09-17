@@ -371,7 +371,7 @@ function AddSowing() {
                                 rowsPerPage={rowsPerPage}
                                 onRowsPerPageChange={handleChangeRowsPerPage}
                                 labelRowsPerPage="Sayfa başına satır"
-                                rowsPerPageOptions={[5, 7,10]} // Sayfa başına gösterilecek bitki
+                                rowsPerPageOptions={[3,5,7,10]} // Sayfa başına gösterilecek bitki
                             />
                         </>
                     ) : (
