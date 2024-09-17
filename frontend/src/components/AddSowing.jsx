@@ -21,8 +21,9 @@ function AddSowing() {
     const [recommendations, setRecommendations] = useState([]);
     const [sortBy, setSortBy] = useState('plantName');
     const [sortOrder, setSortOrder] = useState('asc');
-    const [page, setPage] = useState(0); // Sayfalama için state
-    const [rowsPerPage, setRowsPerPage] = useState(5); // Sayfa başına gösterilecek öğe sayısı
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [dateError, setDateError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -124,6 +125,17 @@ function AddSowing() {
         return new Date().toISOString().split('T')[0];
     };
 
+    const validateDates = () => {
+        const minDate = getMinDate();
+        const maxDate = getMaxDate();
+        if (new Date(sowingDate) < new Date(minDate) || new Date(sowingDate) > new Date(maxDate)) {
+            setDateError(`Tarih ${minDate} ile ${maxDate} arasında olmalıdır.`);
+            return false;
+        }
+        setDateError('');
+        return true;
+    };
+
     const sortRecommendations = (recommendations) => {
         return recommendations.sort((a, b) => {
             if (sortBy === 'plantName') {
@@ -139,7 +151,7 @@ function AddSowing() {
         });
     };
 
-    const paginatedRecommendations = sortRecommendations(recommendations).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage); // Sayfalama
+    const paginatedRecommendations = sortRecommendations(recommendations).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     const handleSort = (column) => {
         const isAsc = sortBy === column && sortOrder === 'asc';
@@ -149,13 +161,13 @@ function AddSowing() {
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
-        window.scrollTo(0, 0); // Sayfa değişince en üste kaydır
+        window.scrollTo(0, 0);
     };
 
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
-        window.scrollTo(0, 0); // Satır sayısı değişince de en üste kaydır
+        window.scrollTo(0, 0);
     };
 
     const handleAddSowing = async (e, redirect = true) => {
@@ -163,6 +175,13 @@ function AddSowing() {
 
         if (!plantId || !landId || !amount || !sowingDate) {
             setSnackbarMessage('Lütfen tüm alanları doldurun.');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
+            return;
+        }
+
+        if (!validateDates()) {
+            setSnackbarMessage(dateError);
             setSnackbarSeverity('error');
             setOpenSnackbar(true);
             return;
@@ -223,7 +242,6 @@ function AddSowing() {
 
     return (
         <Container maxWidth="lg">
-
             <Box>
                 <BreadcrumbComponent pageName="Ekim Yap ve Önerilen Bitkiler" />
             </Box>
@@ -299,6 +317,7 @@ function AddSowing() {
                                 },
                             }}
                         />
+                        {dateError && <Typography color="error">{dateError}</Typography>}
 
                         <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'flex-end', gap: 3 }}>
                             <Button variant="contained" color="success" onClick={(e) => handleAddSowing(e, true)}>
@@ -308,8 +327,6 @@ function AddSowing() {
                                 Kaydetmeye Devam Et
                             </Button>
                         </Box>
-
-
                     </Box>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -371,7 +388,7 @@ function AddSowing() {
                                 rowsPerPage={rowsPerPage}
                                 onRowsPerPageChange={handleChangeRowsPerPage}
                                 labelRowsPerPage="Sayfa başına satır"
-                                rowsPerPageOptions={[3,5,7,10]} // Sayfa başına gösterilecek bitki
+                                rowsPerPageOptions={[3,5,7,10]}
                             />
                         </>
                     ) : (
@@ -392,7 +409,6 @@ function AddSowing() {
                 </Alert>
             </Snackbar>
             <ScrollToTop />
-
         </Container>
     );
 }
