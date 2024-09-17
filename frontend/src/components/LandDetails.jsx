@@ -39,6 +39,9 @@ const LandDetails = () => {
     const fetchLandDetails = async () => {
         try {
             const response = await fetch(`http://localhost:8080/lands/detail/${id}`);
+            if (!response.ok) {
+                throw new Error('Arazi bilgilerini getirirken bir hata oluştu.');
+            }
             const data = await response.json();
             const remainingArea = data.landSize - data.sowedArea;
             setLand({ ...data, remainingArea });
@@ -50,7 +53,9 @@ const LandDetails = () => {
                 fetchKoyler(data.city, data.district);
             }
         } catch (error) {
-            console.error('Error fetching land details:', error);
+            setSnackbarMessage(error.message || 'Bilinmeyen bir hata oluştu');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
         }
     };
 
@@ -73,15 +78,34 @@ const LandDetails = () => {
             body: formData,
             credentials: 'include',
         })
-            .then(response => {
+            .then(async response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    const errorText = await response.text();
+                    let errorMessage = 'Güncelleme başarısız oldu.';
+                    try {
+                        // Eğer backend'den JSON geliyorsa parse et
+                        const errorData = JSON.parse(errorText);
+                        if (errorData.message) {
+                            errorMessage = errorData.message;
+                        }
+                        if (errorData.totalSowedArea) {
+                            // Ekili alan bilgisi varsa hata mesajına ekle
+                            errorMessage += ` Toplam ekilen alan: ${errorData.totalSowedArea} m².`;
+                        }
+                    } catch (err) {
+                        // JSON hatası olursa metin olarak göster
+                        errorMessage = errorText || ` Toplam ekilen alan:  m².`;
+                    }
+                    throw new Error(errorMessage);
                 }
                 return response.json();
             })
             .then(data => {
                 setLand(data);
                 setIsEditing(false);
+                setSnackbarMessage('Arazi bilgileri başarıyla güncellendi!');
+                setSnackbarSeverity('success');
+                setOpenSnackbar(true);
                 navigate('/land-list', {
                     state: {
                         message: 'Arazi bilgileri başarıyla güncellendi!',
@@ -90,15 +114,12 @@ const LandDetails = () => {
                 });
             })
             .catch(error => {
-                console.error('Error updating land details:', error);
-                navigate('/land-list', {
-                    state: {
-                        message: 'Arazi güncellenemedi. Lütfen tekrar deneyin.',
-                        severity: 'error'
-                    }
-                });
+                setSnackbarMessage(error.message); // Backend'den gelen hata mesajını kullanıcıya göster
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
             });
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -223,14 +244,17 @@ const LandDetails = () => {
                 onClose={() => setOpenSnackbar(false)}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             >
-                <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                <Alert
+                    onClose={() => setOpenSnackbar(false)}
+                    severity={snackbarSeverity}
+                    sx={{ width: '100%' }}
+                >
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
             <ScrollToTop />
-
         </Container>
     );
 };
-
 export default LandDetails;
+

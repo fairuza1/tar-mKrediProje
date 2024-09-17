@@ -36,8 +36,9 @@ public class LandService {
     @Autowired
     private UserRepository userRepository;
 
-        public Land saveLand(LandDTO landDto, MultipartFile imageFile) {
-            User user = userRepository.findById(landDto.getUserId())
+    // Yeni arazi oluşturma işlemi
+    public Land saveLand(LandDTO landDto, MultipartFile imageFile) {
+        User user = userRepository.findById(landDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Land land = new Land();
@@ -58,10 +59,23 @@ public class LandService {
         return landRepository.save(land);
     }
 
+    // Arazi güncelleme işlemi
     public Land updateLand(Long id, @Valid LandDTO landDto, MultipartFile file) {
         Land existingLand = landRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Land not found"));
 
+        // Mevcut ekim miktarlarını al
+        int totalSowedArea = sowingRepository.findTotalSowedAreaByLandId(id);
+
+        // Kullanıcının yeni belirlediği arazi boyutu
+        int newLandSize = landDto.getLandSize();
+
+        // Eğer kullanıcı yeni arazi boyutunu ekilen toplam miktardan küçük yapmaya çalışırsa hata ver
+        if (newLandSize < totalSowedArea) {
+            throw new RuntimeException("Yeni arazi boyutu, yapılan toplam ekim alanından küçük olamaz. Toplam ekilen alan: " + totalSowedArea + " m²");
+        }
+
+        // Arazi bilgilerini güncelle
         int oldLandSize = existingLand.getLandSize();
         existingLand.setName(landDto.getName());
         existingLand.setLandSize(landDto.getLandSize());
@@ -78,11 +92,11 @@ public class LandService {
 
         // Arazi boyutu değiştiğinde remainingArea'yi yeniden hesapla
         if (landDto.getLandSize() != oldLandSize) {
-            int totalSowedArea = sowingRepository.findTotalSowedAreaByLandId(id);
             int newRemainingArea = landDto.getLandSize() - totalSowedArea;
             existingLand.setRemainingArea(newRemainingArea < 0 ? 0 : newRemainingArea);
         }
 
+        // Resim güncelleme işlemi
         if (file != null && !file.isEmpty()) {
             String imageUrl = uploadImage(file);
             existingLand.setImage(imageUrl);
@@ -91,6 +105,7 @@ public class LandService {
         return landRepository.save(existingLand);
     }
 
+    // Resim yükleme işlemi
     private String uploadImage(MultipartFile file) {
         try {
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
@@ -103,17 +118,20 @@ public class LandService {
         }
     }
 
+    // Kullanıcının arazilerini getir
     public List<LandDTO> getLandsByUser(Long userId) {
         List<Land> lands = landRepository.findByUserId(userId);
         return lands.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
+    // ID'ye göre arazi getir
     public LandDTO getLandById(Long id) {
         Land land = landRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Land not found"));
         return convertToDto(land);
     }
 
+    // Araziyi DTO'ya dönüştür
     private LandDTO convertToDto(Land land) {
         LandDTO landDto = new LandDTO();
         landDto.setId(land.getId());
