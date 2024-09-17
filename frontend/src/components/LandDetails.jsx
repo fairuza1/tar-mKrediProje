@@ -94,7 +94,7 @@ const LandDetails = () => {
                         }
                     } catch (err) {
                         // JSON hatası olursa metin olarak göster
-                        errorMessage = errorText || ` Toplam ekilen alan:  m².`;
+                        errorMessage = errorText || ` Toplam ekilen alan arazi boyundan büyük olduğu için işlem başarısız.`;
                     }
                     throw new Error(errorMessage);
                 }
