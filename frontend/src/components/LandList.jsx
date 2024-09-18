@@ -262,7 +262,15 @@ const LandList = () => {
                     ))}
                 </Grid>
                 <TablePagination
-                    sx={{marginTop:'30px',paddingTop:'20px'}}
+                    sx={{
+                        marginTop: '30px', // Üstten boşluk
+                        paddingTop: '20px', // Üstten iç boşluk
+                        // Aşağıdaki satırlar sayfanın ortasına hizalamak için
+                        display: 'flex',
+                        justifyContent: 'center', // Sayfa değiştirme kısmını yatay olarak ortalar
+                        position: 'relative', // Konumlandırma için relative
+                        bottom: 0 // Alt kısma sabitleme
+                    }}
                     component="div"
                     count={filteredLands.length}
                     page={page}
@@ -272,6 +280,7 @@ const LandList = () => {
                     labelRowsPerPage="Sayfa başına satır"
                     rowsPerPageOptions={[5, 10, 15]}
                 />
+
             </Box>
 
             <Snackbar
