@@ -22,11 +22,10 @@ import {
     Paper,
     InputAdornment,
     TextField,
-    Tooltip // Tooltip bileşeni eklendi
+    Tooltip
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from "axios";
-import {margin} from "@mui/system";
 
 const StyledIcon = styled('div')(({ selected }) => ({
     cursor: 'pointer',
@@ -106,7 +105,24 @@ const Rating = () => {
                 setHarvestCondition(0);
                 setProductQuality(0);
                 setProductQuantity('');
-                setTimeout(() => navigate('/rating-list'), 3000);
+
+                // Değerlendirme tamamlandığında yönlendirme yap
+                const ratingRedirectUrl = await axios.get(`http://localhost:8080/api/ratings/redirect?harvestId=${harvestId}`);
+                let url = ratingRedirectUrl.data;
+
+                // Harici URL'yi ayıkla
+                const baseUrl = 'http://localhost:5173/';
+                if (url.startsWith(baseUrl)) {
+                    url = url.slice(baseUrl.length); // Başlangıç kısmını kaldır
+                }
+
+                // URL'nin 'http' ile başladığını kontrol et ve yönlendir
+                if (url.startsWith('http')) {
+                    window.location.href = url;
+                } else {
+                    navigate('/rating-list'); // İç URL'ye yönlendir
+                }
+
             } else {
                 setSnackbarMessage('Değerlendirme kaydedilemedi.');
                 setSnackbarSeverity('error');
@@ -144,11 +160,11 @@ const Rating = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '20px' }}></TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '20px',margin:'8px' }}>Çok Kötü</TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '20px',margin:'8px' }}>Kötü</TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '20px',margin:'8px' }}>Ne İyi Ne Kötü</TableCell>
-                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '20px',margin:'8px' }}>İyi</TableCell>
-                                <TableCell align="center" sx={{ fontSize: '1.2rem', padding: '20px',margin:'8px' }}>Çok iyi</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '20px' }}>Çok Kötü</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '20px' }}>Kötü</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '20px' }}>Ne İyi Ne Kötü</TableCell>
+                                <TableCell align="center" sx={{ borderRight: '1px solid #ddd', fontSize: '1.2rem', padding: '20px' }}>İyi</TableCell>
+                                <TableCell align="center" sx={{ fontSize: '1.2rem', padding: '20px' }}>Çok iyi</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -193,59 +209,47 @@ const Rating = () => {
                                 </TableCellCustom>
                             </TableRow>
                             <TableRow>
-                                <TableCell component="th" scope="row" sx={{
-                                    borderRight: '1px solid #ddd',
-                                    fontSize: '1.5rem',
-                                    padding: '8px',
-                                    paddingTop: '16px'
-                                }}>
+                                <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd', fontSize: '1.5rem', padding: '8px', paddingTop: '16px' }}>
                                     Ürün Kalitesi
                                 </TableCell>
                                 <TableCellCustom align="center">
                                     <Tooltip title="1 Puan" arrow>
-                                        <StyledIcon selected={productQuality === 1}
-                                                    onClick={() => setProductQuality(1)}>
-                                            <SentimentVeryDissatisfiedIcon
-                                                style={{color: '#FF1744', fontSize: '1.8rem'}}/>
+                                        <StyledIcon selected={productQuality === 1} onClick={() => setProductQuality(1)}>
+                                            <SentimentVeryDissatisfiedIcon style={{ color: '#FF1744', fontSize: '1.8rem' }} />
                                         </StyledIcon>
                                     </Tooltip>
                                 </TableCellCustom>
                                 <TableCellCustom align="center">
                                     <Tooltip title="2 Puan" arrow>
-                                        <StyledIcon selected={productQuality === 2}
-                                                    onClick={() => setProductQuality(2)}>
-                                            <SentimentDissatisfiedIcon style={{color: '#FF9100', fontSize: '1.8rem'}}/>
+                                        <StyledIcon selected={productQuality === 2} onClick={() => setProductQuality(2)}>
+                                            <SentimentDissatisfiedIcon style={{ color: '#FF9100', fontSize: '1.8rem' }} />
                                         </StyledIcon>
                                     </Tooltip>
                                 </TableCellCustom>
                                 <TableCellCustom align="center">
                                     <Tooltip title="3 Puan" arrow>
-                                        <StyledIcon selected={productQuality === 3}
-                                                    onClick={() => setProductQuality(3)}>
-                                            <SentimentSatisfiedIcon style={{color: '#FFD600', fontSize: '1.8rem'}}/>
+                                        <StyledIcon selected={productQuality === 3} onClick={() => setProductQuality(3)}>
+                                            <SentimentSatisfiedIcon style={{ color: '#FFD600', fontSize: '1.8rem' }} />
                                         </StyledIcon>
                                     </Tooltip>
                                 </TableCellCustom>
                                 <TableCellCustom align="center">
                                     <Tooltip title="4 Puan" arrow>
-                                        <StyledIcon selected={productQuality === 4}
-                                                    onClick={() => setProductQuality(4)}>
-                                            <SentimentSatisfiedAltIcon style={{color: '#76FF03', fontSize: '1.8rem'}}/>
+                                        <StyledIcon selected={productQuality === 4} onClick={() => setProductQuality(4)}>
+                                            <SentimentSatisfiedAltIcon style={{ color: '#76FF03', fontSize: '1.8rem' }} />
                                         </StyledIcon>
                                     </Tooltip>
                                 </TableCellCustom>
-
                                 <TableCellCustom align="center">
                                     <Tooltip title="5 Puan" arrow>
-                                        <StyledIcon selected={productQuality === 5}
-                                                    onClick={() => setProductQuality(5)}>
-                                            <SentimentVerySatisfiedIcon style={{color: '#00E676', fontSize: '1.8rem'}}/>
+                                        <StyledIcon selected={productQuality === 5} onClick={() => setProductQuality(5)}>
+                                            <SentimentVerySatisfiedIcon style={{ color: '#00E676', fontSize: '1.8rem' }} />
                                         </StyledIcon>
                                     </Tooltip>
                                 </TableCellCustom>
                             </TableRow>
                             <TableRow>
-                            <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd', fontSize: '1.5rem', padding: '8px' }}>
+                                <TableCell component="th" scope="row" sx={{ borderRight: '1px solid #ddd', fontSize: '1.5rem', padding: '8px' }}>
                                     Genel Değerlendirme
                                 </TableCell>
                                 <TableCell colSpan={5} align="center" sx={{ padding: '8px' }}>
@@ -284,7 +288,7 @@ const Rating = () => {
             </Box>
 
             <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose}  anchorOrigin={{ vertical: 'top', horizontal: 'center' }} severity={snackbarSeverity} sx={{ width: '100%', fontSize: '1.2rem' }}>
+                <Alert onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} severity={snackbarSeverity} sx={{ width: '100%', fontSize: '1.2rem' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

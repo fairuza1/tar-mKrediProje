@@ -167,4 +167,31 @@ public class RatingService {
         List<Rating> ratings = ratingRepository.findByHarvestId(harvestId);
         return ratings.isEmpty(); // Eğer boşsa, bu hasat için ilk değerlendirme yapılıyor demektir
     }
+    private String getRedirectionUrlForPlant(String plantName) {
+        switch (plantName.toLowerCase()) {
+            case "elma":
+                return "https://www.tarimkredi.org.tr/urunler/elma-yetistiriciligi";
+            case "domates":
+                return "https://www.hektas.com.tr/domates-yetistiriciligi";
+            case "biber":
+                return "https://www.hektas.com.tr/biber-yetistiriciligi";
+            // Diğer bitkiler için eklemeler yapabilirsiniz
+            default:
+                return "https://www.wikipedia.org"; // Varsayılan yönlendirme
+        }
+    }
+    public String getRedirectUrlBasedOnRating(Long harvestId) {
+        List<Rating> ratings = findByHarvestId(harvestId);
+        for (Rating rating : ratings) {
+            String plantName = rating.getHarvest().getSowing().getPlant().getName();
+            double ratingScore = rating.getOverallRating();
+
+            if (ratingScore < 2.5) {
+                return getRedirectionUrlForPlant(plantName);
+            }
+        }
+        return "/rating-list"; // Puan 2.5 ve üzerinde ise RatingList'e yönlendir
+    }
+
+
 }

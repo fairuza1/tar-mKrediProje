@@ -72,5 +72,9 @@ public class RatingController {
         response.put("isFirstEvaluation", isFirstEvaluation);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    @GetMapping("/redirect")
+    public ResponseEntity<String> getRedirectionUrl(@RequestParam Long harvestId) {
+        String redirectUrl = ratingService.getRedirectUrlBasedOnRating(harvestId);
+        return ResponseEntity.ok(redirectUrl);
+    }
 }
