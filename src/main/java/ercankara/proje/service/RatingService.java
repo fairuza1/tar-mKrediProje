@@ -170,16 +170,98 @@ public class RatingService {
     private String getRedirectionUrlForPlant(String plantName) {
         switch (plantName.toLowerCase()) {
             case "elma":
-                return "https://www.tarimkredi.org.tr/urunler/elma-yetistiriciligi";
+                return "https://tr.wikipedia.org/wiki/Elma";
+            case "armut":
+                return "https://tr.wikipedia.org/wiki/Armut";
+            case "kiraz":
+                return "https://tr.wikipedia.org/wiki/Kiraz";
+            case "visne":
+                return "https://tr.wikipedia.org/wiki/Vişne";
+            case "seftali":
+                return "https://tr.wikipedia.org/wiki/Şeftali";
             case "domates":
-                return "https://www.hektas.com.tr/domates-yetistiriciligi";
+                return "https://tr.wikipedia.org/wiki/Domates";
+            case "salatalik":
+                return "https://tr.wikipedia.org/wiki/Salatalık";
             case "biber":
-                return "https://www.hektas.com.tr/biber-yetistiriciligi";
-            // Diğer bitkiler için eklemeler yapabilirsiniz
+                return "https://tr.wikipedia.org/wiki/Biber";
+            case "patlican":
+                return "https://tr.wikipedia.org/wiki/Patlıcan";
+            case "havuc":
+                return "https://tr.wikipedia.org/wiki/Havuç";
+            case "nohut":
+                return "https://tr.wikipedia.org/wiki/Nohut";
+            case "mercimek":
+                return "https://tr.wikipedia.org/wiki/Mercimek";
+            case "fasulye":
+                return "https://tr.wikipedia.org/wiki/Fasulye";
+            case "bakla":
+                return "https://tr.wikipedia.org/wiki/Bakla";
+            case "bezelye":
+                return "https://tr.wikipedia.org/wiki/Bezelye";
+            case "aycicegi":
+                return "https://tr.wikipedia.org/wiki/Ayçiçeği";
+            case "soya fasulyesi":
+                return "https://tr.wikipedia.org/wiki/Soya_fasulyesi";
+            case "kanola":
+                return "https://tr.wikipedia.org/wiki/Kanola";
+            case "pamuk":
+                return "https://tr.wikipedia.org/wiki/Pamuk";
+            case "susam":
+                return "https://tr.wikipedia.org/wiki/Susam";
+            case "nane":
+                return "https://tr.wikipedia.org/wiki/Nane";
+            case "adacayi":
+                return "https://tr.wikipedia.org/wiki/Adaçayı";
+            case "melisa":
+                return "https://tr.wikipedia.org/wiki/Melisa";
+            case "kekik":
+                return "https://tr.wikipedia.org/wiki/Kekik";
+            case "civanpercemi":
+                return "https://tr.wikipedia.org/wiki/Civanperçemi";
+            case "yonca":
+                return "https://tr.wikipedia.org/wiki/Yonca";
+            case "korunga":
+                return "https://tr.wikipedia.org/wiki/Korunga";
+            case "fig":
+                return "https://tr.wikipedia.org/wiki/Fiğ";
+            case "yemlik":
+                return "https://tr.wikipedia.org/wiki/Yemlik";
+            case "cayir ucgulu":
+                return "https://tr.wikipedia.org/wiki/Çayır_üçgülü";
+            case "kimyon":
+                return "https://tr.wikipedia.org/wiki/Kimyon";
+            case "anason":
+                return "https://tr.wikipedia.org/wiki/Anason";
+            case "rezene":
+                return "https://tr.wikipedia.org/wiki/Rezene";
+            case "kisnis":
+                return "https://tr.wikipedia.org/wiki/Kişniş";
+            case "corekotu":
+                return "https://tr.wikipedia.org/wiki/Çörekotu";
+            case "gul":
+                return "https://tr.wikipedia.org/wiki/Gül";
+            case "lale":
+                return "https://tr.wikipedia.org/wiki/Lale";
+            case "sumbul":
+                return "https://tr.wikipedia.org/wiki/Sümbül";
+            case "menekse":
+                return "https://tr.wikipedia.org/wiki/Menekşe";
+            case "papatya":
+                return "https://tr.wikipedia.org/wiki/Papatya";
+            case "tutun":
+                return "https://tr.wikipedia.org/wiki/Tütün";
+            case "seker pancari":
+                return "https://tr.wikipedia.org/wiki/Şeker_pancarı";
+            case "keten":
+                return "https://tr.wikipedia.org/wiki/Keten";
+            case "kenevir":
+                return "https://tr.wikipedia.org/wiki/Kenevir";
             default:
                 return "https://www.wikipedia.org"; // Varsayılan yönlendirme
         }
     }
+
     public String getRedirectUrlBasedOnRating(Long harvestId) {
         List<Rating> ratings = findByHarvestId(harvestId);
         for (Rating rating : ratings) {
