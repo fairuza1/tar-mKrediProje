@@ -265,9 +265,12 @@ const RatingList = () => {
                                     />
                                     <CardHeader
                                         title={`Arazi Adı: ${land ? land.name : 'Bilinmiyor'}`}
-                                        subheader={`Arazi Türü: ${land ? land.landType : 'Bilinmiyor'}`}
+                                        subheader={`Arazi Türü : ${land ? land.landType : 'Bilinmiyor'}`}
+                                        sx={{marginBottom:'0px',paddingBottom:'10'}}
                                     />
-                                    <CardContent>
+                                    <CardContent
+                                    sx={{marginTop:'0px',paddingTop:'0px'}}
+                                    >
                                         <Typography variant="body2" color="text.secondary">
                                             Bitki Adı <span style={{ marginLeft: '51px' }}>:{plantName}</span>
                                         </Typography>

@@ -173,21 +173,23 @@ public class RatingService {
                 return "https://tr.wikipedia.org/wiki/Elma";
             case "armut":
                 return "https://tr.wikipedia.org/wiki/Armut";
+            case "buğday":
+                return "https://tr.wikipedia.org/wiki/Buğday";
             case "kiraz":
                 return "https://tr.wikipedia.org/wiki/Kiraz";
             case "visne":
                 return "https://tr.wikipedia.org/wiki/Vişne";
-            case "seftali":
+            case "şeftali":
                 return "https://tr.wikipedia.org/wiki/Şeftali";
             case "domates":
                 return "https://tr.wikipedia.org/wiki/Domates";
-            case "salatalik":
+            case "salatalık":
                 return "https://tr.wikipedia.org/wiki/Salatalık";
             case "biber":
                 return "https://tr.wikipedia.org/wiki/Biber";
-            case "patlican":
+            case "patlıcan":
                 return "https://tr.wikipedia.org/wiki/Patlıcan";
-            case "havuc":
+            case "havuç":
                 return "https://tr.wikipedia.org/wiki/Havuç";
             case "nohut":
                 return "https://tr.wikipedia.org/wiki/Nohut";
@@ -199,7 +201,7 @@ public class RatingService {
                 return "https://tr.wikipedia.org/wiki/Bakla";
             case "bezelye":
                 return "https://tr.wikipedia.org/wiki/Bezelye";
-            case "aycicegi":
+            case "ayçiçeği":
                 return "https://tr.wikipedia.org/wiki/Ayçiçeği";
             case "soya fasulyesi":
                 return "https://tr.wikipedia.org/wiki/Soya_fasulyesi";
@@ -211,23 +213,23 @@ public class RatingService {
                 return "https://tr.wikipedia.org/wiki/Susam";
             case "nane":
                 return "https://tr.wikipedia.org/wiki/Nane";
-            case "adacayi":
+            case "adaçayı":
                 return "https://tr.wikipedia.org/wiki/Adaçayı";
             case "melisa":
                 return "https://tr.wikipedia.org/wiki/Melisa";
             case "kekik":
                 return "https://tr.wikipedia.org/wiki/Kekik";
-            case "civanpercemi":
+            case "civanperçemi":
                 return "https://tr.wikipedia.org/wiki/Civanperçemi";
             case "yonca":
                 return "https://tr.wikipedia.org/wiki/Yonca";
             case "korunga":
                 return "https://tr.wikipedia.org/wiki/Korunga";
-            case "fig":
+            case "fiğ":
                 return "https://tr.wikipedia.org/wiki/Fiğ";
             case "yemlik":
                 return "https://tr.wikipedia.org/wiki/Yemlik";
-            case "cayir ucgulu":
+            case "çayır üçgülü":
                 return "https://tr.wikipedia.org/wiki/Çayır_üçgülü";
             case "kimyon":
                 return "https://tr.wikipedia.org/wiki/Kimyon";
@@ -235,30 +237,30 @@ public class RatingService {
                 return "https://tr.wikipedia.org/wiki/Anason";
             case "rezene":
                 return "https://tr.wikipedia.org/wiki/Rezene";
-            case "kisnis":
+            case "kişniş":
                 return "https://tr.wikipedia.org/wiki/Kişniş";
-            case "corekotu":
+            case "çörekotu":
                 return "https://tr.wikipedia.org/wiki/Çörekotu";
-            case "gul":
+            case "gül":
                 return "https://tr.wikipedia.org/wiki/Gül";
             case "lale":
                 return "https://tr.wikipedia.org/wiki/Lale";
-            case "sumbul":
+            case "sümbül":
                 return "https://tr.wikipedia.org/wiki/Sümbül";
-            case "menekse":
+            case "menekşe":
                 return "https://tr.wikipedia.org/wiki/Menekşe";
             case "papatya":
                 return "https://tr.wikipedia.org/wiki/Papatya";
-            case "tutun":
+            case "tütün":
                 return "https://tr.wikipedia.org/wiki/Tütün";
-            case "seker pancari":
+            case "şeker pancarı":
                 return "https://tr.wikipedia.org/wiki/Şeker_pancarı";
             case "keten":
                 return "https://tr.wikipedia.org/wiki/Keten";
             case "kenevir":
                 return "https://tr.wikipedia.org/wiki/Kenevir";
             default:
-                return "https://www.wikipedia.org"; // Varsayılan yönlendirme
+                return ""; // Varsayılan yönlendirme
         }
     }
 
