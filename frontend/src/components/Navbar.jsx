@@ -21,7 +21,8 @@ const pages = [
     { title: 'Ekim Yap', link: 'sowings' },
     { title: 'Ekim Listesi', link: 'sowing-list' },
     { title: 'Hasat Listesi', link: 'harvest' },
-    { title: 'Değerlendirme Listesi', link: 'rating-list' }
+    { title: 'Değerlendirme Listesi', link: 'rating-list' },
+    { title: 'Analizler', link: 'analyzes' }
 ];
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {

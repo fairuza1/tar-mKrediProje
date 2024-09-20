@@ -15,6 +15,7 @@ import SowingDetails from './components/SowingDetails.jsx';
 import Harvest from './components/Harvest.jsx';
 import Rating from './components/Rating.jsx';
 import RatingList from './components/RatingList.jsx';
+import AnalysisPage from './components/AnalysisPage.jsx'
 import './App.css';
 
 function App() {
@@ -79,6 +80,7 @@ function AppContent({ isLoggedIn, setIsLoggedIn }) {
                     <Route path="/harvest" element={isLoggedIn ? <Harvest /> : <Navigate to="/login" />} />
                     <Route path="/rating/:harvestId" element={isLoggedIn ? <Rating /> : <Navigate to="/login" />} />
                     <Route path="/rating-list" element={isLoggedIn ? <RatingList /> : <Navigate to="/login" />} />
+                    <Route path="/analyzes" element={isLoggedIn ? <AnalysisPage /> : <Navigate to="/login" />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
                 </Routes>

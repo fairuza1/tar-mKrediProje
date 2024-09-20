@@ -27,6 +27,8 @@ const cards = [
     { title: '', description: '', button: 'Ekimlerim', link: '/sowing-list', image:card5 },
     { title: '', description: '', button: 'Hasatlarım',link: '/harvest', image: card6 },
     { title: '', button: 'Hasatları Değerlendir', link: '/rating-list', image: card3 },
+    { title: '', button: 'Analizler', link: '/analyzes', image: card3 },
+
 
 ];
 
