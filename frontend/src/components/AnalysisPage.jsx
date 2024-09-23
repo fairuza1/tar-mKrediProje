@@ -6,6 +6,10 @@ import Typography from '@mui/material/Typography';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import axios from 'axios';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const AnalysisPage = () => {
     const [landData, setLandData] = useState([]);
@@ -58,14 +62,12 @@ const AnalysisPage = () => {
 
     const handleLandChange = (event) => {
         setSelectedLand(event.target.value);
-        // Burada, seçilen araziye göre bitkileri filtrele
         const filteredFruits = sowingData.filter(sowing => sowing.landId === event.target.value);
         setFruitData(filteredFruits);
     };
 
     const handleFruitChange = (event) => {
         setSelectedFruit(event.target.value);
-        // Seçilen meyveye göre verileri filtrele ve line chart'ta göster
     };
 
     const groupedData = landData.reduce((acc, land) => {
@@ -89,50 +91,69 @@ const AnalysisPage = () => {
                 Analizler
             </Typography>
 
-            <Typography variant="h6" gutterBottom>
-                Şehir Bazında Arazi Dağılımı
-            </Typography>
-            <ResponsiveContainer width="100%" height={500}>
-                <PieChart>
-                    <Pie
-                        data={barData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                        outerRadius={200}
-                        dataKey="value"
-                    >
-                        {barData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip />
-                </PieChart>
-            </ResponsiveContainer>
+            {/* Accordion 1: Şehir Bazında Arazi Dağılımı */}
+            <Accordion>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                >
+                    <Typography variant="h6">Şehir Bazında Arazi Dağılımı</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <ResponsiveContainer width="100%" height={500}>
+                        <PieChart>
+                            <Pie
+                                data={barData}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                                outerRadius={200}
+                                dataKey="value"
+                            >
+                                {barData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </AccordionDetails>
+            </Accordion>
 
-            <Typography variant="h6" gutterBottom>
-                Hasat Durumu
-            </Typography>
-            <ResponsiveContainer width="100%" height={400}>
-                <PieChart>
-                    <Pie
-                        data={harvestPieData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                        outerRadius={150}
-                        dataKey="value"
-                    >
-                        {harvestPieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip />
-                </PieChart>
-            </ResponsiveContainer>
+            {/* Accordion 2: Hasat Durumu */}
+            <Accordion>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel2a-content"
+                    id="panel2a-header"
+                >
+                    <Typography variant="h6">Hasat Durumu</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <ResponsiveContainer width="100%" height={400}>
+                        <PieChart>
+                            <Pie
+                                data={harvestPieData}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                                outerRadius={150}
+                                dataKey="value"
+                            >
+                                {harvestPieData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </AccordionDetails>
+            </Accordion>
 
+            {/* Arazi ve meyve seçimi */}
             <Typography variant="h6" gutterBottom>
                 Arazi Seçin
             </Typography>
