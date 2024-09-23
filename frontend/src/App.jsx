@@ -25,7 +25,7 @@ function App() {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await fetch('/auth/validate-token', {
+                const response = await fetch('http://localhost:8080/auth/validate-token', {
                     method: 'GET',
                     credentials: 'include', // JWT'yi içeren cookie'yi gönderir
                 });

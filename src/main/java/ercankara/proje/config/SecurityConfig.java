@@ -42,11 +42,6 @@ public class SecurityConfig {
                         .requestMatchers("/harvests/**").permitAll()
                         .requestMatchers("/api/ratings/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
-
-
-
-
-
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

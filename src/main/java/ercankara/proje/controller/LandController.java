@@ -38,7 +38,7 @@ public class LandController {
     public ResponseEntity<LandDTO> createLand(@RequestPart("land") LandDTO landDto,
                                               @RequestPart(value = "file", required = false) MultipartFile file) {
         if (landDto.getUserId() == null) {
-            throw new IllegalArgumentException("User ID must not be null");
+            throw new IllegalArgumentException("User ID boş olamaz.");
         }
 
         User user = userRepository.findById(landDto.getUserId())
