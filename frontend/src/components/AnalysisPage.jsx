@@ -70,6 +70,9 @@ const AnalysisPage = () => {
         setSelectedFruit(event.target.value);
     };
 
+    // Benzersiz bitki isimlerini filtreleme
+    const uniqueFruits = [...new Map(fruitData.map(item => [item['plantName'], item])).values()];
+
     const groupedData = landData.reduce((acc, land) => {
         const city = land.city;
         acc[city] = (acc[city] || 0) + 1;
@@ -169,7 +172,7 @@ const AnalysisPage = () => {
                 Meyve Seçin
             </Typography>
             <Select value={selectedFruit} onChange={handleFruitChange} fullWidth>
-                {fruitData.map((fruit) => (
+                {uniqueFruits.map((fruit) => (
                     <MenuItem key={fruit.id} value={fruit.plantName}>
                         {fruit.plantName}
                     </MenuItem>
