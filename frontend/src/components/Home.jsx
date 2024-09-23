@@ -16,6 +16,7 @@ import card3 from '../assets/card3.jpg';
 import card4 from '../assets/card4.jpg';
 import card5 from '../assets/card5.jpg';
 import card6 from '../assets/card6.jpg';
+import card7 from  '../assets/card7.jpg'
 
 
 const pageName = "Ekim Yap"
@@ -27,7 +28,7 @@ const cards = [
     { title: '', description: '', button: 'Ekimlerim', link: '/sowing-list', image:card5 },
     { title: '', description: '', button: 'Hasatlarım',link: '/harvest', image: card6 },
     { title: '', button: 'Hasatları Değerlendir', link: '/rating-list', image: card3 },
-    { title: '', button: 'Analizler', link: '/analyzes', image: card3 },
+    { title: '', button: 'Analizler', link: '/analyzes', image: card7 },
 
 
 ];
