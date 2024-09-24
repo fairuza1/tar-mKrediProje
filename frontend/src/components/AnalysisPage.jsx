@@ -19,6 +19,7 @@ const AnalysisPage = () => {
     const [selectedFruit, setSelectedFruit] = useState('');
     const [fruitData, setFruitData] = useState([]);
     const [selectedCity, setSelectedCity] = useState('');
+    const [ratings, setRatings] = useState([]); // Rating durumu eklendi
 
     useEffect(() => {
         const fetchLands = async () => {
@@ -49,7 +50,15 @@ const AnalysisPage = () => {
                 return [];
             }
         };
-
+        const fetchRatings = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/ratings', { withCredentials: true });
+                return response.data; // Gelen veriyi doğrudan döndür
+            } catch (error) {
+                console.error('Error fetching ratings:', error);
+                return []; // Hata durumunda boş bir dizi döndür
+            }
+        };
         const calculateHarvestData = async (sowingData) => {
             const harvestIds = await fetchHarvests();
             const harvestedCount = sowingData.filter(sowing => harvestIds.includes(sowing.id)).length;
@@ -251,10 +260,20 @@ const AnalysisPage = () => {
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="sowingDate" />
                                 <YAxis />
-                                <Tooltip />
+                                <Tooltip
+                                    formatter={(value, name, props) => {
+                                        const productQuantity = props.active ? props.payload[0].productQuantity : null;  // Backend'den gelen productQuantity
+                                        if (name === 'amount') {
+                                            return [`Miktar: ${value}`, `Ürün Miktarı: ${productQuantity !== null ? `${productQuantity} kg` : 'Bilgi yok'}`];
+                                        }
+                                        return value;
+                                    }}
+                                />
+
                                 <Line type="monotone" dataKey="amount" stroke="#8884d8" activeDot={{ r: 8 }} />
                             </LineChart>
                         </ResponsiveContainer>
+
                     )}
                 </>
             )}
