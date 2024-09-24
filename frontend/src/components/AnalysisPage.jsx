@@ -18,6 +18,7 @@ const AnalysisPage = () => {
     const [selectedLand, setSelectedLand] = useState('');
     const [selectedFruit, setSelectedFruit] = useState('');
     const [fruitData, setFruitData] = useState([]);
+    const [selectedCity, setSelectedCity] = useState('');
 
     useEffect(() => {
         const fetchLands = async () => {
@@ -64,22 +65,36 @@ const AnalysisPage = () => {
         setSelectedLand(event.target.value);
         const filteredFruits = sowingData.filter(sowing => sowing.landId === event.target.value);
         setFruitData(filteredFruits);
+        setSelectedFruit('');  // Meyve seçimini sıfırlıyoruz
     };
 
     const handleFruitChange = (event) => {
         setSelectedFruit(event.target.value);
     };
 
+    const handleCityChange = (event) => {
+        setSelectedCity(event.target.value);
+    };
+
     // Benzersiz bitki isimlerini filtreleme
     const uniqueFruits = [...new Map(fruitData.map(item => [item['plantName'], item])).values()];
 
-    const groupedData = landData.reduce((acc, land) => {
+    const groupedDataByCity = landData.reduce((acc, land) => {
         const city = land.city;
         acc[city] = (acc[city] || 0) + 1;
         return acc;
     }, {});
 
-    const barData = Object.entries(groupedData).map(([name, value]) => ({ name, value }));
+    const groupedDataByDistrict = landData
+        .filter(land => land.city === selectedCity)
+        .reduce((acc, land) => {
+            const district = land.district;
+            acc[district] = (acc[district] || 0) + 1;
+            return acc;
+        }, {});
+
+    const cityData = Object.entries(groupedDataByCity).map(([name, value]) => ({ name, value }));
+    const districtData = Object.entries(groupedDataByDistrict).map(([name, value]) => ({ name, value }));
 
     const harvestPieData = [
         { name: 'Hasat Edilmiş', value: harvestData.harvested },
@@ -107,7 +122,7 @@ const AnalysisPage = () => {
                     <ResponsiveContainer width="100%" height={500}>
                         <PieChart>
                             <Pie
-                                data={barData}
+                                data={cityData}
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
@@ -115,7 +130,7 @@ const AnalysisPage = () => {
                                 outerRadius={200}
                                 dataKey="value"
                             >
-                                {barData.map((entry, index) => (
+                                {cityData.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
@@ -125,12 +140,54 @@ const AnalysisPage = () => {
                 </AccordionDetails>
             </Accordion>
 
-            {/* Accordion 2: Hasat Durumu */}
+            {/* Accordion 2: İlçe Bazında Arazi Dağılımı */}
             <Accordion>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel2a-content"
                     id="panel2a-header"
+                >
+                    <Typography variant="h6">İlçe Bazında Arazi Dağılımı</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Typography variant="h6" gutterBottom>
+                        Şehir Seçin
+                    </Typography>
+                    <Select value={selectedCity} onChange={handleCityChange} fullWidth>
+                        {Object.keys(groupedDataByCity).map((city) => (
+                            <MenuItem key={city} value={city}>
+                                {city}
+                            </MenuItem>
+                        ))}
+                    </Select>
+
+                    <ResponsiveContainer width="100%" height={500}>
+                        <PieChart>
+                            <Pie
+                                data={districtData}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                                outerRadius={200}
+                                dataKey="value"
+                            >
+                                {districtData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </AccordionDetails>
+            </Accordion>
+
+            {/* Accordion 3: Hasat Durumu */}
+            <Accordion>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel3a-content"
+                    id="panel3a-header"
                 >
                     <Typography variant="h6">Hasat Durumu</Typography>
                 </AccordionSummary>
@@ -168,29 +225,39 @@ const AnalysisPage = () => {
                 ))}
             </Select>
 
-            <Typography variant="h6" gutterBottom>
-                Meyve Seçin
-            </Typography>
-            <Select value={selectedFruit} onChange={handleFruitChange} fullWidth>
-                {uniqueFruits.map((fruit) => (
-                    <MenuItem key={fruit.id} value={fruit.plantName}>
-                        {fruit.plantName}
-                    </MenuItem>
-                ))}
-            </Select>
+            {/* Eğer bir arazi seçilmediyse meyve seçimi ve grafik gösterilmez */}
+            {selectedLand && (
+                <>
+                    <Typography variant="h6" gutterBottom>
+                        Meyve Seçin
+                    </Typography>
+                    <Select value={selectedFruit} onChange={handleFruitChange} fullWidth>
+                        {uniqueFruits.map((sowing) => (
+                            <MenuItem key={sowing.id} value={sowing.plantName}>
+                                {sowing.plantName}
+                            </MenuItem>
+                        ))}
+                    </Select>
 
-            <Typography variant="h6" gutterBottom>
-                Seçilen Meyve Verileri
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={fruitData.filter(fruit => fruit.plantName === selectedFruit)}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="amount" stroke="#8884d8" />
-                </LineChart>
-            </ResponsiveContainer>
+                    {/* Meyve analizi ve grafikler */}
+                    {selectedFruit && (
+                        <ResponsiveContainer width="100%" height={500}>
+                            <LineChart
+                                data={fruitData.filter(sowing => sowing.plantName === selectedFruit)}
+                                margin={{
+                                    top: 5, right: 30, left: 20, bottom: 5,
+                                }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="sowingDate" />
+                                <YAxis />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="amount" stroke="#8884d8" activeDot={{ r: 8 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    )}
+                </>
+            )}
         </Container>
     );
 };
