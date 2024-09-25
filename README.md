@@ -168,4 +168,7 @@ INSERT INTO plants (id, name, category_id) VALUES
 
 **Proje hakkında sorularınız veya önerileriniz varsa, benimle [karae0618@gmail.com] üzerinden iletişime geçebilirsiniz.**
 
+## **Projeye Ait Bazı Görseller**
+
+
 
