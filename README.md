@@ -1,5 +1,5 @@
 **Proje Hakkında
-Bu proje, Spring Boot ve React kullanılarak geliştirilmiş bir web uygulamasıdır. Proje, tarım ve bitki yetiştiriciliği süreçlerini yönetmek ve izlemek amacıyla geliştirilmiştir. Kullanıcılar, ekim alanlarını, hasat bilgilerini ve ürünlerin değerlendirmelerini kolayca takip edebilirler.
+**Bu proje, Spring Boot ve React kullanılarak geliştirilmiş bir web uygulamasıdır. Proje, tarım ve bitki yetiştiriciliği süreçlerini yönetmek ve izlemek amacıyla geliştirilmiştir. Kullanıcılar, ekim alanlarını, hasat bilgilerini ve ürünlerin değerlendirmelerini kolayca takip edebilirler.
 
 Özellikler
 Arazi Yönetimi: Arazilerin listelenmesi, ekim ve hasat bilgileri.
